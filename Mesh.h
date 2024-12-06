@@ -135,7 +135,7 @@ public:
 	std::vector<unsigned int> indices; 
 	std::vector<VertexBoneData> bones; // this has to be manually constructed  
 
-	std::map<std::string, uint32_t> BoneName2IndexMap;
+	std::map<std::string, uint32_t> boneName2IndexMap;
 
 	struct BoneInfo { 
 		glm::mat4 currBone2ParentBoneCoord; // matrix that chnages coord from CurrentBoneCoord ParentBoneCoord
@@ -147,7 +147,7 @@ public:
 		}
 	};
 
-	std::vector<BoneInfo> BoneInfo;  // map from boneID -> BoneInfo 
+	std::vector<BoneInfo> boneID2BoneInfo;  // map from boneID -> BoneInfo 
 	glm::mat4 GlobalInverseTransform; // wtf is this??????
 
 	RiggedMesh() {}; 
@@ -159,7 +159,7 @@ public:
 	void Render(); 
 
 	uint32_t NumBones() {
-		return (uint32_t)BoneName2IndexMap.size(); 
+		return (uint32_t)boneName2IndexMap.size(); 
 	}
 
 	Transform& GetModel2WorldTransform() {
@@ -178,6 +178,14 @@ private:
 	void ReserveSpace(unsigned int numVertices, unsigned int numIndices); // why? why reserve space? just use vector 
 
 	void InitAllMeshes(const aiScene* ptrScene); 
+
+	void InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh);
+
+	void LoadMeshBones(uint32_t MeshIndex, const aiMesh* ptrMesh); 
+
+	void LoadSingleBone(uint32_t MeshIndex, const aiBone* ptrBone); 
+
+	int GetBoneId(const aiBone* ptrBone);
 
 	// bool InitMaterials(const aiScene* ptrScene, const std::string& filename); todo or to trash
 

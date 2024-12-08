@@ -15,19 +15,19 @@
 
 #define MAX_NUM_BONES_PER_VERTEX 4 
 
-class VertexBoneData {
-public:
-	uint32_t BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 }; 
-	float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
-
-	VertextBoneData();
-
-	void AddBoneData(uint32_t BoneID, float Weight);
-};
+//class VertexBoneData {
+//public:
+//	uint32_t BoneIndexs[MAX_NUM_BONES_PER_VERTEX] = { 0 }; 
+//	float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
+//
+//	VertextBoneData();
+//
+//	void AddBoneData(uint32_t BoneIndex, float Weight);
+//};
 
 struct Mesh {
 	GLuint VAO, VBO, EBO;
-	GLuint textureID;
+	GLuint textureIndex;
 	int indexCount = 0;
 }; 
 
@@ -43,70 +43,37 @@ class SkinnedMesh {
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals |  aiProcess_JoinIdenticalVertices ) 
 
 
-class SceneLoader {
-public: 
-	std::vector<Mesh*> meshes; 
-
-
-	std::vector<VertexBoneData> vertexID2BoneDatas; // vertex id -> Bone data
-	std::vector<int> mesh_base_vertex;
-	std::map<std::string, uint32_t> bone_name_to_index_map;
-
-	SceneLoader();
-
-	~SceneLoader();
-
-
-	int GetBoneID(const aiBone* pBone); 
-	void ParseSingleBone(int mesh_index, const aiBone* pBone);
-	void ParseMeshBones(int mesh_index, const aiMesh* pMesh); 
-	void ParseMeshes(const aiScene* pScene); 
-	void ParseScene(const aiScene* pScene);
-
-	Mesh LoadModel(const std::string& path);
-	void AddMesh(const std::string& path);
-}; 
-
-
-class RiggedMesh {
-public:
-	struct VertexBoneData {
-		uint32_t BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 }; 
-		float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f }; 
-
-		VertexBoneData() {
-
-		}
-
-		void AddBoneData(uint32_t BoneID, float Weight) {
-			for (uint32_t i = 0; i < std::size(BoneIDs); i++) {
-				if (Weights[i] == 0.0) { // if one of the weight is empty, 
-					BoneIDs[i] = BoneID; // take its 
-					Weights[i] = Weight;
-					//printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
-					return;
-				}
-			}
-
-			// should never get here - more bones than we have space for
-			assert(0);
-		}
-	};
-
+//class SceneLoader {
+//public: 
+//	std::vector<Mesh*> meshes; 
+//
+//
+//	std::vector<VertexBoneData> vertexIndex2BoneDatas; // vertex id -> Bone data
+//	std::vector<int> mesh_base_vertex;
+//	std::map<std::string, uint32_t> bone_name_to_index_map;
+//
+//	SceneLoader();
+//
+//	~SceneLoader();
+//
+//
+//	int GetBoneIndex(const aiBone* pBone); 
+//	void ParseSingleBone(int mesh_index, const aiBone* pBone);
+//	void ParseMeshBones(int mesh_index, const aiMesh* pMesh); 
+//	void ParseMeshes(const aiScene* pScene); 
+//	void ParseScene(const aiScene* pScene);
+//
+//	Mesh LoadModel(const std::string& path);
+//	void AddMesh(const std::string& path);
+//}; 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
-	enum BUFFER_TYPE {
-		INDEX_BUFFER = 0,
-		POS_VB = 1,
-		TEXCOORD_VB = 2,
-		NORMAL_VB = 3,
-		BONE_VB = 4,
-		NUM_BUFFERS = 5
-	};
+class GeneralMesh {
+public: 
+	virtual ~GeneralMesh() {} 
 
-	Transform model2WorldTransform; 
-	GLuint VAO = 0; 
-	GLuint Buffers[NUM_BUFFERS] = { 0 }; 
+	virtual bool LoadMesh(const std::string& fileName) = 0; 
+	virtual void Render() const = 0; 
 
 	struct BasicMeshEntry {
 		BasicMeshEntry()
@@ -121,12 +88,67 @@ public:
 		unsigned int BaseVertex;
 		unsigned int BaseIndex;
 		unsigned int MaterialIndex;
-	};
-	
+	}; 
+
+	Transform model2WorldTransform;
+	GLuint VAO = 0;
+
 	Assimp::Importer Importer;
-	const aiScene* ptrScene = NULL; 
+	const aiScene* ptrScene = NULL;
 	std::vector<BasicMeshEntry> meshes;
 	// std::vector<Material> m_Materials; materials are currently not implemented 
+};
+
+class StaticMesh : GeneralMesh {
+public: 
+	enum BUFFER_TYPE {
+		INDEX_BUFFER = 0,
+		POS_VB = 1,
+		TEXCOORD_VB = 2,
+		NORMAL_VB = 3,
+		NUM_BUFFERS = 4
+	};
+
+	GLuint Buffers[NUM_BUFFERS] = { 0 };
+};
+
+class RiggedMesh : GeneralMesh{
+public:
+	struct VertexBoneData {
+		uint32_t BoneIndexs[MAX_NUM_BONES_PER_VERTEX] = { 0 }; 
+		float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f }; 
+
+		VertexBoneData() {
+
+		}
+
+		void AddBoneData(uint32_t BoneIndex, float Weight) {
+			for (uint32_t i = 0; i < std::size(BoneIndexs); i++) {
+				if (Weights[i] == 0.0) { // if one of the weight is empty, 
+					BoneIndexs[i] = BoneIndex; // take its 
+					Weights[i] = Weight;
+					//printf("Adding bone %d weight %f at index %i\n", BoneIndex, Weight, i);
+					return;
+				}
+			}
+
+			// should never get here - more bones than we have space for
+			assert(0);
+		}
+	};
+
+
+
+	enum BUFFER_TYPE {
+		INDEX_BUFFER = 0,
+		POS_VB = 1,
+		TEXCOORD_VB = 2,
+		NORMAL_VB = 3,
+		BONE_VB = 4,
+		NUM_BUFFERS = 5
+	};
+
+	GLuint Buffers[NUM_BUFFERS] = { 0 }; 
 
 	// Temporary space for vertex stuff before we load them into the GPU
 	std::vector<glm::vec3> positions; 
@@ -139,15 +161,15 @@ public:
 
 	struct BoneInfo { 
 		glm::mat4 currBone2ParentBoneCoord; // matrix that chnages coord from CurrentBoneCoord ParentBoneCoord
-		glm::mat4 currBone2LocalCoord; 
+		glm::mat4 currBone2GlobalCoord; 
 
 		BoneInfo(const glm::mat4 Offset) {
 			currBone2ParentBoneCoord = Offset; 
-			currBone2LocalCoord = glm::mat4(1.0f); 
+			currBone2GlobalCoord = glm::mat4(1.0f); 
 		}
 	};
 
-	std::vector<BoneInfo> boneID2BoneInfo;  // map from boneID -> BoneInfo 
+	std::vector<BoneInfo> boneIndex2BoneInfo;  // map from boneIndex -> BoneInfo 
 	glm::mat4 GlobalInverseTransform; // wtf is this??????
 
 	RiggedMesh() {}; 
@@ -157,6 +179,22 @@ public:
 	bool LoadMesh(const std::string& fileName); 
 
 	void Render(); 
+
+	uint32_t FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim); 
+
+	void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+
+
+	uint32_t FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+
+
+	void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+
+
+	uint32_t FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+
+
+	void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
 	uint32_t NumBones() {
 		return (uint32_t)boneName2IndexMap.size(); 
@@ -185,7 +223,7 @@ private:
 
 	void LoadSingleBone(uint32_t MeshIndex, const aiBone* ptrBone); 
 
-	int GetBoneId(const aiBone* ptrBone);
+	int GetBoneIndex(const aiBone* ptrBone);
 
 	// bool InitMaterials(const aiScene* ptrScene, const std::string& filename); todo or to trash
 
@@ -193,6 +231,6 @@ private:
 
 	void LoadTextures(const std::string& textureImagePath); 
 
-
+	void ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform);
 };
 

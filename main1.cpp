@@ -11,7 +11,7 @@ SDL_GLContext gOpenGLContext = nullptr;
 bool gQuit = false; 
 
 void InitializaProgram() {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIndexEO) < 0) {
 		std::cout << "SDL could not init" << std::endl; 
 		exit(1); 
 	} 

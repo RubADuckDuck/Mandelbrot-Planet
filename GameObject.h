@@ -12,9 +12,9 @@ class Transform;
 
 class GameObject {
 public: 
-	Mesh* mesh; 
-	Texture* texture; 
-	Animation* animation; 
+	Mesh* mesh;  
+	Texture* texture;  
+	Animation* animation;  
 	Transform* transform;  
 
 	glm::mat4 GetModelMatrixFromTransform();

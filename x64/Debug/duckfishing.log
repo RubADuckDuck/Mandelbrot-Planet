@@ -1,37 +1,8 @@
-﻿  GameObject.cpp
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Transform.h(7,1): error C2236: unexpected token 'class'. Did you forget a ';'?
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Transform.h(7,17): error C3381: 'Transform': assembly access specifiers are only available in code compiled with a /clr option
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(29,9): error C2027: use of undefined type 'Texture'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.h(7,7): message : see declaration of 'Texture'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(30,8): error C2039: 'Draw': is not a member of 'Mesh'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.h(23,7): message : see declaration of 'Mesh'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(34,18): error C2084: function 'void GameObject::DrawGameObject(glm::mat4,glm::mat4)' already has a body
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(23,18): message : see previous definition of 'DrawGameObject'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(37,15): error C2065: 'shaderProgram': undeclared identifier
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(39,41): error C2065: 'shaderProgram': undeclared identifier
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(40,40): error C2065: 'shaderProgram': undeclared identifier
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(41,40): error C2065: 'shaderProgram': undeclared identifier
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(42,43): error C2065: 'shaderProgram': undeclared identifier
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(44,59): error C2065: 'model': undeclared identifier
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(44,2): error C2198: 'PFNGLUNIFORMMATRIX4FVPROC': too few arguments for call
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(46,58): error C2065: 'projection': undeclared identifier
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(46,2): error C2198: 'PFNGLUNIFORMMATRIX4FVPROC': too few arguments for call
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(48,32): error C2039: 'meshes': is not a member of 'GameObject'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.h(13,7): message : see declaration of 'GameObject'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(48,2): error C2530: 'mesh': references must be initialized
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(48,2): error C3531: 'mesh': a symbol whose type contains 'auto' must have an initializer
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(48,24): error C2143: syntax error: missing ';' before ':'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(48,38): error C2143: syntax error: missing ';' before ')'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(53,3): error C2198: 'PFNGLBINDTEXTUREPROC': too few arguments for call
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(57,3): error C2198: 'PFNGLDRAWELEMENTSPROC': too few arguments for call
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(63,1): error C2059: syntax error: '}'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.cpp(63,1): error C2143: syntax error: missing ';' before '}'
+﻿  Mesh.cpp
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(128,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(146,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   main.cpp
-  Mesh.cpp
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(79,13): error C2660: 'MeshLoader::parse_mesh_bones': function does not take 1 arguments
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.h(55,7): message : see declaration of 'MeshLoader::parse_mesh_bones'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(79,13): message : while trying to match the argument list '(const aiMesh *)'
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(91,5): error C3861: 'parse_meshes': identifier not found
-  Transform.cpp
+  stb_image.h
   Generating Code...
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\main.cpp(100): warning C4715: 'MeshManager::LoadMaterials': not all control paths return a value
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\main.cpp(96): warning C4715: 'MeshManager::LoadMaterials': not all control paths return a value
+  duckfishing.vcxproj -> C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\x64\Debug\duckfishing.exe

@@ -59,9 +59,9 @@ public:
 	}
 
 	GLuint LoadTexture(const std::string& path) {
-		GLuint textureID;
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_2D, textureID);
+		GLuint textureIndex;
+		glGenTextures(1, &textureIndex);
+		glBindTexture(GL_TEXTURE_2D, textureIndex);
 
 		// Load texture using your favorite library (e.g., stb_image)
 		int width, height, nrChannels;
@@ -76,7 +76,7 @@ public:
 		}
 		stbi_image_free(data);
 
-		return textureID;
+		return textureIndex;
 	}
 
 	GLuint LoadMaterials(const aiScene* scene) {
@@ -88,9 +88,9 @@ public:
 				std::string textureFile = texPath.C_Str();
 
 				// Call the LoadTexture function here
-				GLuint textureID = LoadTexture(textureFile);
+				GLuint textureIndex = LoadTexture(textureFile);
 
-				return textureID; 
+				return textureIndex; 
 			}
 		}
 	} 
@@ -102,7 +102,7 @@ public:
 		GLuint VBO; 
 		GLuint EBO; 
 
-		GLuint textureID; 
+		GLuint textureIndex; 
 		int indexCount = 0; // bit confused if it's number of verts or faces 
 
 		Assimp::Importer importer;
@@ -193,9 +193,9 @@ public:
 		newMesh.indexCount = indexCount; 
 
 		// load texture from material
-		textureID = LoadMaterials(scene); 
+		textureIndex = LoadMaterials(scene); 
 
-		newMesh.textureID = textureID; 
+		newMesh.textureIndex = textureIndex; 
 
 		return newMesh; 
 	}
@@ -227,7 +227,7 @@ public:
 
 			// bind texture 
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mesh.textureID);
+			glBindTexture(GL_TEXTURE_2D, mesh.textureIndex);
 			glUniform1i(textureLoc, 0);
 
 			// render the mesh
@@ -291,7 +291,7 @@ public:
 
 			// bind texture 
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mesh.textureID);
+			glBindTexture(GL_TEXTURE_2D, mesh.textureIndex);
 			glUniform1i(textureLoc, 0);
 
 			// render the mesh

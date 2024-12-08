@@ -7,6 +7,12 @@
 #include "Mesh.h"
 
 
+#define POSITION_LOCATION    0
+#define TEX_COORD_LOCATION   1
+#define NORMAL_LOCATION      2
+#define BONE_Index_LOCATION  3
+#define BONE_WEIGHT_LOCATION 4
+
 // Function to convert aiMatrix4x4 to glm::mat4
 glm::mat4 ConvertToGlmMat4(const aiMatrix4x4& aiMat) {
     glm::mat4 glmMat;
@@ -19,96 +25,114 @@ glm::mat4 ConvertToGlmMat4(const aiMatrix4x4& aiMat) {
     return glmMat;
 }
 
-int SceneLoader::GetBoneID(const aiBone* pBone)
+//int SceneLoader::GetBoneIndex(const aiBone* pBone)
+//{
+//    int bone_id = 0;
+//    std::string bone_name(pBone->mName.C_Str());
+//
+//    // each bone has to have a different name to assign the Index
+//    if (bone_name_to_index_map.find(bone_name) == bone_name_to_index_map.end()) { 
+//        // Allocate an index for a new bone
+//        bone_id = (int)bone_name_to_index_map.size();
+//        bone_name_to_index_map[bone_name] = bone_id;
+//    }
+//    else {
+//        bone_id = bone_name_to_index_map[bone_name];
+//    }
+//
+//    return bone_id;
+//}
+//
+//void SceneLoader::ParseSingleBone(int mesh_index, const aiBone* pBone)
+//{
+//    printf("      Bone '%s': num vertices affected by this bone: %d\n", pBone->mName.C_Str(), pBone->mNumWeights);
+//
+//    int bone_id = this->GetBoneIndex(pBone);
+//    // printf("bone id %d\n", bone_id); 
+//
+//    
+//
+//    for (unsigned int i = 0; i < pBone->mNumWeights; i++) {
+//        if (i == 0) printf("\n");
+//        const aiVertexWeight& vw = pBone->mWeights[i]; // vw has mVertexId and mWeight as attribute 
+//
+//        uint32_t global_vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;  // calculate global id
+//        printf("Vertex id %d ", global_vertex_id);
+//
+//        // for this to be true if bone1 refers to vertices in Mesh1 and Mesh2 but the bone is under Mesh1
+//        // Vertices on mesh2 should not be here.
+//        assert(global_vertex_id < vertexIndex2BoneDatas.size()); 
+//        vertexIndex2BoneDatas[global_vertex_id].AddBoneData(bone_id, vw.mWeight);
+//    }
+//
+//    printf("\n");
+//}
+//
+//
+//void SceneLoader::ParseMeshBones(int mesh_index, const aiMesh* pMesh)
+//{
+//    for (unsigned int i = 0; i < pMesh->mNumBones; i++) {
+//        ParseSingleBone(mesh_index, pMesh->mBones[i]);
+//    }
+//}
+//
+//
+//void SceneLoader::ParseMeshes(const aiScene* ptrScene)
+//{
+//    printf("*******************************************************\n");
+//    printf("Parsing %d meshes\n\n", ptrScene->mNumMeshes);
+//
+//    int total_vertices = 0;
+//    int total_indices = 0;
+//    int total_bones = 0;
+//
+//    mesh_base_vertex.resize(ptrScene->mNumMeshes);
+//
+//    for (unsigned int i = 0; i < ptrScene->mNumMeshes; i++) { const aiMesh* pMesh = ptrScene->mMeshes[i];
+//        int num_vertices = pMesh->mNumVertices;
+//        int nuindices = pMesh->mNumFaces * 3;
+//        int nubones = pMesh->mNumBones;
+//        printf("  Mesh %d '%s': vertices %d indices %d bones %d\n\n", i, pMesh->mName.C_Str(), num_vertices, nuindices, nubones);
+//        total_vertices += num_vertices;
+//        total_indices += nuindices;
+//        total_bones += nubones;
+//
+//        vertexIndex2BoneDatas.resize(total_vertices);
+//
+//        if (pMesh->HasBones()) {
+//            this->ParseMeshBones(i ,pMesh);
+//        }
+//
+//        printf("\n");
+//    }
+//
+//    printf("\nTotal vertices %d total indices %d total bones %d\n", total_vertices, total_indices, total_bones);
+//}
+//
+//
+//void SceneLoader::ParseScene(const aiScene* ptrScene)
+//{
+//    this->ParseMeshes(ptrScene);
+//} // SceneLoader class seems sort of useless
+
+
+RiggedMesh::~RiggedMesh()
 {
-    int bone_id = 0;
-    std::string bone_name(pBone->mName.C_Str());
-
-    // each bone has to have a different name to assign the ID
-    if (bone_name_to_index_map.find(bone_name) == bone_name_to_index_map.end()) { 
-        // Allocate an index for a new bone
-        bone_id = (int)bone_name_to_index_map.size();
-        bone_name_to_index_map[bone_name] = bone_id;
-    }
-    else {
-        bone_id = bone_name_to_index_map[bone_name];
-    }
-
-    return bone_id;
+    this->Clear();
 }
 
-void SceneLoader::ParseSingleBone(int mesh_index, const aiBone* pBone)
+
+void RiggedMesh::Clear()
 {
-    printf("      Bone '%s': num vertices affected by this bone: %d\n", pBone->mName.C_Str(), pBone->mNumWeights);
-
-    int bone_id = this->GetBoneID(pBone);
-    // printf("bone id %d\n", bone_id); 
-
-    
-
-    for (unsigned int i = 0; i < pBone->mNumWeights; i++) {
-        if (i == 0) printf("\n");
-        const aiVertexWeight& vw = pBone->mWeights[i]; // vw has mVertexId and mWeight as attribute 
-
-        uint32_t global_vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;  // calculate global id
-        printf("Vertex id %d ", global_vertex_id);
-
-        // for this to be true if bone1 refers to vertices in Mesh1 and Mesh2 but the bone is under Mesh1
-        // Vertices on mesh2 should not be here.
-        assert(global_vertex_id < vertexID2BoneDatas.size()); 
-        vertexID2BoneDatas[global_vertex_id].AddBoneData(bone_id, vw.mWeight);
+    if (this->Buffers[0] != 0) {
+        glDeleteBuffers(std::size(Buffers), Buffers);
     }
 
-    printf("\n");
-}
-
-
-void SceneLoader::ParseMeshBones(int mesh_index, const aiMesh* pMesh)
-{
-    for (unsigned int i = 0; i < pMesh->mNumBones; i++) {
-        ParseSingleBone(mesh_index, pMesh->mBones[i]);
+    if (VAO != 0) {
+        glDeleteVertexArrays(1, &VAO);
+        VAO = 0;
     }
 }
-
-
-void SceneLoader::ParseMeshes(const aiScene* pScene)
-{
-    printf("*******************************************************\n");
-    printf("Parsing %d meshes\n\n", pScene->mNumMeshes);
-
-    int total_vertices = 0;
-    int total_indices = 0;
-    int total_bones = 0;
-
-    mesh_base_vertex.resize(pScene->mNumMeshes);
-
-    for (unsigned int i = 0; i < pScene->mNumMeshes; i++) { const aiMesh* pMesh = pScene->mMeshes[i];
-        int num_vertices = pMesh->mNumVertices;
-        int nuindices = pMesh->mNumFaces * 3;
-        int nubones = pMesh->mNumBones;
-        printf("  Mesh %d '%s': vertices %d indices %d bones %d\n\n", i, pMesh->mName.C_Str(), num_vertices, nuindices, nubones);
-        total_vertices += num_vertices;
-        total_indices += nuindices;
-        total_bones += nubones;
-
-        vertexID2BoneDatas.resize(total_vertices);
-
-        if (pMesh->HasBones()) {
-            this->ParseMeshBones(i ,pMesh);
-        }
-
-        printf("\n");
-    }
-
-    printf("\nTotal vertices %d total indices %d total bones %d\n", total_vertices, total_indices, total_bones);
-}
-
-
-void SceneLoader::ParseScene(const aiScene* pScene)
-{
-    this->ParseMeshes(pScene);
-}
-
 
 bool RiggedMesh::LoadMesh(const std::string& filename) {
     // Release previously loaded mesh 
@@ -126,8 +150,16 @@ bool RiggedMesh::LoadMesh(const std::string& filename) {
     this->ptrScene = Importer.ReadFile(filename.c_str(), ASSIMP_LOAD_FLAGS);  
 
     if (ptrScene) {
-        GlobalInverseTransform = ptrScene->mRootNode->mTransformation; 
-        GlobalInverseTransform = GlobalInverseTransform.Inverse(); // todo 
+        GlobalInverseTransform = ConvertToGlmMat4(ptrScene->mRootNode->mTransformation);
+        GlobalInverseTransform = glm::inverse(GlobalInverseTransform); // calculate inverse transformation 
+        // mTransforms map from RootNode -> Global
+        // the inverse does the oppisite mapping Global -> RootNode 
+        // this is needed since each accumulated transform in each bone maps from 
+        // Bone_n -> ... -> Global 
+        // however since meshes' vertices are represented respect to RootCoord, 
+        // the Transformation that properly controls the vertices is 
+        // Bone_n -> ... -> Global -> RootNode. Not, Bone_n -> ... -> Global
+        // that is why we keep the inverse as member var.
         Ret = this->InitFromScene(ptrScene, filename); 
 
     } else {
@@ -152,16 +184,17 @@ bool RiggedMesh::InitFromScene(const aiScene* ptrScene, const std::string& filen
 
     InitAllMeshes(ptrScene); 
 
-    //if (!this->InitMaterials(pScene, Filename)) {
+    //if (!this->InitMaterials(ptrScene, Filename)) {
     //    return false;
     //}
 
     this->PopulateBuffers(); 
-
-    return GLCheckError(); // todo
+    
+    return true; 
+    // return GLCheckError(); // todo: why isn't glcheckerror available? legacy?
 }
 
-void RiggedMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int& numVertices, unsigned int& numIndices)
+void RiggedMesh::CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& numVertices, unsigned int& numIndices)
 {
     for (unsigned int i = 0; i < meshes.size(); i++) {
         meshes[i].MaterialIndex = this->ptrScene->mMeshes[i]->mMaterialIndex;
@@ -169,7 +202,7 @@ void RiggedMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int& nu
         meshes[i].BaseVertex = numVertices; // baseVertex is the Global index of the first vertex in mesh 
         meshes[i].BaseIndex = numIndices;   // goes same for Indices 
 
-        numVertices += pScene->mMeshes[i]->mNumVertices;
+        numVertices += ptrScene->mMeshes[i]->mNumVertices;
         numIndices += meshes[i].NumIndices;
     }
 } 
@@ -197,10 +230,11 @@ void RiggedMesh::InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh)
 
     // Populate the vertex attribute vectors
     for (unsigned int i = 0; i < ptraiMesh->mNumVertices; i++) {
-
+        // add vert pos 
         const aiVector3D& pPos = ptraiMesh->mVertices[i];
         positions.push_back(glm::vec3(pPos.x, pPos.y, pPos.z));
 
+        // add normal vec
         if (ptraiMesh->mNormals) {
             const aiVector3D& pNormal = ptraiMesh->mNormals[i];
             normals.push_back(glm::vec3(pNormal.x, pNormal.y, pNormal.z));
@@ -210,6 +244,7 @@ void RiggedMesh::InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh)
             normals.push_back(glm::vec3(Normal.x, Normal.y, Normal.z));
         }
 
+        // add UV coord
         const aiVector3D& pTexCoord = ptraiMesh->HasTextureCoords(0) ? ptraiMesh->mTextureCoords[0][i] : Zero3D;
         texCoords.push_back(glm::vec2(pTexCoord.x, pTexCoord.y));
     }
@@ -228,42 +263,51 @@ void RiggedMesh::InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh)
 }
 
 void RiggedMesh::LoadMeshBones(uint32_t MeshIndex, const aiMesh* ptrMesh) {
-    for (uint32_t i = 0; i < ptrMesh->mNumBones; i++) {
-        this->LoadSingleBone(MeshIndex, ptrMesh->mBones[i]); 
+    // iterate on bones 
+    for (uint32_t i = 0; i < ptrMesh->mNumBones; i++) { aiBone* currBone = ptrMesh->mBones[i];
+        this->LoadSingleBone(MeshIndex, currBone); 
     }
 }
 
 void RiggedMesh::LoadSingleBone(uint32_t MeshIndex, const aiBone* ptrBone) {
-    int BoneId = this->GetBoneId(ptrBone);
+    int BoneIndex = this->GetBoneIndex(ptrBone); 
 
-    if (BoneId == this->boneID2BoneInfo.size()) {
+    if (BoneIndex == this->boneIndex2BoneInfo.size()) { // new unregistered bone
+        // if the bone is new BoneIndex will be out of bound
         aiMatrix4x4 curOffsetMat = ptrBone->mOffsetMatrix;
 
         BoneInfo bi(ConvertToGlmMat4(curOffsetMat));
-        boneID2BoneInfo.push_back(bi);
+        boneIndex2BoneInfo.push_back(bi);
     }
 
-    for (uint32_t i = 0; i < ptrBone->mNumWeights; i++) {
+    // iterate through affected vertices 
+    // add boneIndex that we just made 
+    // add the Weight value to the 'bone' 
+    // bone is a map of GlobalVertexIndex -> (Array of Bone Index) x (Array of weight) 
+    // it is nessesary and important to do this 
+    // since the Renderer iterates on the Vertices, not on Bones
+    for (uint32_t i = 0; i < ptrBone->mNumWeights; i++) { // list of bone weights 
         const aiVertexWeight& vw = ptrBone->mWeights[i];
-        // globalVertexID = (index of first vertex in mesh) + (local Vertex ID)
-        uint32_t GlobalVertexID = meshes[MeshIndex].BaseVertex + ptrBone->mWeights[i].mVertexId; 
-        bones[GlobalVertexID].AddBoneData(BoneId, vw.mWeight);
+        // globalVertexIndex = (index of first vertex in mesh) + (local Vertex Index)
+        uint32_t GlobalVertexIndex = meshes[MeshIndex].BaseVertex + vw.mVertexId;  
+        bones[GlobalVertexIndex].AddBoneData(BoneIndex, vw.mWeight); 
     }
 }
 
 //------------------
 
 
-int RiggedMesh::GetBoneId(const aiBone* ptrBone) {
+int RiggedMesh::GetBoneIndex(const aiBone* ptrBone) {
     int BoneIndex = 0;
     std::string BoneName(ptrBone->mName.C_Str());
 
-    if (this->boneName2IndexMap.find(BoneName) == this->boneName2IndexMap.end()) {
+    if (this->boneName2IndexMap.find(BoneName) == this->boneName2IndexMap.end()) { 
         // Allocate an index for a new bone
         BoneIndex = (int)this->boneName2IndexMap.size();
         this->boneName2IndexMap[BoneName] = BoneIndex;
     }
-    else {
+    else { 
+        // if existing bone, return the boneIndex
         BoneIndex = this->boneName2IndexMap[BoneName];
     }
 
@@ -271,17 +315,17 @@ int RiggedMesh::GetBoneId(const aiBone* ptrBone) {
 }
 
 
-//bool RiggedMesh::InitMaterials(const aiScene* pScene, const string& Filename)
+//bool RiggedMesh::InitMaterials(const aiScene* ptrScene, const string& Filename)
 //{
 //    string Dir = GetDirFromFilename(Filename);
 //
 //    bool Ret = true;
 //
-//    printf("Num materials: %d\n", pScene->mNumMaterials);
+//    printf("Num materials: %d\n", ptrScene->mNumMaterials);
 //
 //    // Initialize the materials
-//    for (unsigned int i = 0; i < pScene->mNumMaterials; i++) {
-//        const aiMaterial* pMaterial = pScene->mMaterials[i];
+//    for (unsigned int i = 0; i < ptrScene->mNumMaterials; i++) {
+//        const aiMaterial* pMaterial = ptrScene->mMaterials[i];
 //
 //        LoadTextures(Dir, pMaterial, i);
 //
@@ -420,11 +464,11 @@ void RiggedMesh::PopulateBuffers()
 
     glBindBuffer(GL_ARRAY_BUFFER, Buffers[BONE_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(bones[0]) * bones.size(), &bones[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(BONE_ID_LOCATION);
-    glVertexAttribIPointer(BONE_ID_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+    glEnableVertexAttribArray(BONE_Index_LOCATION);
+    glVertexAttribIPointer(BONE_Index_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
     glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
     glVertexAttribPointer(BONE_WEIGHT_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData),
-        (const GLvoid*)(MAX_NUbones_PER_VERTEX * sizeof(int32_t)));
+        (const GLvoid*)(MAX_NUM_BONES_PER_VERTEX * sizeof(int32_t)));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[INDEX_BUFFER]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
@@ -441,13 +485,13 @@ void RiggedMesh::Render()
 
         // assert(MaterialIndex < m_Materials.size()); todo: how do I assert?
 
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
-        }
+        //if (m_Materials[MaterialIndex].pDiffuse) { todo: material is currently ignored
+        //    m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        //}
 
-        if (m_Materials[MaterialIndex].pSpecularExponent) {
-            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
-        }
+        //if (m_Materials[MaterialIndex].pSpecularExponent) {
+        //    m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        //}
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
             meshes[i].NumIndices,
@@ -461,21 +505,21 @@ void RiggedMesh::Render()
 }
 
 
-const Material& RiggedMesh::GetMaterial()
+//const Material& RiggedMesh::GetMaterial()
+//{
+//    for (unsigned int i = 0; i < m_Materials.size(); i++) {
+//        if (m_Materials[i].AmbientColor != Vector4f(0.0f, 0.0f, 0.0f, 0.0f)) {
+//            return m_Materials[i];
+//        }
+//    }
+//
+//    return m_Materials[0];
+//}
+
+
+uint32_t RiggedMesh::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
-    for (unsigned int i = 0; i < m_Materials.size(); i++) {
-        if (m_Materials[i].AmbientColor != Vector4f(0.0f, 0.0f, 0.0f, 0.0f)) {
-            return m_Materials[i];
-        }
-    }
-
-    return m_Materials[0];
-}
-
-
-uint RiggedMesh::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
-{
-    for (uint i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++) {
+    for (uint32_t i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++) {
         float t = (float)pNodeAnim->mPositionKeys[i + 1].mTime;
         if (AnimationTimeTicks < t) {
             return i;
@@ -494,8 +538,8 @@ void RiggedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTi
         return;
     }
 
-    uint PositionIndex = FindPosition(AnimationTimeTicks, pNodeAnim);
-    uint NextPositionIndex = PositionIndex + 1;
+    uint32_t PositionIndex = this->FindPosition(AnimationTimeTicks, pNodeAnim);
+    uint32_t NextPositionIndex = PositionIndex + 1;
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
     float t1 = (float)pNodeAnim->mPositionKeys[PositionIndex].mTime;
     float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime;
@@ -509,11 +553,11 @@ void RiggedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTi
 }
 
 
-uint RiggedMesh::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint32_t RiggedMesh::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumRotationKeys > 0);
 
-    for (uint i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++) {
+    for (uint32_t i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++) {
         float t = (float)pNodeAnim->mRotationKeys[i + 1].mTime;
         if (AnimationTimeTicks < t) {
             return i;
@@ -532,8 +576,8 @@ void RiggedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime
         return;
     }
 
-    uint RotationIndex = FindRotation(AnimationTimeTicks, pNodeAnim);
-    uint NextRotationIndex = RotationIndex + 1;
+    uint32_t RotationIndex = FindRotation(AnimationTimeTicks, pNodeAnim);
+    uint32_t NextRotationIndex = RotationIndex + 1;
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
     float t1 = (float)pNodeAnim->mRotationKeys[RotationIndex].mTime;
     float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime;
@@ -547,11 +591,11 @@ void RiggedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime
 }
 
 
-uint RiggedMesh::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint32_t RiggedMesh::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumScalingKeys > 0);
 
-    for (uint i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++) {
+    for (uint32_t i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++) {
         float t = (float)pNodeAnim->mScalingKeys[i + 1].mTime;
         if (AnimationTimeTicks < t) {
             return i;
@@ -570,8 +614,8 @@ void RiggedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTic
         return;
     }
 
-    uint ScalingIndex = FindScaling(AnimationTimeTicks, pNodeAnim);
-    uint NextScalingIndex = ScalingIndex + 1;
+    uint32_t ScalingIndex = FindScaling(AnimationTimeTicks, pNodeAnim);
+    uint32_t NextScalingIndex = ScalingIndex + 1;
     assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
     float t1 = (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime;
     float t2 = (float)pNodeAnim->mScalingKeys[NextScalingIndex].mTime;
@@ -585,78 +629,86 @@ void RiggedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTic
 }
 
 
-void RiggedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform)
+void RiggedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform)
 {
-    string NodeName(pNode->mName.data);
+    // Read the current Node and Set tranformation for each corresponding bone
+    // recursively call children below it 
 
-    const aiAnimation* pAnimation = pScene->mAnimations[0];
+    std::string NodeName(pNode->mName.data);
 
-    Matrix4f NodeTransformation(pNode->mTransformation);
+    const aiAnimation* pAnimation = ptrScene->mAnimations[0];
 
-    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+    glm::mat4 NodeTransformation(ConvertToGlmMat4(pNode->mTransformation));
 
-    if (pNodeAnim) {
-        // Interpolate scaling and generate scaling transformation matrix
-        aiVector3D Scaling;
-        CalcInterpolatedScaling(Scaling, AnimationTimeTicks, pNodeAnim);
-        Matrix4f ScalingM;
-        ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
 
-        // Interpolate rotation and generate rotation transformation matrix
-        aiQuaternion RotationQ;
-        CalcInterpolatedRotation(RotationQ, AnimationTimeTicks, pNodeAnim);
-        Matrix4f RotationM = Matrix4f(RotationQ.GetMatrix());
+    //// todo: not implemented animation not available
+    //const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
-        // Interpolate translation and generate translation transformation matrix
-        aiVector3D Translation;
-        CalcInterpolatedPosition(Translation, AnimationTimeTicks, pNodeAnim);
-        Matrix4f TranslationM;
-        TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+    //if (pNodeAnim) { 
+    //    // Interpolate scaling and generate scaling transformation matrix
+    //    aiVector3D Scaling;
+    //    CalcInterpolatedScaling(Scaling, AnimationTimeTicks, pNodeAnim);
+    //    Matrix4f ScalingM;
+    //    ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
 
-        // Combine the above transformations
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    }
+    //    // Interpolate rotation and generate rotation transformation matrix
+    //    aiQuaternion RotationQ;
+    //    CalcInterpolatedRotation(RotationQ, AnimationTimeTicks, pNodeAnim);
+    //    glm::mat4 RotationM = Matrix4f(RotationQ.GetMatrix());
 
-    Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
+    //    // Interpolate translation and generate translation transformation matrix
+    //    aiVector3D Translation;
+    //    CalcInterpolatedPosition(Translation, AnimationTimeTicks, pNodeAnim);
+    //    Matrix4f TranslationM;
+    //    TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+
+    //    // Combine the above transformations
+    //    NodeTransformation = TranslationM * RotationM * ScalingM;
+    //}
+
+    glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
 
     if (this->boneName2IndexMap.find(NodeName) != this->boneName2IndexMap.end()) {
-        uint BoneIndex = this->boneName2IndexMap[NodeName];
-        m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
+        uint32_t BoneIndex = this->boneName2IndexMap[NodeName];
+
+
+        this->boneIndex2BoneInfo[BoneIndex].currBone2GlobalCoord = 
+            this->GlobalInverseTransform * GlobalTransformation 
+            * this->boneIndex2BoneInfo[BoneIndex].currBone2ParentBoneCoord;
     }
 
-    for (uint i = 0; i < pNode->mNumChildren; i++) {
+    for (uint32_t i = 0; i < pNode->mNumChildren; i++) {
         ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation);
     }
 }
 
 
-void RiggedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms)
+void RiggedMesh::GetBoneTransforms(float TimeInSeconds, std::vector<glm::mat4>& Transforms)
 {
-    Matrix4f Identity;
-    Identity.InitIdentity();
+    glm::mat4 Identity = glm::mat4(1.0);
 
-    float TicksPerSecond = (float)(pScene->mAnimations[0]->mTicksPerSecond != 0 ? pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+    float TicksPerSecond = (float)(ptrScene->mAnimations[0]->mTicksPerSecond != 0 ? ptrScene->mAnimations[0]->mTicksPerSecond : 25.0f);
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
-    float AnimationTimeTicks = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
+    float AnimationTimeTicks = fmod(TimeInTicks, (float)ptrScene->mAnimations[0]->mDuration);
 
-    ReadNodeHierarchy(AnimationTimeTicks, pScene->mRootNode, Identity);
-    Transforms.resize(m_BoneInfo.size());
+    ReadNodeHierarchy(AnimationTimeTicks, ptrScene->mRootNode, Identity);
+    Transforms.resize(this->boneIndex2BoneInfo.size());
 
-    for (uint i = 0; i < m_BoneInfo.size(); i++) {
-        Transforms[i] = m_BoneInfo[i].FinalTransformation;
+    for (uint32_t i = 0; i < this->boneIndex2BoneInfo.size(); i++) {
+        Transforms[i] = this->boneIndex2BoneInfo[i].currBone2GlobalCoord;
     }
 }
 
 
-const aiNodeAnim* RiggedMesh::FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName)
-{
-    for (uint i = 0; i < pAnimation->mNumChannels; i++) {
-        const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
-
-        if (string(pNodeAnim->mNodeName.data) == NodeName) {
-            return pNodeAnim;
-        }
-    }
-
-    return NULL;
-}
+//const aiNodeAnim* RiggedMesh::FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName)
+//{
+//    for (uint i = 0; i < pAnimation->mNumChannels; i++) {
+//        const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
+//
+//        if (string(pNodeAnim->mNodeName.data) == NodeName) {
+//            return pNodeAnim;
+//        }
+//    }
+//
+//    return NULL;
+//}

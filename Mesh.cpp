@@ -5,7 +5,7 @@
 #include <assimp/postprocess.h> // Post processing flags 
 #include <cassert>
 #include "Mesh.h"
-
+#include "GameObject.h"
 
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
@@ -121,6 +121,25 @@ RiggedMesh::~RiggedMesh()
     this->Clear();
 }
 
+void GeneralMesh::Clear()
+{
+    //if (this->Buffers[0] != 0) {
+    //    glDeleteBuffers(std::size(Buffers), Buffers);
+    //}
+
+    if (VAO != 0) {
+        glDeleteVertexArrays(1, &VAO);
+        VAO = 0;
+    }
+} 
+
+void GeneralMesh::PopulateBuffers() {
+    // Implementation here
+}
+
+void GeneralMesh::LoadTextures(const std::string& texturePath) {
+    // Implementation here
+}
 
 void RiggedMesh::Clear()
 {
@@ -172,8 +191,12 @@ bool RiggedMesh::LoadMesh(const std::string& filename) {
     return Ret;
 }
 
-bool RiggedMesh::InitFromScene(const aiScene* ptrScene, const std::string& filename) {
+bool GeneralMesh::InitFromScene(const aiScene* ptrScene, const std::string& filename) {
     this->meshes.resize(ptrScene->mNumMeshes); 
+    if (StaticMesh* thisMesh = dynamic_cast<StaticMesh*>(this)) {
+        // if this is a instance of StaticMesh 
+        thisMesh->meshIndex2meshTransform.resize(ptrScene->mNumMeshes);
+    }
    
     unsigned int numVertices = 0; 
     unsigned int numIndices = 0; 
@@ -194,7 +217,7 @@ bool RiggedMesh::InitFromScene(const aiScene* ptrScene, const std::string& filen
     // return GLCheckError(); // todo: why isn't glcheckerror available? legacy?
 }
 
-void RiggedMesh::CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& numVertices, unsigned int& numIndices)
+void GeneralMesh::CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& numVertices, unsigned int& numIndices)
 {
     for (unsigned int i = 0; i < meshes.size(); i++) {
         meshes[i].MaterialIndex = this->ptrScene->mMeshes[i]->mMaterialIndex;
@@ -205,6 +228,27 @@ void RiggedMesh::CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& 
         numVertices += ptrScene->mMeshes[i]->mNumVertices;
         numIndices += meshes[i].NumIndices;
     }
+}
+
+//void RiggedMesh::CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& numVertices, unsigned int& numIndices)
+//{
+//    for (unsigned int i = 0; i < meshes.size(); i++) {
+//        meshes[i].MaterialIndex = this->ptrScene->mMeshes[i]->mMaterialIndex;
+//        meshes[i].NumIndices = this->ptrScene->mMeshes[i]->mNumFaces * 3;
+//        meshes[i].BaseVertex = numVertices; // baseVertex is the Global index of the first vertex in mesh 
+//        meshes[i].BaseIndex = numIndices;   // goes same for Indices 
+//
+//        numVertices += ptrScene->mMeshes[i]->mNumVertices;
+//        numIndices += meshes[i].NumIndices;
+//    }
+//} 
+
+void GeneralMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
+{
+    this->positions.reserve(NumVertices);
+    this->normals.reserve(NumVertices);
+    this->texCoords.reserve(NumVertices);
+    this->indices.reserve(NumIndices);
 } 
 
 void RiggedMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
@@ -216,13 +260,49 @@ void RiggedMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
     this->bones.resize(NumVertices);
 } 
 
-void RiggedMesh::InitAllMeshes(const aiScene* ptrScene)
+void GeneralMesh::InitAllMeshes(const aiScene* ptrScene)
 {
     for (unsigned int i = 0; i < this->meshes.size(); i++) {
         const aiMesh* paiMesh = ptrScene->mMeshes[i];
         InitSingleMesh(i, paiMesh); 
     }
 } 
+
+void GeneralMesh::InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh)
+{
+    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+
+    // Populate the vertex attribute vectors
+    for (unsigned int i = 0; i < ptraiMesh->mNumVertices; i++) {
+        // add vert pos 
+        const aiVector3D& pPos = ptraiMesh->mVertices[i];
+        positions.push_back(glm::vec3(pPos.x, pPos.y, pPos.z));
+
+        // add normal vec
+        if (ptraiMesh->mNormals) {
+            const aiVector3D& pNormal = ptraiMesh->mNormals[i];
+            normals.push_back(glm::vec3(pNormal.x, pNormal.y, pNormal.z));
+        }
+        else {
+            aiVector3D Normal(0.0f, 1.0f, 0.0f);
+            normals.push_back(glm::vec3(Normal.x, Normal.y, Normal.z));
+        }
+
+        // add UV coord
+        const aiVector3D& pTexCoord = ptraiMesh->HasTextureCoords(0) ? ptraiMesh->mTextureCoords[0][i] : Zero3D;
+        texCoords.push_back(glm::vec2(pTexCoord.x, pTexCoord.y));
+    }
+
+    // Populate the index buffer
+    for (unsigned int i = 0; i < ptraiMesh->mNumFaces; i++) {
+        const aiFace& Face = ptraiMesh->mFaces[i];
+        //        printf("num indices %d\n", Face.mNumIndices);
+        //        assert(Face.mNumIndices == 3);
+        indices.push_back(Face.mIndices[0]);
+        indices.push_back(Face.mIndices[1]);
+        indices.push_back(Face.mIndices[2]);
+    }
+}
 
 void RiggedMesh::InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh)
 {
@@ -475,9 +555,52 @@ void RiggedMesh::PopulateBuffers()
 }
 
 
-// Introduced in youtube tutorial #18
-void RiggedMesh::Render()
+
+
+
+void StaticMesh::Render(CameraObject& cameraObj)
 {
+    GLuint shaderProgram = NULL; 
+
+    glm::mat4 curMwvp = glm::mat4(1); 
+    glm::mat4 viewProj = cameraObj.GetviewProjMat();
+    
+    glm::vec3 cameraGlobalPos = cameraObj.GetGlobalCameraPosition(); 
+
+    GLuint curTextureIndex = 0; 
+
+    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp"); 
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
+    GLuint cameraGlobalPosition = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
+    GLuint lightVecLocation = glGetUniformLocation(shaderProgram, "light_vec");
+
+    { // set light
+        DirectionalLight directionalLight = this->GetDirectionalLight();
+        GLint location;
+
+        // Set BaseLight fields
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.Color");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.base.color));
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.AmbientIntensity");
+        glUniform1f(location, directionalLight.base.ambientIntensity);
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.DiffuseIntensity");
+        glUniform1f(location, directionalLight.base.diffuseIntensity);
+
+        // Set Direction field
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Direction");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.direction));
+    }
+
+    // set cameraPosition
+    glUniform3f(
+        cameraGlobalPosition,
+        cameraGlobalPos[0],
+        cameraGlobalPos[1],
+        cameraGlobalPos[2]
+    ); 
+
     glBindVertexArray(VAO);
 
     for (unsigned int i = 0; i < meshes.size(); i++) {
@@ -493,6 +616,101 @@ void RiggedMesh::Render()
         //    m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
         //}
 
+        // get Mesh->World->View->Projection transformation
+        curMwvp = viewProj * this->meshIndex2meshTransform[i]; 
+
+        // get TextureIndex 
+        curTextureIndex = this->textures[i].GetTextureIndex(); 
+
+        // set MWVP transformation
+        glUniformMatrix4fv(mwvpLoc, 1, GL_FALSE, glm::value_ptr(curMwvp)); 
+        // set texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, curTextureIndex); 
+        glUniform1i(textureLoc, 0); 
+
+        glDrawElementsBaseVertex(GL_TRIANGLES,
+            meshes[i].NumIndices,
+            GL_UNSIGNED_INT,
+            (void*)(sizeof(unsigned int) * meshes[i].BaseIndex), // Specifies a pointer to the location where the indices are stored 
+            meshes[i].BaseVertex
+        ); // Specifies a constant that should be added to each element of indices when chosing elements from the enabled vertex arrays.
+    }
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);
+}
+
+void RiggedMesh::Render(CameraObject& cameraObj)
+{
+    GLuint shaderProgram = NULL;
+
+    glm::mat4 curMwvp = glm::mat4(1);
+    glm::mat4 viewProj = cameraObj.GetviewProjMat();
+
+    glm::vec3 cameraGlobalPos = cameraObj.GetGlobalCameraPosition();
+    
+
+    GLuint curTextureIndex = 0;
+
+    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
+    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
+
+    { // set light
+        DirectionalLight directionalLight = this->GetDirectionalLight();
+        GLint location;
+
+        // Set BaseLight fields
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.Color");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.base.color));
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.AmbientIntensity");
+        glUniform1f(location, directionalLight.base.ambientIntensity);
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.DiffuseIntensity");
+        glUniform1f(location, directionalLight.base.diffuseIntensity);
+
+        // Set Direction field
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Direction");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.direction));
+    }
+
+    // set cameraPosition
+    glUniform3f(
+        cameraGlobalPositionLoc,
+        cameraGlobalPos[0],
+        cameraGlobalPos[1],
+        cameraGlobalPos[2]
+    );
+
+    curMwvp = viewProj * this->model2WorldTransform.GetTranformMatrix();
+    // set MWVP transformation
+    glUniformMatrix4fv(mwvpLoc, 1, GL_FALSE, glm::value_ptr(curMwvp));
+
+    glBindVertexArray(VAO);
+
+    for (unsigned int i = 0; i < meshes.size(); i++) {
+        unsigned int MaterialIndex = meshes[i].MaterialIndex;
+
+        // assert(MaterialIndex < m_Materials.size()); todo: how do I assert?
+
+        //if (m_Materials[MaterialIndex].pDiffuse) { todo: material is currently ignored
+        //    m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        //}
+
+        //if (m_Materials[MaterialIndex].pSpecularExponent) {
+        //    m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        //}
+
+        // get TextureIndex 
+        curTextureIndex = this->textures[i].GetTextureIndex(); 
+
+        // set texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, curTextureIndex);
+        glUniform1i(textureLoc, 0);
+
         glDrawElementsBaseVertex(GL_TRIANGLES,
             meshes[i].NumIndices,
             GL_UNSIGNED_INT,
@@ -503,7 +721,6 @@ void RiggedMesh::Render()
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
 }
-
 
 //const Material& RiggedMesh::GetMaterial()
 //{
@@ -629,6 +846,61 @@ void RiggedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTic
 }
 
 
+
+
+void StaticMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform)
+{
+    // Get the node name and its local transformation
+    std::string NodeName(pNode->mName.data);
+
+    // Node transformation in local space
+    glm::mat4 NodeTransformation(ConvertToGlmMat4(pNode->mTransformation));
+
+    //// todo: not implemented animation not available
+    //const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+
+    //if (pNodeAnim) { 
+    //    // Interpolate scaling and generate scaling transformation matrix
+    //    aiVector3D Scaling;
+    //    CalcInterpolatedScaling(Scaling, AnimationTimeTicks, pNodeAnim);
+    //    Matrix4f ScalingM;
+    //    ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
+
+    //    // Interpolate rotation and generate rotation transformation matrix
+    //    aiQuaternion RotationQ;
+    //    CalcInterpolatedRotation(RotationQ, AnimationTimeTicks, pNodeAnim);
+    //    glm::mat4 RotationM = Matrix4f(RotationQ.GetMatrix());
+
+    //    // Interpolate translation and generate translation transformation matrix
+    //    aiVector3D Translation;
+    //    CalcInterpolatedPosition(Translation, AnimationTimeTicks, pNodeAnim);
+    //    Matrix4f TranslationM;
+    //    TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+
+    //    // Combine the above transformations
+    //    NodeTransformation = TranslationM * RotationM * ScalingM;
+    //}
+
+    // Combine with parent transformation to get global transformation
+    glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation; 
+
+    // Check if this node references any meshes
+    for (uint32_t i = 0; i < pNode->mNumMeshes; i++) {
+        uint32_t MeshIndex = pNode->mMeshes[i]; // Get the mesh index
+
+        // Apply the global transformation to the mesh
+        this->meshIndex2meshTransform[MeshIndex] = GlobalTransformation; 
+    }
+
+    // Recursively process child nodes
+    for (uint32_t i = 0; i < pNode->mNumChildren; i++) {
+        ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation);
+    }
+}
+
+
+
+
 void RiggedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform)
 {
     // Read the current Node and Set tranformation for each corresponding bone
@@ -672,9 +944,9 @@ void RiggedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode
         uint32_t BoneIndex = this->boneName2IndexMap[NodeName];
 
 
-        this->boneIndex2BoneInfo[BoneIndex].currBone2GlobalCoord = 
+        this->boneIndex2BoneInfo[BoneIndex].bone2GlobalCoord = 
             this->GlobalInverseTransform * GlobalTransformation 
-            * this->boneIndex2BoneInfo[BoneIndex].currBone2ParentBoneCoord;
+            * this->boneIndex2BoneInfo[BoneIndex].boneOffset;
     }
 
     for (uint32_t i = 0; i < pNode->mNumChildren; i++) {
@@ -695,7 +967,7 @@ void RiggedMesh::GetBoneTransforms(float TimeInSeconds, std::vector<glm::mat4>& 
     Transforms.resize(this->boneIndex2BoneInfo.size());
 
     for (uint32_t i = 0; i < this->boneIndex2BoneInfo.size(); i++) {
-        Transforms[i] = this->boneIndex2BoneInfo[i].currBone2GlobalCoord;
+        Transforms[i] = this->boneIndex2BoneInfo[i].bone2GlobalCoord;
     }
 }
 

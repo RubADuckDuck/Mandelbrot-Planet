@@ -1,13 +1,21 @@
-//#include "GameObject.h"
-//#include "Mesh.h"       // Assuming Mesh class handles vertex data and drawing
-//#include "Texture.h"    // Assuming Texture class handles texture binding
-//#include "Transform.h"
-//#include "Animation.h"  // Assuming Animation class handles animation
-//
-//
-//#include <glm/glm.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtc/type_ptr.hpp>
+#include "GameObject.h"
+#include "Mesh.h"       // Assuming Mesh class handles vertex data and drawing
+#include "Texture.h"    // Assuming Texture class handles texture binding
+#include "Transform.h"
+#include "Animation.h"  // Assuming Animation class handles animation
+
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
+void GameObject::DrawGameObject(CameraObject& cameraObj) {
+	
+
+
+}
+
 //
 //// Calculate the Model Matrix from the Transform object
 //glm::mat4 GameObject::GetModelMatrixFromTransform() {

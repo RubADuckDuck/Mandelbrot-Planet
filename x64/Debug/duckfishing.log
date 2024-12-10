@@ -3,7 +3,6 @@
 C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(147,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
 C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(165,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   main.cpp
-  stb_image.h
   Generating Code...
 C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\main.cpp(96): warning C4715: 'MeshManager::LoadMaterials': not all control paths return a value
 C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\GameObject.h(46): warning C4172: returning address of local variable or temporary: temp

@@ -13,7 +13,7 @@
 #include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+
 #include "Mesh.h"
 
 // Globals 
@@ -234,7 +234,9 @@ public:
 			glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
 
 			glBindVertexArray(0);
-		}
+		} 
+
+		glUseProgram(0);
 	}
 };
 

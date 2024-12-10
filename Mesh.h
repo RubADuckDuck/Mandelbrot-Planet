@@ -10,8 +10,10 @@
 
 #include <map>
 #include <string> 
-#include <vector> 
+#include <vector>  
 #include "Transform.h"
+#include "Texture.h"
+#include "Light.h"
 
 #define MAX_NUM_BONES_PER_VERTEX 4 
 
@@ -24,6 +26,8 @@
 //
 //	void AddBoneData(uint32_t BoneIndex, float Weight);
 //};
+
+class CameraObject;
 
 struct Mesh {
 	GLuint VAO, VBO, EBO;
@@ -70,10 +74,6 @@ class SkinnedMesh {
 
 class GeneralMesh {
 public: 
-	virtual ~GeneralMesh() {} 
-
-	virtual bool LoadMesh(const std::string& fileName) = 0; 
-	virtual void Render() const = 0; 
 
 	struct BasicMeshEntry {
 		BasicMeshEntry()
@@ -96,10 +96,44 @@ public:
 	Assimp::Importer Importer;
 	const aiScene* ptrScene = NULL;
 	std::vector<BasicMeshEntry> meshes;
+	std::vector<Texture> textures; 
 	// std::vector<Material> m_Materials; materials are currently not implemented 
+
+	// Temporary space for vertex stuff before we load them into the GPU
+	std::vector<glm::vec3> positions;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec2> texCoords;
+	std::vector<unsigned int> indices; 
+
+	virtual ~GeneralMesh() {}
+
+	virtual bool LoadMesh(const std::string& fileName) = 0;
+
+	virtual void Render(CameraObject& camObj) = 0;
+
+protected:
+	virtual void Clear();
+
+	virtual bool InitFromScene(const aiScene* ptrScene, const std::string& filename); // why need file name when you have scene? 
+
+	virtual void CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& numVertices, unsigned int& numIndices); // hmm.. 
+
+	virtual void ReserveSpace(unsigned int numVertices, unsigned int numIndices); // why? why reserve space? just use vector 
+
+	virtual void InitAllMeshes(const aiScene* ptrScene);
+
+	virtual void InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh);
+
+	// virtual bool InitMaterials(const aiScene* ptrScene, const std::string& filename); todo or to trash
+
+	virtual void PopulateBuffers(); // I can imagine what this does, create the buffers load the data, take there address 
+
+	virtual void LoadTextures(const std::string& textureImagePath); 
+
+	virtual DirectionalLight GetDirectionalLight() { return DirectionalLight(); } // return default light for now
 };
 
-class StaticMesh : GeneralMesh {
+class StaticMesh : public GeneralMesh {
 public: 
 	enum BUFFER_TYPE {
 		INDEX_BUFFER = 0,
@@ -109,10 +143,18 @@ public:
 		NUM_BUFFERS = 4
 	};
 
-	GLuint Buffers[NUM_BUFFERS] = { 0 };
+	GLuint Buffers[NUM_BUFFERS] = { 0 }; 
+
+	std::vector<glm::mat4> meshIndex2meshTransform; 
+
+	void Render(CameraObject& camObj) override;
+
+protected:
+	
+	void ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform);
 };
 
-class RiggedMesh : GeneralMesh{
+class RiggedMesh : public GeneralMesh{
 public:
 	struct VertexBoneData {
 		uint32_t BoneIndexs[MAX_NUM_BONES_PER_VERTEX] = { 0 }; 
@@ -151,21 +193,21 @@ public:
 	GLuint Buffers[NUM_BUFFERS] = { 0 }; 
 
 	// Temporary space for vertex stuff before we load them into the GPU
-	std::vector<glm::vec3> positions; 
-	std::vector<glm::vec3> normals; 
-	std::vector<glm::vec2> texCoords; 
-	std::vector<unsigned int> indices; 
+	//std::vector<glm::vec3> positions; // these exist in the parent class 
+	//std::vector<glm::vec3> normals; 
+	//std::vector<glm::vec2> texCoords; 
+	//std::vector<unsigned int> indices; 
 	std::vector<VertexBoneData> bones; // this has to be manually constructed  
 
 	std::map<std::string, uint32_t> boneName2IndexMap;
 
 	struct BoneInfo { 
-		glm::mat4 currBone2ParentBoneCoord; // matrix that chnages coord from CurrentBoneCoord ParentBoneCoord
-		glm::mat4 currBone2GlobalCoord; 
+		glm::mat4 boneOffset; // matrix that chnages coord from CurrentBoneCoord ParentBoneCoord
+		glm::mat4 bone2GlobalCoord; 
 
 		BoneInfo(const glm::mat4 Offset) {
-			currBone2ParentBoneCoord = Offset; 
-			currBone2GlobalCoord = glm::mat4(1.0f); 
+			boneOffset = Offset; 
+			bone2GlobalCoord = glm::mat4(1.0f); 
 		}
 	};
 
@@ -176,23 +218,19 @@ public:
 
 	~RiggedMesh(); 
 
-	bool LoadMesh(const std::string& fileName); 
+	bool LoadMesh(const std::string& fileName) override; 
 
-	void Render(); 
+	void Render(CameraObject& camObj) override;
 
 	uint32_t FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim); 
 
 	void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
-
 	uint32_t FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
-
 
 	void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
-
 	uint32_t FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
-
 
 	void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
@@ -209,27 +247,28 @@ public:
 private: 
 	void Clear(); 
 
-	bool InitFromScene(const aiScene* ptrScene, const std::string& filename); // why need file name when you have scene? 
+	// bool InitFromScene(const aiScene* ptrScene, const std::string& filename); // why need file name when you have scene? 
 
-	void CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& numVertices, unsigned int& numIndices); // hmm.. 
+	// void CountVerticesAndIndices(const aiScene* ptrScene, unsigned int& numVertices, unsigned int& numIndices); implementation exists in Parent Class
 
 	void ReserveSpace(unsigned int numVertices, unsigned int numIndices); // why? why reserve space? just use vector 
 
-	void InitAllMeshes(const aiScene* ptrScene); 
+	// void InitAllMeshes(const aiScene* ptrScene); 
 
-	void InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh);
+	void InitSingleMesh(uint32_t MeshIndex, const aiMesh* ptraiMesh) override;
 
+	// bone related 
 	void LoadMeshBones(uint32_t MeshIndex, const aiMesh* ptrMesh); 
 
 	void LoadSingleBone(uint32_t MeshIndex, const aiBone* ptrBone); 
 
 	int GetBoneIndex(const aiBone* ptrBone);
 
-	// bool InitMaterials(const aiScene* ptrScene, const std::string& filename); todo or to trash
+	// bool InitMaterials(const aiScene* ptrScene, const std::string& filename); // todo or to trash
 
 	void PopulateBuffers(); // I can imagine what this does, create the buffers load the data, take there address 
 
-	void LoadTextures(const std::string& textureImagePath); 
+	// void LoadTextures(const std::string& textureImagePath); 
 
 	void ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform);
 };

@@ -4,8 +4,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Mesh.h"
 
-//class Texture; 
 //class Animation; 
+
+class Texture; 
 
 class Transform; 
 
@@ -15,7 +16,7 @@ class CameraObject;
 class GameObject {
 public: 
 	GeneralMesh* ptrModel;
-	//Texture* ptrTexture;  
+	 Texture* ptrTexture;  
 	//Animation* ptrAnimation;  
 	Transform* ptrTransform;  
 
@@ -23,11 +24,13 @@ public:
 
 
 	void SetMesh(GeneralMesh* ptrModel) { this->ptrModel = ptrModel; }
-	//void SetTexture(Texture* ptrTexture) { this->ptrTexture = ptrTexture; }
+	void SetTexture(Texture* ptrTexture) { this->ptrTexture = ptrTexture; }
 	//void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
 	void SetTransform(Transform* ptrTransform) { this->ptrTransform = ptrTransform; }
 
-	virtual void DrawGameObject(CameraObject& cameraObj);
+	virtual void Update();
+	virtual void DrawGameObject(CameraObject& cameraObj); 
+	virtual void onEvent(const std::string& message);
 };
 
 

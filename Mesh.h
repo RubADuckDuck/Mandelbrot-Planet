@@ -36,14 +36,6 @@ struct Mesh {
 }; 
 
 
-
-
-
-class SkinnedMesh {
-
-};
-
-
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals |  aiProcess_JoinIdenticalVertices ) 
 
 
@@ -146,6 +138,9 @@ public:
 	GLuint Buffers[NUM_BUFFERS] = { 0 }; 
 
 	std::vector<glm::mat4> meshIndex2meshTransform; 
+
+
+	bool LoadMesh(const std::string& fileName) override;
 
 	void Render(CameraObject& camObj) override;
 

@@ -11,9 +11,10 @@
 
 
 void GameObject::DrawGameObject(CameraObject& cameraObj) {
-	
+	glm::mat4 transformMat = GetModelMatrixFromTransform();
 
-
+	// draw mesh
+	ptrModel->Render(cameraObj, transformMat);
 }
 
 //

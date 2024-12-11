@@ -96,8 +96,6 @@ private:
 
 class Event {
 public: 
- 
-
 	// add Objects that subscribe to this instance of event 
 	void Subscribe(Listener listener) {
 		listeners.push_back(listener); 

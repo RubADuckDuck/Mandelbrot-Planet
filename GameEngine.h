@@ -5,6 +5,8 @@
 
 class GameEngine {
 public: 
+
+	CameraObject camera;
 	
 	std::vector<GameObject*> gameObjects; 
 	 
@@ -14,10 +16,11 @@ public:
 	InputHandler inputHandler; 
 
 	GameEngine() {
+		camera = CameraObject(); 
 		inputHandler = InputHandler();
 	} 
 
-	void update() {
+	void Update() {
 		inputHandler.pollEvents(); 
 		GameObject* curGameObjPtr; 
 
@@ -25,9 +28,18 @@ public:
 			curGameObjPtr = gameObjects[i]; 
 			curGameObjPtr->Update();
 		}
+	} 
+
+	void Draw() {
+		for (GameObject* ptrGameObj : gameObjects) {
+			ptrGameObj->DrawGameObject(camera);
+		}
 	}
 
-	void CreateAndAddGameObject(std::string& meshPath, std::string& texturePath) { // no need for specification of coordinate? how odd for a gameengine 
+	void CreateAndAddGameObject(
+		const std::string& meshPath, 
+		std::string& texturePath) 
+	{  
 		GeneralMesh* curMesh = new StaticMesh();  
 		curMesh->LoadMesh(meshPath); 
 
@@ -43,6 +55,38 @@ public:
 
 		this->AddGameObjectToGameEngine(gameObject);
 	} 
+
+	void CreateAndAddGameObjectWithTransform(
+		const std::string& meshPath,
+		const std::string& texturePath,
+		const glm::vec3& translation = glm::vec3(0.0f),
+		const glm::vec3& scale = glm::vec3(1.0f),
+		const glm::vec3& rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f),
+		float rotationAngleRadians = 0.0f) // Angle in radians
+	{
+		// Load mesh
+		GeneralMesh* curMesh = new StaticMesh();
+		curMesh->LoadMesh(meshPath);
+
+		// Load texture
+		Texture* curTexture = new Texture();
+		curTexture->LoadandSetTextureIndexFromPath(texturePath);
+
+		// Create and set up transform
+		Transform* customTransform = new Transform();
+		customTransform->SetTranslation(translation);
+		customTransform->SetScale(scale);
+		customTransform->SetRotation(rotationAngleRadians, rotationAxis);
+
+		// Create the game object
+		GameObject* gameObject = new GameObject();
+		gameObject->SetMesh(curMesh);
+		gameObject->SetTexture(curTexture);
+		gameObject->SetTransform(customTransform);
+
+		// Add to game engine
+		this->AddGameObjectToGameEngine(gameObject);
+	}
 	
 private: 
 	void AddGameObjectToGameEngine(GameObject* gameObj) {

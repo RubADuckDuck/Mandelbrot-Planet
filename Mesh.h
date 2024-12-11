@@ -38,30 +38,6 @@ struct Mesh {
 
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals |  aiProcess_JoinIdenticalVertices ) 
 
-
-//class SceneLoader {
-//public: 
-//	std::vector<Mesh*> meshes; 
-//
-//
-//	std::vector<VertexBoneData> vertexIndex2BoneDatas; // vertex id -> Bone data
-//	std::vector<int> mesh_base_vertex;
-//	std::map<std::string, uint32_t> bone_name_to_index_map;
-//
-//	SceneLoader();
-//
-//	~SceneLoader();
-//
-//
-//	int GetBoneIndex(const aiBone* pBone); 
-//	void ParseSingleBone(int mesh_index, const aiBone* pBone);
-//	void ParseMeshBones(int mesh_index, const aiMesh* pMesh); 
-//	void ParseMeshes(const aiScene* pScene); 
-//	void ParseScene(const aiScene* pScene);
-//
-//	Mesh LoadModel(const std::string& path);
-//	void AddMesh(const std::string& path);
-//}; 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
 class GeneralMesh {
@@ -101,7 +77,7 @@ public:
 
 	virtual bool LoadMesh(const std::string& fileName) = 0;
 
-	virtual void Render(CameraObject& camObj) = 0;
+	virtual void Render(CameraObject& camObj, glm::mat4& tranform) = 0;
 
 protected:
 	virtual void Clear();
@@ -142,7 +118,7 @@ public:
 
 	bool LoadMesh(const std::string& fileName) override;
 
-	void Render(CameraObject& camObj) override;
+	void Render(CameraObject& camObj, glm::mat4& tranform) override;
 
 protected:
 	
@@ -215,7 +191,7 @@ public:
 
 	bool LoadMesh(const std::string& fileName) override; 
 
-	void Render(CameraObject& camObj) override;
+	void Render(CameraObject& camObj, glm::mat4& tranform) override;
 
 	uint32_t FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim); 
 

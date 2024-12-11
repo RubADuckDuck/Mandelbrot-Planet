@@ -28,9 +28,9 @@ public:
 	//void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
 	void SetTransform(Transform* ptrTransform) { this->ptrTransform = ptrTransform; }
 
-	virtual void Update();
+	virtual void Update() = 0;
 	virtual void DrawGameObject(CameraObject& cameraObj); 
-	virtual void onEvent(const std::string& message);
+	virtual void onEvent(const std::string& message) = 0;
 };
 
 

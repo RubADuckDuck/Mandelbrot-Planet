@@ -558,7 +558,7 @@ void RiggedMesh::PopulateBuffers()
 
 
 
-void StaticMesh::Render(CameraObject& cameraObj)
+void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 {
     GLuint shaderProgram = NULL; 
 
@@ -616,8 +616,8 @@ void StaticMesh::Render(CameraObject& cameraObj)
         //    m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
         //}
 
-        // get Mesh->World->View->Projection transformation
-        curMwvp = viewProj * this->meshIndex2meshTransform[i]; 
+        // get Mesh->World(SceneRoot)->World(InGame)->View->Projection transformation
+        curMwvp = viewProj * tranform * this->meshIndex2meshTransform[i];
 
         // get TextureIndex 
         curTextureIndex = this->textures[i].GetTextureIndex(); 
@@ -641,7 +641,7 @@ void StaticMesh::Render(CameraObject& cameraObj)
     glBindVertexArray(0);
 }
 
-void RiggedMesh::Render(CameraObject& cameraObj)
+void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 {
     GLuint shaderProgram = NULL;
 
@@ -684,7 +684,9 @@ void RiggedMesh::Render(CameraObject& cameraObj)
         cameraGlobalPos[2]
     );
 
-    curMwvp = viewProj * this->model2WorldTransform.GetTranformMatrix();
+    // get Mesh->World(SceneRoot)->World(InGame)->View->Projection transformation
+    curMwvp = viewProj * this->model2WorldTransform.GetTransformMatrix() * tranform;
+
     // set MWVP transformation
     glUniformMatrix4fv(mwvpLoc, 1, GL_FALSE, glm::value_ptr(curMwvp));
 

@@ -1,27 +1,49 @@
 #include "Transform.h"
 
-// Constructor to initialize the transformation matrices
 Transform::Transform()
-    : translation(glm::mat4(1.0f)),
-    rotation(glm::mat4(1.0f)),
-    scale(glm::mat4(1.0f)) {}
-
-// Method to compute the final transformation matrix
-glm::mat4 Transform::GetTranformMatrix() {
-    return translation * rotation * scale; // Apply transformations in order
+    : translation(0.0f, 0.0f, 0.0f),
+    rotation(glm::quat_identity<float, glm::defaultp>()),
+    scale(1.0f, 1.0f, 1.0f)
+{
+    // Initialize translation to zero, rotation to identity quaternion, scale to 1
 }
 
-// Set the translation matrix using a translation vector
-void Transform::SetTranslation(glm::vec3 x) {
-    translation = glm::translate(glm::mat4(1.0f), x);
+glm::mat4 Transform::GetTransformMatrix() const {
+    // Construct transformation matrix in order: Translate * Rotate * Scale
+    glm::mat4 T = glm::translate(glm::mat4(1.0f), translation);
+    glm::mat4 R = glm::mat4_cast(rotation);   // Converts quaternion to rotation matrix
+    glm::mat4 S = glm::scale(glm::mat4(1.0f), scale);
+
+    return T * R * S;
 }
 
-// Set the rotation matrix using an angle (radians) and an axis
-void Transform::SetRotation(float theta, glm::vec3 axis) {
-    rotation = glm::rotate(glm::mat4(1.0f), theta, axis);
+void Transform::SetTranslation(const glm::vec3& t) {
+    this->translation = t;
 }
 
-// Set the scaling matrix using a scaling vector
-void Transform::SetScale(glm::vec3 x) {
-    scale = glm::scale(glm::mat4(1.0f), x);
+void Transform::SetRotation(float radians, const glm::vec3& axis) {
+    // Create a quaternion representing a rotation of 'radians' around 'axis'
+    // Ensure 'axis' is normalized
+    glm::vec3 normAxis = glm::normalize(axis);
+    this->rotation = glm::angleAxis(radians, normAxis);
+}
+
+void Transform::SetScale(const glm::vec3& s) {
+    this->scale = s;
+}
+
+void Transform::SetRotationQuat(const glm::quat& q) {
+    this->rotation = q;
+}
+
+glm::vec3 Transform::GetTranslation() const {
+    return translation;
+}
+
+glm::quat Transform::GetRotationQuat() const {
+    return rotation;
+}
+
+glm::vec3 Transform::GetScale() const {
+    return scale;
 }

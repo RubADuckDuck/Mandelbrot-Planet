@@ -5,11 +5,29 @@
 #include <SDL.h> 
 #include <iostream>
 
-class Event;
-
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
 using Listener = std::function<void(const std::string&)>;
+
+class Event {
+public:
+    // add Objects that subscribe to this instance of event 
+    void Subscribe(Listener listener) {
+        listeners.push_back(listener);
+    }
+
+    // propagate Messages 
+    void Publish(const std::string& message) {
+        for (const auto& listener : listeners) {
+            listener(message);
+        }
+    }
+
+private:
+    std::vector<Listener> listeners;
+};
+
+
 
 class InputHandler {
 public:
@@ -94,23 +112,7 @@ private:
     }
 };
 
-class Event {
-public: 
-	// add Objects that subscribe to this instance of event 
-	void Subscribe(Listener listener) {
-		listeners.push_back(listener); 
-	} 
-	
-	// propagate Messages 
-	void Publish(const std::string& message) {
-		for (const auto& listener : listeners) {
-			listener(message); 
-		}
-	}
 
-private: 
-	std::vector<Listener> listeners; 
-};  
 
 
 

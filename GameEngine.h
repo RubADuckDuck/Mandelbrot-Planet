@@ -38,7 +38,9 @@ public:
 
 	void CreateAndAddGameObject(
 		const std::string& meshPath, 
-		std::string& texturePath) 
+		std::string& texturePath,
+		GLuint shaderProgram
+		) 
 	{  
 		GeneralMesh* curMesh = new StaticMesh();  
 		curMesh->LoadMesh(meshPath); 
@@ -52,6 +54,7 @@ public:
 		gameObject->SetMesh(curMesh); 
 		gameObject->SetTexture(curTexture); 
 		gameObject->SetTransform(defaultTransform); 
+		gameObject->SetShaderProgram(shaderProgram);
 
 		this->AddGameObjectToGameEngine(gameObject);
 	} 
@@ -59,6 +62,7 @@ public:
 	void CreateAndAddGameObjectWithTransform(
 		const std::string& meshPath,
 		const std::string& texturePath,
+		GLuint shaderProgram,
 		const glm::vec3& translation = glm::vec3(0.0f),
 		const glm::vec3& scale = glm::vec3(1.0f),
 		const glm::vec3& rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -83,6 +87,10 @@ public:
 		gameObject->SetMesh(curMesh);
 		gameObject->SetTexture(curTexture);
 		gameObject->SetTransform(customTransform);
+		gameObject->SetShaderProgram(shaderProgram); // Are these redundant?
+
+		// Set Shader on Mesh 
+		gameObject->ptrModel->SetShaderProgram(shaderProgram); // Are these redundant?
 
 		// Add to game engine
 		this->AddGameObjectToGameEngine(gameObject);

@@ -65,6 +65,8 @@ public:
 	const aiScene* ptrScene = NULL;
 	std::vector<BasicMeshEntry> meshes;
 	std::vector<Texture> textures; 
+	GLuint shaderProgramIndex; 
+
 	// std::vector<Material> m_Materials; materials are currently not implemented 
 
 	// Temporary space for vertex stuff before we load them into the GPU
@@ -75,9 +77,13 @@ public:
 
 	virtual ~GeneralMesh() {}
 
+	void SetShaderProgram(GLuint shaderIndex) { this->shaderProgramIndex = shaderIndex; }
+
 	virtual bool LoadMesh(const std::string& fileName) = 0;
 
-	virtual void Render(CameraObject& camObj, glm::mat4& tranform) = 0;
+	virtual void Render(CameraObject& camObj, glm::mat4& tranform) = 0; 
+
+	virtual void Render(CameraObject& camObj, glm::mat4& tranform, Texture* texture) = 0;
 
 protected:
 	virtual void Clear();
@@ -118,7 +124,9 @@ public:
 
 	bool LoadMesh(const std::string& fileName) override;
 
-	void Render(CameraObject& camObj, glm::mat4& tranform) override;
+	void Render(CameraObject& camObj, glm::mat4& tranform) override; 
+
+	void Render(CameraObject& camObj, glm::mat4& tranform, Texture* texture) override;
 
 protected:
 	
@@ -191,7 +199,9 @@ public:
 
 	bool LoadMesh(const std::string& fileName) override; 
 
-	void Render(CameraObject& camObj, glm::mat4& tranform) override;
+	void Render(CameraObject& camObj, glm::mat4& tranform) override; 
+
+	void Render(CameraObject& camObj, glm::mat4& tranform, Texture* texture) override;
 
 	uint32_t FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim); 
 

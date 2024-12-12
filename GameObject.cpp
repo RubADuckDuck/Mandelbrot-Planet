@@ -9,12 +9,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+glm::mat4 GameObject::GetModelMatrixFromTransform() {
+	return ptrTransform->GetTransformMatrix();
+}
+
+
 
 void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	glm::mat4 transformMat = GetModelMatrixFromTransform();
 
 	// draw mesh
-	ptrModel->Render(cameraObj, transformMat);
+	ptrModel->Render(cameraObj, transformMat, ptrTexture);
 }
 
 //

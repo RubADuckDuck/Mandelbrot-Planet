@@ -4,6 +4,7 @@
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags 
 #include <cassert>
+#include <iostream>
 #include "Mesh.h"
 #include "GameObject.h"
 
@@ -151,6 +152,46 @@ void RiggedMesh::Clear()
         glDeleteVertexArrays(1, &VAO);
         VAO = 0;
     }
+}
+
+bool StaticMesh::LoadMesh(const std::string& filename) {
+    // Release previously loaded mesh 
+    this->Clear();
+
+    // Create VAO... this early? 
+    glGenVertexArrays(1, &this->VAO);
+    glBindVertexArray(this->VAO);
+
+    // Create the buffers for the vertexs' attributes
+    glGenBuffers(std::size(this->Buffers), this->Buffers); // forgot what this does 
+
+    bool Ret = false; // what does this do? 
+
+    this->ptrScene = Importer.ReadFile(filename.c_str(), ASSIMP_LOAD_FLAGS);
+
+    if (ptrScene) {
+        // GlobalInverseTransform = ConvertToGlmMat4(ptrScene->mRootNode->mTransformation);
+        // GlobalInverseTransform = glm::inverse(GlobalInverseTransform); // calculate inverse transformation 
+        // 
+        // mTransforms map from RootNode -> Global
+        // the inverse does the oppisite mapping Global -> RootNode 
+        // this is needed since each accumulated transform in each bone maps from 
+        // Bone_n -> ... -> Global 
+        // however since meshes' vertices are represented respect to RootCoord, 
+        // the Transformation that properly controls the vertices is 
+        // Bone_n -> ... -> Global -> RootNode. Not, Bone_n -> ... -> Global
+        // that is why we keep the inverse as member var.
+        Ret = this->InitFromScene(ptrScene, filename);
+
+    }
+    else {
+        printf("Error parsing '%s': '%s'\n", filename.c_str(), Importer.GetErrorString());
+    }
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);
+
+    return Ret;
 }
 
 bool RiggedMesh::LoadMesh(const std::string& filename) {
@@ -560,7 +601,10 @@ void RiggedMesh::PopulateBuffers()
 
 void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 {
-    GLuint shaderProgram = NULL; 
+    if (!shaderProgramIndex) {
+        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl; 
+    }
+    GLuint shaderProgram = this->shaderProgramIndex;
 
     glm::mat4 curMwvp = glm::mat4(1); 
     glm::mat4 viewProj = cameraObj.GetviewProjMat();
@@ -643,7 +687,10 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
 void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 {
-    GLuint shaderProgram = NULL;
+    if (!shaderProgramIndex) {
+        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl;
+    }
+    GLuint shaderProgram = this->shaderProgramIndex;
 
     glm::mat4 curMwvp = glm::mat4(1);
     glm::mat4 viewProj = cameraObj.GetviewProjMat();
@@ -707,6 +754,181 @@ void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
         // get TextureIndex 
         curTextureIndex = this->textures[i].GetTextureIndex(); 
+
+        // set texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, curTextureIndex);
+        glUniform1i(textureLoc, 0);
+
+        glDrawElementsBaseVertex(GL_TRIANGLES,
+            meshes[i].NumIndices,
+            GL_UNSIGNED_INT,
+            (void*)(sizeof(unsigned int) * meshes[i].BaseIndex),
+            meshes[i].BaseVertex);
+    }
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);
+}
+
+
+void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
+{
+    if (shaderProgramIndex!=NULL) {
+        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl;
+    }
+    GLuint shaderProgram = this->shaderProgramIndex;
+
+    glm::mat4 curMwvp = glm::mat4(1);
+    glm::mat4 viewProj = cameraObj.GetviewProjMat();
+
+    glm::vec3 cameraGlobalPos = cameraObj.GetGlobalCameraPosition();
+
+    GLuint curTextureIndex = 0;
+
+    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
+    GLuint cameraGlobalPosition = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
+    GLuint lightVecLocation = glGetUniformLocation(shaderProgram, "light_vec");
+
+    { // set light
+        DirectionalLight directionalLight = this->GetDirectionalLight();
+        GLint location;
+
+        // Set BaseLight fields
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.Color");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.base.color));
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.AmbientIntensity");
+        glUniform1f(location, directionalLight.base.ambientIntensity);
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.DiffuseIntensity");
+        glUniform1f(location, directionalLight.base.diffuseIntensity);
+
+        // Set Direction field
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Direction");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.direction));
+    }
+
+    // set cameraPosition
+    glUniform3f(
+        cameraGlobalPosition,
+        cameraGlobalPos[0],
+        cameraGlobalPos[1],
+        cameraGlobalPos[2]
+    );
+
+    glBindVertexArray(VAO);
+
+    for (unsigned int i = 0; i < meshes.size(); i++) {
+        unsigned int MaterialIndex = meshes[i].MaterialIndex;
+
+        // assert(MaterialIndex < m_Materials.size()); todo: how do I assert?
+
+        //if (m_Materials[MaterialIndex].pDiffuse) { todo: material is currently ignored
+        //    m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        //}
+
+        //if (m_Materials[MaterialIndex].pSpecularExponent) {
+        //    m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        //}
+
+        // get Mesh->World(SceneRoot)->World(InGame)->View->Projection transformation
+        curMwvp = viewProj * tranform * this->meshIndex2meshTransform[i];
+
+        // get TextureIndex 
+        // curTextureIndex = this->textures[i].GetTextureIndex();
+        curTextureIndex = ptrTexture->GetTextureIndex();
+
+        // set MWVP transformation
+        glUniformMatrix4fv(mwvpLoc, 1, GL_FALSE, glm::value_ptr(curMwvp));
+        // set texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, curTextureIndex);
+        glUniform1i(textureLoc, 0);
+
+        glDrawElementsBaseVertex(GL_TRIANGLES,
+            meshes[i].NumIndices,
+            GL_UNSIGNED_INT,
+            (void*)(sizeof(unsigned int) * meshes[i].BaseIndex), // Specifies a pointer to the location where the indices are stored 
+            meshes[i].BaseVertex
+        ); // Specifies a constant that should be added to each element of indices when chosing elements from the enabled vertex arrays.
+    }
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);
+}
+
+void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
+{
+    if (!shaderProgramIndex) {
+        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl;
+    }
+    GLuint shaderProgram = this->shaderProgramIndex;
+
+    glm::mat4 curMwvp = glm::mat4(1);
+    glm::mat4 viewProj = cameraObj.GetviewProjMat();
+
+    glm::vec3 cameraGlobalPos = cameraObj.GetGlobalCameraPosition();
+
+
+    GLuint curTextureIndex = 0;
+
+    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
+    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
+
+    { // set light
+        DirectionalLight directionalLight = this->GetDirectionalLight();
+        GLint location;
+
+        // Set BaseLight fields
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.Color");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.base.color));
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.AmbientIntensity");
+        glUniform1f(location, directionalLight.base.ambientIntensity);
+
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Base.DiffuseIntensity");
+        glUniform1f(location, directionalLight.base.diffuseIntensity);
+
+        // Set Direction field
+        location = glGetUniformLocation(shaderProgram, "gDirectionalLight.Direction");
+        glUniform3fv(location, 1, glm::value_ptr(directionalLight.direction));
+    }
+
+    // set cameraPosition
+    glUniform3f(
+        cameraGlobalPositionLoc,
+        cameraGlobalPos[0],
+        cameraGlobalPos[1],
+        cameraGlobalPos[2]
+    );
+
+    // get Mesh->World(SceneRoot)->World(InGame)->View->Projection transformation
+    curMwvp = viewProj * this->model2WorldTransform.GetTransformMatrix() * tranform;
+
+    // set MWVP transformation
+    glUniformMatrix4fv(mwvpLoc, 1, GL_FALSE, glm::value_ptr(curMwvp));
+
+    glBindVertexArray(VAO);
+
+    for (unsigned int i = 0; i < meshes.size(); i++) {
+        unsigned int MaterialIndex = meshes[i].MaterialIndex;
+
+        // assert(MaterialIndex < m_Materials.size()); todo: how do I assert?
+
+        //if (m_Materials[MaterialIndex].pDiffuse) { todo: material is currently ignored
+        //    m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        //}
+
+        //if (m_Materials[MaterialIndex].pSpecularExponent) {
+        //    m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        //}
+
+        // get TextureIndex 
+        // curTextureIndex = this->textures[i].GetTextureIndex();
+        curTextureIndex = ptrTexture->GetTextureIndex();
 
         // set texture
         glActiveTexture(GL_TEXTURE0);

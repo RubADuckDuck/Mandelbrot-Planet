@@ -19,6 +19,7 @@ public:
 	 Texture* ptrTexture;  
 	//Animation* ptrAnimation;  
 	Transform* ptrTransform;  
+	GLuint shaderProgram; 
 
 	glm::mat4 GetModelMatrixFromTransform();
 
@@ -27,10 +28,11 @@ public:
 	void SetTexture(Texture* ptrTexture) { this->ptrTexture = ptrTexture; }
 	//void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
 	void SetTransform(Transform* ptrTransform) { this->ptrTransform = ptrTransform; }
+	void SetShaderProgram(GLuint arg_shaderProgram) { this->shaderProgram = arg_shaderProgram; }
 
-	virtual void Update() = 0;
+	virtual void Update() {};
 	virtual void DrawGameObject(CameraObject& cameraObj); 
-	virtual void onEvent(const std::string& message) = 0;
+	virtual void onEvent(const std::string& message) {};
 };
 
 

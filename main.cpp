@@ -29,7 +29,7 @@ bool gQuit = false;
 // OpenGL Globals
 GLuint shaderProgram;
 
-GameEngine gameEngine; 
+GameEngine gameEngine = GameEngine();
 
 
 
@@ -513,20 +513,25 @@ void InitializaProgram() {
 			std::cerr << "GL DEBUG: " << message << std::endl;
 		}, nullptr);
 
-	// init gameEngine 
-	gameEngine = GameEngine();
-
+	// GameEngine ge = GameEngine(); 
+	/* 
+	for some reason, of which I have no idea, when I Create the game EngineObject, the SDL window crashes. 
+	I'm wondering if it is possible, and if so, for what reason?
+	*/
 	
 	// load meshmanager and load model
 	std::string objPath = "E:\\repos\\[DuckFishing]\\model\\duck.obj";
 	std::string texturePath = "E:\repos\[DuckFishing]\model\texture\Poliigon_RattanWeave_6945\2K\Poliigon_RattanWeave_6945_BaseColor.jpg"; 
 
+	GLuint testVertArr;
+	glGenVertexArrays(1, &testVertArr);
+	std::cout << "Index of Vertex array generated for test purpose: " << testVertArr << std::endl;
+
 	gameEngine.CreateAndAddGameObject(
-		objPath, 
-		texturePath, 
+		objPath,
+		texturePath,
 		shaderProgram
 	);
-	
 }
 
 

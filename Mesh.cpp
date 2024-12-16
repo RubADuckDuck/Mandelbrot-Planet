@@ -14,6 +14,10 @@
 #define BONE_Index_LOCATION  3
 #define BONE_WEIGHT_LOCATION 4
 
+void log(std::string& msg) {
+    std::cout << msg << std::endl;
+}
+
 // Function to convert aiMatrix4x4 to glm::mat4
 glm::mat4 ConvertToGlmMat4(const aiMatrix4x4& aiMat) {
     glm::mat4 glmMat;
@@ -159,8 +163,8 @@ bool StaticMesh::LoadMesh(const std::string& filename) {
     this->Clear();
 
     // Create VAO... this early? 
-    glGenVertexArrays(1, &this->VAO);
-    glBindVertexArray(this->VAO);
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
     // Create the buffers for the vertexs' attributes
     glGenBuffers(std::size(this->Buffers), this->Buffers); // forgot what this does 
@@ -568,23 +572,37 @@ int RiggedMesh::GetBoneIndex(const aiBone* ptrBone) {
 
 void StaticMesh::PopulateBuffers()
 {
+    std::string debugLine = "";
+
     glBindBuffer(GL_ARRAY_BUFFER, Buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(positions[0]) * positions.size(), &positions[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POSITION_LOCATION);
     glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    debugLine = "Position buffer size:" + std::to_string(sizeof(positions[0]) * positions.size());
+    log(debugLine);
 
     glBindBuffer(GL_ARRAY_BUFFER, Buffers[TEXCOORD_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords[0]) * texCoords.size(), &texCoords[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(TEX_COORD_LOCATION);
     glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+    debugLine = "TexCoord buffer size:" + std::to_string(sizeof(texCoords[0]) * texCoords.size());
+    log(debugLine);
+
     glBindBuffer(GL_ARRAY_BUFFER, Buffers[NORMAL_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(normals[0]) * normals.size(), &normals[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(NORMAL_LOCATION);
     glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+    debugLine = "Normal buffer size:" + std::to_string(sizeof(normals[0]) * normals.size());
+    log(debugLine);
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[INDEX_BUFFER]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW); 
+
+    debugLine = "Index buffer size:" + std::to_string(sizeof(indices[0]) * indices.size());
+    log(debugLine);
 }
 
 void RiggedMesh::PopulateBuffers()
@@ -866,6 +884,9 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, curTextureIndex);
         glUniform1i(textureLoc, 0);
+
+        std::string msg = "IndexNum in Currently drawn mesh: " + std::to_string(meshes[i].NumIndices);
+        log(msg);
 
         glDrawElementsBaseVertex(
             GL_TRIANGLES,

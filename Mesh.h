@@ -59,7 +59,7 @@ public:
 	}; 
 
 	Transform model2WorldTransform;
-	GLuint VAO = 0;
+	GLuint VAO = 58;
 
 	Assimp::Importer Importer;
 	const aiScene* ptrScene = NULL;

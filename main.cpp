@@ -313,36 +313,90 @@ GameEngine gameEngine;
 const char* vertexShaderSource = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoords; 
+layout (location = 1) in vec2 aTexCoord; 
+layout (location = 2) in vec3 aNormal;
 
-out vec2 TexCoords; 
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+out vec2 TexCoord0; 
+out vec3 Normal0; 
+out vec3 Position0; 
+
+uniform mat4 mwvp;
 
 void main() { 
 
 	// Pass texture coordinates to the fragment shader
-    TexCoords = aTexCoords; 
+    TexCoord0 = aTexCoord; 
+    Normal0 = aNormal;
+    Position0 = aPos; 
 
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-}
+    gl_Position = mwvp * vec4(aPos, 1.0);
+} 
 )";
 
 const char* fragmentShaderSource = R"(
-#version 330 core
+#version 330
+
+in vec2 TexCoord0;
+in vec3 Normal0;
+in vec3 Position0;
+
 out vec4 FragColor;
 
-in vec2 TexCoords;
+struct BaseLight
+{
+    vec3 Color;
+    float AmbientIntensity;
+    float DiffuseIntensity;
+};
 
-uniform sampler2D texture_diffuse;
+struct DirectionalLight
+{
+    BaseLight Base;
+    vec3 Direction;
+};
 
-void main() {
-    FragColor = texture(texture_diffuse, TexCoords);
-	// Visualize the texture coordinates as colors
-    // FragColor = vec4(1, 1, 0.0, 1.0);
+uniform DirectionalLight gDirectionalLight;
+uniform vec3 gCameraPos;
+uniform sampler2D textureDiffuse;
+
+
+vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
+{
+    LightDirection = normalize(LightDirection);  // Add normalization here
+    float DiffuseFactor = dot(Normal, -LightDirection);
+
+    vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;
+    vec4 DiffuseColor = vec4(0, 0, 0, 0);
+    vec4 SpecularColor = vec4(0, 0, 0, 0);
+
+    if (DiffuseFactor > 0) {
+        DiffuseColor = vec4(Light.Color, 1.0f) *
+                       Light.DiffuseIntensity *
+                       DiffuseFactor; 
+
+        vec3 PixelToCamera = normalize(gCameraPos - Position0);
+        vec3 LightReflect = normalize(reflect(LightDirection, Normal));
+        float SpecularFactor = dot(PixelToCamera, LightReflect); 
+
+        SpecularColor = vec4(Light.Color, 1.0f) * SpecularFactor;
+    }
+
+    return AmbientColor + DiffuseColor + SpecularColor;
+}
+
+
+vec4 CalcDirectionalLight(vec3 Normal)
+{
+    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal);
+}
+
+void main()
+{
+    vec3 Normal = normalize(Normal0);
+    vec4 TotalLight = CalcDirectionalLight(Normal);
+
+    FragColor = texture(textureDiffuse, TexCoord0.xy) * TotalLight;
 }
 )"; 
 
@@ -360,6 +414,9 @@ GLuint CompileShader(GLenum type, const char* source) {
 		std::cout << "Shader Compilation Error:\n" << infoLog << std::endl;
 		exit(1);
 	}
+
+	std::cout << "Successully compiled shader at: " << shader << std::endl;
+
 	return shader;
 }
 
@@ -439,12 +496,22 @@ void InitializaProgram() {
 
 	// init ShaderProgram 
 	shaderProgram = CreateShaderProgram(vertexShaderSource, fragmentShaderSource); 
+	std::cout << "Shader Program at:" << shaderProgram << std::endl; 
+
 
 	GetOpenGLVersionInfo(); 
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+
+	// debugging 
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity,
+		GLsizei length, const GLchar* message, const void* userParam) {
+			std::cerr << "GL DEBUG: " << message << std::endl;
+		}, nullptr);
 
 	// init gameEngine 
 	gameEngine = GameEngine();
@@ -476,6 +543,9 @@ void Input() {
 	}
 }
 
+void debugging() {
+	std::cout << gQuit << std::endl; 
+}
 
 void MainLoop() {
 	const int targetFPS = 30; // Target frame rate
@@ -488,13 +558,15 @@ void MainLoop() {
 		// Handle inputs
 		Input();
 
+		debugging();
+
 		// Update game state
 		gameEngine.Update();
 
 		// Render game state
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		gameEngine.Draw();
-		SDL_GL_SwapWindow(gGraphicsApplicationWindow);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffer
+		gameEngine.Draw(); // draw on cleared buffer
+		SDL_GL_SwapWindow(gGraphicsApplicationWindow); // swap buffer
 
 		// End frame timer and calculate frame time
 		Uint64 endTicks = SDL_GetPerformanceCounter();

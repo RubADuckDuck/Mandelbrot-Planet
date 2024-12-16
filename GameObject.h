@@ -16,7 +16,7 @@ class CameraObject;
 class GameObject {
 public: 
 	GeneralMesh* ptrModel;
-	 Texture* ptrTexture;  
+	Texture* ptrTexture;  
 	//Animation* ptrAnimation;  
 	Transform* ptrTransform;  
 	GLuint shaderProgram; 

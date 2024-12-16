@@ -33,13 +33,27 @@ struct SpotLight {
     float cutoff;
 };
 
-struct DirectionalLight {
+class DirectionalLight {
+private:
+    // Private constructor to ensure no external instantiation
+    DirectionalLight() : base(), direction(glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f))) {}
+
+    // Delete copy constructor and assignment operator
+    DirectionalLight(const DirectionalLight&) = delete;
+    DirectionalLight& operator=(const DirectionalLight&) = delete;
+
+public:
     BaseLight base;
     glm::vec3 direction;
 
-    DirectionalLight() {
-        this->base = BaseLight();
-        // Set Direction
-        this->direction = glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f)); // Pointing diagonally downward
+    // Static method to access the singleton instance
+    static DirectionalLight& getInstance() {
+        static DirectionalLight instance;  // Guaranteed to be created once and thread-safe
+        return instance;
     }
+
+    // Public methods to access and modify the DirectionalLight properties
+    BaseLight& getBaseLight() { return base; }
+    glm::vec3& getDirection() { return direction; }
+    void setDirection(const glm::vec3& dir) { direction = glm::normalize(dir); }
 };

@@ -104,7 +104,10 @@ protected:
 
 	virtual void LoadTextures(const std::string& textureImagePath); 
 
-	virtual DirectionalLight GetDirectionalLight() { return DirectionalLight(); } // return default light for now
+	virtual DirectionalLight& GetDirectionalLight() { 
+		DirectionalLight& light = DirectionalLight::getInstance(); 
+		return light;
+	} // directionalLight is singleton. dot product is biliniar that's why
 };
 
 class StaticMesh : public GeneralMesh {
@@ -131,6 +134,8 @@ public:
 protected:
 	
 	void ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform);
+
+	void PopulateBuffers() override; // I can imagine what this does, create the buffers load the data, take there address 
 };
 
 class RiggedMesh : public GeneralMesh{

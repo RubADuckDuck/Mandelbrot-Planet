@@ -4,39 +4,105 @@
 #include <vector>
 #include <SDL.h> 
 #include <iostream>
+#include <unordered_map>
+#include <mutex>
 
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
 using Listener = std::function<void(const std::string&)>;
 
-class Event {
+class EventDispatcher {
 public:
-    // add Objects that subscribe to this instance of event 
-    void Subscribe(Listener listener) {
-        listeners.push_back(listener);
+    // Public method to get the singleton instance
+    static EventDispatcher& GetInstance() {
+        static EventDispatcher instance; // Guaranteed to be initialized only once
+        return instance;
     }
 
-    // propagate Messages 
-    void Publish(const std::string& message) {
-        for (const auto& listener : listeners) {
-            listener(message);
+    void Subscribe(Listener* ptrListener) {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (std::find(listeners.begin(), listeners.end(), ptrListener) == listeners.end()) {
+            listeners.push_back(ptrListener);
+        }
+    }
+
+    void Subscribe(const std::string& tag, Listener* ptrListener) {
+        std::lock_guard<std::mutex> lock(mutex);
+        auto& tagListeners = tag2Listener[tag];
+        if (std::find(tagListeners.begin(), tagListeners.end(), ptrListener) == tagListeners.end()) {
+            tagListeners.push_back(ptrListener);
+        }
+        // Subscribe(ptrListener); // Add to general listeners as well // currently blocked
+    }
+
+    void Publish(const std::string& message) { 
+        std::cout << message << " triggered" << std::endl;
+
+        std::lock_guard<std::mutex> lock(mutex);
+        for (const auto& ptrListener : listeners) {
+            try {
+                (*ptrListener)(message);
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Listener exception: " << e.what() << std::endl;
+            }
+        }
+    }
+
+    void Publish(const std::string& tag, const std::string& message) {
+        std::cout << tag << "::" << message << " triggered" << std::endl;
+
+        std::lock_guard<std::mutex> lock(mutex);
+        auto it = tag2Listener.find(tag); 
+
+        if (it != tag2Listener.end()) {
+            for (const auto& ptrListener : it->second) {
+                try {
+                    (*ptrListener)(message);
+                }
+                catch (const std::exception& e) {
+                    std::cerr << "Listener exception: " << e.what() << std::endl;
+                }
+            }
+        }
+    }
+
+    void Unsubscribe(Listener* ptrListener) {
+        std::lock_guard<std::mutex> lock(mutex);
+        listeners.erase(std::remove(listeners.begin(), listeners.end(), ptrListener), listeners.end());
+    }
+
+    void Unsubscribe(const std::string& tag, Listener* ptrListener) {
+        std::lock_guard<std::mutex> lock(mutex);
+        auto it = tag2Listener.find(tag);
+        if (it != tag2Listener.end()) {
+            it->second.erase(std::remove(it->second.begin(), it->second.end(), ptrListener), it->second.end());
+            if (it->second.empty()) {
+                tag2Listener.erase(it);
+            }
         }
     }
 
 private:
-    std::vector<Listener> listeners;
+    // Private constructor to prevent direct instantiation
+    EventDispatcher() = default;
+
+    // Delete copy constructor and assignment operator
+    EventDispatcher(const EventDispatcher&) = delete;
+    EventDispatcher& operator=(const EventDispatcher&) = delete;
+
+    std::vector<Listener*> listeners;
+    std::map<std::string, std::vector<Listener*>> tag2Listener;
+    std::mutex mutex;
 };
 
 
 
 class InputHandler {
 public:
-    Event inputEvent; //
+    std::string tag = "keyInput"; 
 
     InputHandler() : quit(false) {
-        // Initialize SDL
-        inputEvent = Event();  
-
 
         if (SDL_Init(SDL_INIT_VIDEO) != 0) {
             std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
@@ -81,31 +147,46 @@ public:
     bool isDPressed() const { return dPressed; }
     bool isSpacePressed() const { return spacePressed; }
 
-    void Subscribe(Listener listener) {
-        inputEvent.Subscribe(listener);
+    void Subscribe(Listener* ptrListener) {
+        // Get the singleton instance
+        EventDispatcher& dispatcher = EventDispatcher::GetInstance();
+        dispatcher.Subscribe(this->tag, ptrListener);
+    }
+
+    void Publish(const std::string& msg) {
+        // Get the singleton instance
+        EventDispatcher& dispatcher = EventDispatcher::GetInstance();
+        dispatcher.Publish(this->tag, "w_down");
     }
 
 private:
     bool quit;
-    bool wPressed, aPressed, sPressed, dPressed, spacePressed;
+    bool wPressed, aPressed, sPressed, dPressed, spacePressed; 
+
+
 
     void handleKeyDown(SDL_Keycode key) { 
+        
+
         switch (key) {
-        case SDLK_w: wPressed = true; inputEvent.Publish("w_down"); break;
-        case SDLK_a: aPressed = true; inputEvent.Publish("a_down"); break;
-        case SDLK_s: sPressed = true; inputEvent.Publish("s_down"); break;
-        case SDLK_d: dPressed = true; inputEvent.Publish("d_down"); break;
+        case SDLK_w: wPressed = true; this->Publish("w_down"); break;
+        case SDLK_a: aPressed = true; this->Publish("a_down"); break;
+        case SDLK_s: sPressed = true; this->Publish("s_down"); break;
+        case SDLK_d: dPressed = true; this->Publish("d_down"); break;
         case SDLK_SPACE: spacePressed = true; break;
         default: break;
         }
     }
 
     void handleKeyUp(SDL_Keycode key) {
+        // Get the singleton instance
+        EventDispatcher& dispatcher = EventDispatcher::GetInstance(); 
+
         switch (key) {
-        case SDLK_w: wPressed = false; inputEvent.Publish("w_up"); break;
-        case SDLK_a: aPressed = false; inputEvent.Publish("a_up"); break;
-        case SDLK_s: sPressed = false; inputEvent.Publish("s_up"); break;
-        case SDLK_d: dPressed = false; inputEvent.Publish("d_up"); break;
+        case SDLK_w: wPressed = false; this->Publish("w_up"); break;
+        case SDLK_a: aPressed = false; this->Publish("a_up"); break;
+        case SDLK_s: sPressed = false; this->Publish("s_up"); break;
+        case SDLK_d: dPressed = false; this->Publish("d_up"); break;
         case SDLK_SPACE: spacePressed = false; break;
         default: break;
         }

@@ -566,6 +566,27 @@ int RiggedMesh::GetBoneIndex(const aiBone* ptrBone) {
 //}
 
 
+void StaticMesh::PopulateBuffers()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, Buffers[POS_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(positions[0]) * positions.size(), &positions[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(POSITION_LOCATION);
+    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, Buffers[TEXCOORD_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords[0]) * texCoords.size(), &texCoords[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(TEX_COORD_LOCATION);
+    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, Buffers[NORMAL_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normals[0]) * normals.size(), &normals[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(NORMAL_LOCATION);
+    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[INDEX_BUFFER]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
+}
+
 void RiggedMesh::PopulateBuffers()
 {
     glBindBuffer(GL_ARRAY_BUFFER, Buffers[POS_VB]);
@@ -613,13 +634,12 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
     GLuint curTextureIndex = 0; 
 
-    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp"); 
-    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
-    GLuint cameraGlobalPosition = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
-    GLuint lightVecLocation = glGetUniformLocation(shaderProgram, "light_vec");
+    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "textureDiffuse");
+    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "gCameraPos");
 
     { // set light
-        DirectionalLight directionalLight = this->GetDirectionalLight();
+        DirectionalLight& directionalLight = this->GetDirectionalLight(); // IDK what the end sign does
         GLint location;
 
         // Set BaseLight fields
@@ -639,11 +659,11 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
     // set cameraPosition
     glUniform3f(
-        cameraGlobalPosition,
+        cameraGlobalPositionLoc,
         cameraGlobalPos[0],
         cameraGlobalPos[1],
         cameraGlobalPos[2]
-    ); 
+    );
 
     glBindVertexArray(VAO);
 
@@ -701,11 +721,11 @@ void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
     GLuint curTextureIndex = 0;
 
     GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
-    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
-    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "textureDiffuse");
+    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "gCameraPos");
 
     { // set light
-        DirectionalLight directionalLight = this->GetDirectionalLight();
+        DirectionalLight& directionalLight = this->GetDirectionalLight(); // IDK what the end sign does
         GLint location;
 
         // Set BaseLight fields
@@ -774,10 +794,11 @@ void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
 void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
 {
-    if (shaderProgramIndex!=NULL) {
+    if (shaderProgramIndex==NULL) {
         std::cout << "Object ??? Missing shaderProgramIndex" << std::endl;
     }
-    GLuint shaderProgram = this->shaderProgramIndex;
+    GLuint shaderProgram = this->shaderProgramIndex; 
+    glUseProgram(shaderProgram);
 
     glm::mat4 curMwvp = glm::mat4(1);
     glm::mat4 viewProj = cameraObj.GetviewProjMat();
@@ -787,12 +808,11 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
     GLuint curTextureIndex = 0;
 
     GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
-    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
-    GLuint cameraGlobalPosition = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
-    GLuint lightVecLocation = glGetUniformLocation(shaderProgram, "light_vec");
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "textureDiffuse");
+    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "gCameraPos");
 
     { // set light
-        DirectionalLight directionalLight = this->GetDirectionalLight();
+        DirectionalLight& directionalLight = this->GetDirectionalLight(); // IDK what the end sign does
         GLint location;
 
         // Set BaseLight fields
@@ -812,7 +832,7 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
 
     // set cameraPosition
     glUniform3f(
-        cameraGlobalPosition,
+        cameraGlobalPositionLoc,
         cameraGlobalPos[0],
         cameraGlobalPos[1],
         cameraGlobalPos[2]
@@ -847,7 +867,8 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
         glBindTexture(GL_TEXTURE_2D, curTextureIndex);
         glUniform1i(textureLoc, 0);
 
-        glDrawElementsBaseVertex(GL_TRIANGLES,
+        glDrawElementsBaseVertex(
+            GL_TRIANGLES,
             meshes[i].NumIndices,
             GL_UNSIGNED_INT,
             (void*)(sizeof(unsigned int) * meshes[i].BaseIndex), // Specifies a pointer to the location where the indices are stored 
@@ -856,7 +877,8 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
     }
 
     // Make sure the VAO is not changed from the outside
-    glBindVertexArray(0);
+    glBindVertexArray(0); 
+    glUseProgram(shaderProgram);
 }
 
 void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
@@ -875,11 +897,11 @@ void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
     GLuint curTextureIndex = 0;
 
     GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
-    GLuint textureLoc = glGetUniformLocation(shaderProgram, "texture_diffuse"); // todos
-    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "camera_local_position"); // why local? isn't it global?  
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "textureDiffuse");
+    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "gCameraPos");
 
     { // set light
-        DirectionalLight directionalLight = this->GetDirectionalLight();
+        DirectionalLight& directionalLight = this->GetDirectionalLight(); // IDK what the end sign does
         GLint location;
 
         // Set BaseLight fields

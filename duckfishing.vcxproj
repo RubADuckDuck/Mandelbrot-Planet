@@ -164,6 +164,7 @@
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Gizmo.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LOG.h" />
     <ClInclude Include="Mesh.h" />

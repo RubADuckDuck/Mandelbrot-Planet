@@ -322,13 +322,18 @@ out vec3 Normal0;
 out vec3 Position0; 
 
 uniform mat4 mwvp;
+uniform mat4 modelMatrix;   // Model matrix (to transform positions)
+uniform mat3 normalMatrix;  // Normal matrix (to transform normals)
 
 void main() { 
+    // Transform position into world space
+    Position0 = vec3(modelMatrix * vec4(aPos, 1.0));
 
-	// Pass texture coordinates to the fragment shader
+    // Transform the normal vector
+    Normal0 = normalize(normalMatrix * aNormal);
+
+    // Pass texture coordinates to the fragment shader
     TexCoord0 = aTexCoord; 
-    Normal0 = aNormal;
-    Position0 = aPos; 
 
     gl_Position = mwvp * vec4(aPos, 1.0);
 } 
@@ -397,8 +402,8 @@ void main()
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     FragColor = texture(textureDiffuse, TexCoord0.xy) * TotalLight;
-	FragColor = texture(textureDiffuse, TexCoord0.xy);
-	FragColor = vec4(1,1,1,1);
+	// FragColor = texture(textureDiffuse, TexCoord0.xy);
+	// FragColor = vec4(1,1,1,1);
 }
 )"; 
 
@@ -525,7 +530,7 @@ void InitializaProgram() {
 	
 	// load meshmanager and load model
 	std::string objPath = "E:\\repos\\[DuckFishing]\\model\\duck.obj";
-	std::string texturePath = "E:\repos\[DuckFishing]\model\texture\Poliigon_RattanWeave_6945\2K\Poliigon_RattanWeave_6945_BaseColor.jpg"; 
+	std::string texturePath = "E:\\repos\\[DuckFishing]\\model\\texture\\Poliigon_RattanWeave_6945\\2K\\Poliigon_RattanWeave_6945_BaseColor.jpg"; 
 
 	GLuint testVertArr;
 	glGenVertexArrays(1, &testVertArr);

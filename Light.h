@@ -10,7 +10,7 @@ struct BaseLight {
     BaseLight() { // default light  
         // Set BaseLight properties
         color = glm::vec3(1.0f, 1.0f, 1.0f);  // White light
-        ambientIntensity = 0.3f;             // 30% ambient intensity
+        ambientIntensity = 0.5f;             // 30% ambient intensity
         diffuseIntensity = 1.0f;             // Full diffuse intensity
     }
 };

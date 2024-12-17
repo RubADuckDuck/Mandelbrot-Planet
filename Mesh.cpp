@@ -823,14 +823,26 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
 
     glm::mat4 curMwvp = glm::mat4(1);
     glm::mat4 viewProj = cameraObj.GetviewProjMat();
+    glm::mat4 curModelMatrix = glm::mat4(1); 
+    glm::mat3 curNormalMatrix = glm::mat3(1);
+
+    curModelMatrix = tranform;
+    curNormalMatrix = glm::transpose(glm::inverse(glm::mat3(curModelMatrix)));
 
     glm::vec3 cameraGlobalPos = cameraObj.GetGlobalCameraPosition();
 
     GLuint curTextureIndex = 0;
 
-    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp");
-    GLuint textureLoc = glGetUniformLocation(shaderProgram, "textureDiffuse");
-    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "gCameraPos");
+    // get Locations 
+    GLuint mwvpLoc = glGetUniformLocation(shaderProgram, "mwvp"); 
+    GLuint modelMatrixLoc = glGetUniformLocation(shaderProgram, "modelMatrix"); 
+    GLuint normalMatrixLoc = glGetUniformLocation(shaderProgram, "normalMatrix"); 
+    GLuint textureLoc = glGetUniformLocation(shaderProgram, "textureDiffuse"); 
+    GLuint cameraGlobalPositionLoc = glGetUniformLocation(shaderProgram, "gCameraPos"); 
+
+    // set ModelMatrix and NormalMatrix 
+    glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(curModelMatrix)); 
+    glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(curNormalMatrix));
 
     { // set light
         DirectionalLight& directionalLight = this->GetDirectionalLight(); // IDK what the end sign does
@@ -901,6 +913,7 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
 
         // set MWVP transformation
         glUniformMatrix4fv(mwvpLoc, 1, GL_FALSE, glm::value_ptr(curMwvp));
+
         // set texture
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, curTextureIndex);

@@ -24,6 +24,9 @@ public:
 
 	glm::mat4 GetModelMatrixFromTransform();
 
+	virtual ~GameObject() {
+		std::cout << "GameObject Destructor" << std::endl;
+	}
 
 	void SetMesh(GeneralMesh* ptrModel) { this->ptrModel = ptrModel; }
 	void SetTexture(Texture* ptrTexture) { this->ptrTexture = ptrTexture; }
@@ -34,6 +37,21 @@ public:
 	virtual void Update() {};
 	virtual void DrawGameObject(CameraObject& cameraObj); 
 	virtual void onEvent(const std::string& message) {};
+}; 
+
+class RotatingGameObject : public GameObject {
+public: 
+	float radian = 0; 
+	glm::vec3 axis = glm::vec3(0, 1, 0); 
+
+	~RotatingGameObject() {
+		std::cout << "RotatingGameObject Destructor" << std::endl;
+	}
+
+	void Update() override {
+		ptrTransform->SetRotation(radian, axis); 
+		radian = radian + 0.1;
+	}
 };
 
 

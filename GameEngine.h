@@ -50,7 +50,7 @@ public:
 
 		Transform* defaultTransform = new Transform();  
 
-		GameObject* gameObject = new GameObject(); 
+		GameObject* gameObject = new RotatingGameObject(); 
 		gameObject->SetMesh(curMesh); 
 		gameObject->SetTexture(curTexture); 
 		gameObject->SetTransform(defaultTransform); 

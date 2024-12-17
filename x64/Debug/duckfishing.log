@@ -1,5 +1,1 @@
-﻿  main.cpp
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\main.cpp(524,28): warning C4129: '[': unrecognized character escape sequence
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\main.cpp(524,28): warning C4129: 'm': unrecognized character escape sequence
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\main.cpp(524,28): warning C4129: 'P': unrecognized character escape sequence
-  duckfishing.vcxproj -> C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\x64\Debug\duckfishing.exe
+﻿  duckfishing.vcxproj -> C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\x64\Debug\duckfishing.exe

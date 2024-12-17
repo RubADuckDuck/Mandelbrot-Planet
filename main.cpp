@@ -397,6 +397,8 @@ void main()
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     FragColor = texture(textureDiffuse, TexCoord0.xy) * TotalLight;
+	FragColor = texture(textureDiffuse, TexCoord0.xy);
+	FragColor = vec4(1,1,1,1);
 }
 )"; 
 
@@ -503,6 +505,8 @@ void InitializaProgram() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
+
 	glCullFace(GL_BACK);
 
 
@@ -563,7 +567,7 @@ void MainLoop() {
 		// Handle inputs
 		Input();
 
-		debugging();
+		// debugging();
 
 		// Update game state
 		gameEngine.Update();

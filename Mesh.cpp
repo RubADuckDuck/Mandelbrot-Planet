@@ -5,6 +5,7 @@
 #include <assimp/postprocess.h> // Post processing flags 
 #include <cassert>
 #include <iostream>
+
 #include "Mesh.h"
 #include "GameObject.h"
 
@@ -13,6 +14,8 @@
 #define NORMAL_LOCATION      2
 #define BONE_Index_LOCATION  3
 #define BONE_WEIGHT_LOCATION 4
+
+
 
 void log(std::string& msg) {
     std::cout << msg << std::endl;
@@ -872,7 +875,25 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
         //}
 
         // get Mesh->World(SceneRoot)->World(InGame)->View->Projection transformation
-        curMwvp = viewProj * tranform * this->meshIndex2meshTransform[i];
+        curMwvp = viewProj * tranform * this->meshIndex2meshTransform[i]; 
+        curMwvp = viewProj * tranform;
+
+        //{ // debugging render 
+        //    std::cout << "ViewProj Mat: " << std::endl << viewProj << std::endl;
+        //    std::cout << "GameWorld Mat: " << std::endl << tranform << std::endl;
+        //    std::cout << "MeshTransform Mat: " << std::endl << this->meshIndex2meshTransform[i] << std::endl;
+        //    std::cout << "MWVP Array" << std::endl << curMwvp << std::endl; 
+        //    glm::vec4 temp; 
+        //    for (const glm::vec3& position : positions) {
+        //        temp = glm::vec4(position, 1); 
+        //        temp = curMwvp * temp
+        //        std::cout << "Current Vert Pos: " << position << std::endl; 
+        //        std::cout << "After Projection: " << temp << std::endl;
+        //    std::string msg = "IndexNum in Currently drawn mesh: " + std::to_string(meshes[i].NumIndices);
+        //    log(msg);
+        //    }
+        //}
+        // // debugging
 
         // get TextureIndex 
         // curTextureIndex = this->textures[i].GetTextureIndex();
@@ -885,8 +906,7 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
         glBindTexture(GL_TEXTURE_2D, curTextureIndex);
         glUniform1i(textureLoc, 0);
 
-        std::string msg = "IndexNum in Currently drawn mesh: " + std::to_string(meshes[i].NumIndices);
-        log(msg);
+        
 
         glDrawElementsBaseVertex(
             GL_TRIANGLES,

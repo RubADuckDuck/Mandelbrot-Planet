@@ -9,18 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-glm::mat4 GameObject::GetModelMatrixFromTransform() {
-	return ptrTransform->GetTransformMatrix();
-}
 
-
-
-void GameObject::DrawGameObject(CameraObject& cameraObj) {
-	glm::mat4 transformMat = GetModelMatrixFromTransform();
-
-	// draw mesh
-	ptrModel->Render(cameraObj, transformMat, ptrTexture);
-}
 
 //
 //// Calculate the Model Matrix from the Transform object
@@ -75,3 +64,107 @@ void GameObject::DrawGameObject(CameraObject& cameraObj) {
 //}
 //
 //}
+
+
+GameObject::~GameObject() {
+	std::cout << "GameObject Destructor" << std::endl;
+}
+
+
+void GameObject::SetMesh(GeneralMesh* ptrModel) { this->ptrModel = ptrModel; }
+void GameObject::SetTexture(Texture* ptrTexture) { this->ptrTexture = ptrTexture; }
+//void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
+void GameObject::SetTransform(Transform* ptrTransform) { this->ptrTransform = ptrTransform; }
+
+void GameObject::Update() {};
+glm::mat4 GameObject::GetModelMatrixFromTransform() {
+	return ptrTransform->GetTransformMatrix();
+}
+void GameObject::DrawGameObject(CameraObject& cameraObj) {
+	glm::mat4 transformMat = GetModelMatrixFromTransform();
+
+	// draw mesh
+	ptrModel->Render(cameraObj, transformMat, ptrTexture);
+}
+void GameObject::onEvent(const std::string& message) {};
+
+
+RotatingGameObject::~RotatingGameObject() {
+	std::cout << "RotatingGameObject Destructor" << std::endl;
+}
+
+void RotatingGameObject::Update() {
+	ptrTransform->SetRotation(radian, axis);
+	radian = radian + 0.1;
+}
+
+// Default Constructor
+CameraObject::CameraObject()
+	: showCamera(true) // Initialize showCamera to true by default
+{
+	InitializeCamera();
+}
+
+// Function to set the viewProjectionMatrix
+void CameraObject::SetViewProjMat(float fov = 45.0f, float aspectRatio = 800.0f / 600.0f, float nearPlane = 0.1f, float farPlane = 100.0f) {
+	// Define camera parameters
+	glm::vec3 position(0.0f, 10.0f, 10.0f); // High angle position
+	glm::vec3 target(0.0f, 0.0f, 0.0f);      // Looking at origin
+	glm::vec3 up(0.0f, 1.0f, 0.0f);          // Up vector
+
+	// Create view matrix
+	glm::mat4 view = glm::lookAt(position, target, up);
+
+	// Create projection matrix
+	glm::mat4 projection = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+
+	// Combine view and projection matrices
+	viewProjectionMatrix = projection * view;
+}
+
+// Getter for viewProjectionMatrix
+const glm::mat4& CameraObject::GetViewProjMat() const {
+	return viewProjectionMatrix;
+}
+
+void CameraObject::SetViewProjMat() {};
+glm::mat4& CameraObject::GetviewProjMat() { return viewProjectionMatrix; }
+glm::vec3& CameraObject::GetGlobalCameraPosition() {
+	glm::vec3 temp = glm::vec3(1);
+	return temp;
+};
+
+void CameraObject::DrawGameObject(CameraObject& cameraObj) {
+	if (this->showCamera && this != &cameraObj) {
+		GameObject::DrawGameObject(cameraObj);
+	}
+	return;
+}
+
+// Method to initialize viewProjectionMatrix
+void CameraObject::InitializeCamera() {
+	// Define camera parameters
+	glm::vec3 position(0.0f, 10.0f, 10.0f); // High angle position
+	glm::vec3 target(0.0f, 0.0f, 0.0f);      // Looking at origin
+	glm::vec3 up(0.0f, 1.0f, 0.0f);          // Up vector
+
+	// Create view matrix using glm::lookAt
+	glm::mat4 view = glm::lookAt(position, target, up);
+
+	// Define projection parameters
+	float fov = 45.0f;                       // Field of view in degrees
+	float aspectRatio = 800.0f / 600.0f;     // Aspect ratio (adjust as needed)
+	float nearPlane = 0.1f;                  // Near clipping plane
+	float farPlane = 1000.0f;                  // Far clipping plane
+
+	// Create projection matrix using glm::perspective
+	glm::mat4 projection = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+
+	std::cout << "==============(Camera's View and Projection Matrix)==============" << std::endl;
+	std::cout << "View Matrix: " << std::endl << view << std::endl;
+	std::cout << "Proj Matrix: " << std::endl << projection << std::endl;
+	std::cout << "==================================================================" << std::endl;
+
+	// Combine view and projection matrices
+	viewProjectionMatrix = projection * view;
+}

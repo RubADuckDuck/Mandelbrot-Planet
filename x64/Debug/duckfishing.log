@@ -1,1 +1,6 @@
-﻿  duckfishing.vcxproj -> C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\x64\Debug\duckfishing.exe
+﻿  Mesh.cpp
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(153,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(185,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(206,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\Mesh.cpp(249,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  duckfishing.vcxproj -> C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\x64\Debug\duckfishing.exe

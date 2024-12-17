@@ -8,6 +8,7 @@
 
 #include "Mesh.h"
 #include "GameObject.h"
+#include "LOG.h"
 
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
@@ -123,6 +124,35 @@ glm::mat4 ConvertToGlmMat4(const aiMatrix4x4& aiMat) {
 //    this->ParseMeshes(ptrScene);
 //} // SceneLoader class seems sort of useless
 
+GLuint GeneralMesh::sharedShaderProgram = 0; // Static shader program for all Gizmos
+bool GeneralMesh::shaderInitialized = false;     // Tracks if the shader is loaded 
+
+GeneralMesh::GeneralMesh() {} 
+
+void GeneralMesh::InitShader() {
+    if (!shaderInitialized) {
+        LoadSharedShader(); // Load shader only once
+        shaderInitialized = true;
+    }
+}
+
+void GeneralMesh::LoadSharedShader() {
+    LOG(LOG_ERROR, "Loading shared shader for a GeneralMesh Class is not allowed");
+}
+
+StaticMesh::StaticMesh() {}
+
+StaticMesh::~StaticMesh() {
+    std::cout << "StaticMesh Destructor Called" << std::endl;
+
+    // Release any resources here if necessary
+    if (VAO) {
+        glDeleteVertexArrays(1, &VAO);
+    }
+    if (Buffers[0]) {
+        glDeleteBuffers(std::size(Buffers), Buffers);
+    }
+}
 
 RiggedMesh::~RiggedMesh()
 {
@@ -162,6 +192,9 @@ void RiggedMesh::Clear()
 }
 
 bool StaticMesh::LoadMesh(const std::string& filename) {
+    // Init shader 
+    this->InitShader();
+
     // Release previously loaded mesh 
     this->Clear();
 
@@ -202,6 +235,9 @@ bool StaticMesh::LoadMesh(const std::string& filename) {
 }
 
 bool RiggedMesh::LoadMesh(const std::string& filename) {
+    // Init shader 
+    this->InitShader();
+
     // Release previously loaded mesh 
     this->Clear(); 
 
@@ -643,10 +679,10 @@ void RiggedMesh::PopulateBuffers()
 
 void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 {
-    if (!shaderProgramIndex) {
-        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl; 
+    if (!sharedShaderProgram) {
+        std::cout << "Object ??? Missing sharedShaderProgram" << std::endl; 
     }
-    GLuint shaderProgram = this->shaderProgramIndex;
+    GLuint shaderProgram = this->sharedShaderProgram;
 
     glm::mat4 curMwvp = glm::mat4(1); 
     glm::mat4 viewProj = cameraObj.GetviewProjMat();
@@ -728,10 +764,10 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
 void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 {
-    if (!shaderProgramIndex) {
-        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl;
+    if (!sharedShaderProgram) {
+        std::cout << "Object ??? Missing sharedShaderProgram" << std::endl;
     }
-    GLuint shaderProgram = this->shaderProgramIndex;
+    GLuint shaderProgram = this->sharedShaderProgram;
 
     glm::mat4 curMwvp = glm::mat4(1);
     glm::mat4 viewProj = cameraObj.GetviewProjMat();
@@ -815,10 +851,10 @@ void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
 void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
 {
-    if (shaderProgramIndex==NULL) {
-        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl;
+    if (sharedShaderProgram==NULL) {
+        std::cout << "Object ??? Missing sharedShaderProgram" << std::endl;
     }
-    GLuint shaderProgram = this->shaderProgramIndex; 
+    GLuint shaderProgram = this->sharedShaderProgram; 
     glUseProgram(shaderProgram);
 
     glm::mat4 curMwvp = glm::mat4(1);
@@ -937,10 +973,10 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
 
 void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
 {
-    if (!shaderProgramIndex) {
-        std::cout << "Object ??? Missing shaderProgramIndex" << std::endl;
+    if (!sharedShaderProgram) {
+        std::cout << "Object ??? Missing sharedShaderProgram" << std::endl;
     }
-    GLuint shaderProgram = this->shaderProgramIndex;
+    GLuint shaderProgram = this->sharedShaderProgram;
 
     glm::mat4 curMwvp = glm::mat4(1);
     glm::mat4 viewProj = cameraObj.GetviewProjMat();

@@ -6,23 +6,47 @@
 #include <glad/glad.h>
 #include "GameObject.h"
 #include "Transform.h"
-#include "Light.h" // For camera object
+#include "ShaderProgramLoader.h"
 
 // Base Gizmo Class
 class Gizmo {
-public:
+public: 
+    static GLuint sharedShaderProgram; // Static shader program for all Gizmos
+    static bool shaderInitialized;     // Tracks if the shader is loaded
+
+    GLuint shaderProgram; 
+
     GLuint VAO;
     GLuint VBO;
     glm::vec3 color;
     Transform transform;
 
+    Gizmo() {
+        if (!shaderInitialized) {
+            LoadSharedShader(); // Load shader only once
+            shaderInitialized = true;
+        } 
+
+        this->CreateandLoad();
+    }
+
     virtual void CreateandLoad() = 0;
     virtual void Update() = 0;
-    virtual void Draw(CameraObject& cameraObj, GLuint shaderProgram) = 0;
+    virtual void Draw(CameraObject& cameraObj) = 0;
 
     virtual ~Gizmo() {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
+    }
+
+private: 
+    void LoadSharedShader() {
+        // Load shader from files
+        std::string vertShaderPath = "C:\\Users\\kmo73\\source\\repos\\apple\\websocketsharp\\duckfishing\\duckfishing\\shaders\\gizmo_vertex.vs";
+        std::string fragShaderPath = "C:\\Users\\kmo73\\source\\repos\\apple\\websocketsharp\\duckfishing\\duckfishing\\shaders\\gizmo_fragment.fs";
+
+        sharedShaderProgram = LoadAndCreateShaderProgram(vertShaderPath, fragShaderPath);
+        std::cout << "Shared shader loaded for Gizmos: " << sharedShaderProgram << std::endl;
     }
 };
 
@@ -79,7 +103,7 @@ public:
         }
     }
 
-    void Draw(CameraObject& cameraObj, GLuint shaderProgram) override {
+    void Draw(CameraObject& cameraObj) override {
         glUseProgram(shaderProgram);
 
         // Pass uniform data

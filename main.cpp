@@ -383,8 +383,10 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
         vec3 PixelToCamera = normalize(gCameraPos - Position0);
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect); 
-
-        SpecularColor = vec4(Light.Color, 1.0f) * SpecularFactor;
+		if (SpecularFactor > 0) {
+			SpecularColor = vec4(Light.Color, 1.0f) * SpecularFactor;
+		}
+        
     }
 
     return AmbientColor + DiffuseColor + SpecularColor;

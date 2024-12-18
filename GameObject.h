@@ -4,6 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Mesh.h"
 #include "utils.h"
+#include "LOG.h"
 
 //class Animation; 
 
@@ -33,13 +34,23 @@ public:
 	virtual void Update();
 	virtual glm::mat4 GetModelMatrixFromTransform();
 	virtual void DrawGameObject(CameraObject& cameraObj); 
-	virtual void onEvent(const std::string& message);
+    virtual void onEvent(const std::string& message);
 }; 
+
+class PlayableObject : public GameObject {
+    void onEvent(const std::string& message) override{
+        glm::vec3 curTranslation = ptrTransform->GetTranslation(); 
+
+        curTranslation = curTranslation + glm::vec3(1, 0, 0);
+
+        ptrTransform->SetTranslation(curTranslation);
+    }
+};
 
 class TerrainObject : public GameObject {
 public:
     static const int GRID_SIZE = 100;
-    float BLOCK_SIZE = 1.0f;
+    float BLOCK_SIZE = 0.5f;
     float BLOCK_OFFSET = 1.0f;
 
     enum MapLayerType {
@@ -52,13 +63,44 @@ public:
     enum GroundType {
         WATER,
         GRASS,
+        LAST // dummy that for iteration
     };
 
     GroundType groundGrid[GRID_SIZE][GRID_SIZE];
     Transform index2GroundTransform[GRID_SIZE][GRID_SIZE];
 
-    std::map<GroundType, GeneralMesh*> groundType2Mesh;    // Use pointers to GeneralMesh
+    std::map<GroundType, std::string> groundType2ObjPath; 
+    std::map<GroundType, GeneralMesh*> groundType2Mesh;    // Use pointers to GeneralMesh 
+
+    std::map<GroundType, std::string> groundType2TexturePath;
     std::map<GroundType, Texture*> groundType2Texture;     // Use pointers to Texture
+    
+    
+
+    TerrainObject() {
+        // Initialize paths for each GroundType
+        groundType2ObjPath[WATER] = "E:/repos/[DuckFishing]/model/Water.obj";
+        groundType2ObjPath[GRASS] = "E:/repos/[DuckFishing]/model/Grass.obj";
+
+        groundType2TexturePath[WATER] = "E:/repos/[DuckFishing]/model/texture/Water.png";
+        groundType2TexturePath[GRASS] = "E:/repos/[DuckFishing]/model/texture/Grass.png";
+
+        // Load meshes and textures for each GroundType
+        for (int groundTypeInt = WATER; groundTypeInt < LAST; groundTypeInt++) {
+            GroundType groundType = static_cast<GroundType>(groundTypeInt); // 
+
+            // Load Mesh
+            groundType2Mesh[groundType] = new StaticMesh();
+            groundType2Mesh[groundType]->LoadMesh(groundType2ObjPath[groundType]);
+
+            // Load Texture
+            groundType2Texture[groundType] = new Texture();
+            groundType2Texture[groundType]->LoadandSetTextureIndexFromPath(groundType2TexturePath[groundType]);
+        }
+
+        // Randomly initialize the ground grid
+        RandomizeGroundGrid();
+    }
 
     void Update() override {
         for (int i = 0; i < GRID_SIZE; i++) {
@@ -66,6 +108,7 @@ public:
                 // Set the transform positions for each block
                 float xCoord = j * BLOCK_OFFSET;
                 float yCoord = i * BLOCK_OFFSET;
+                index2GroundTransform[i][j].SetScale(glm::vec3(BLOCK_SIZE));
                 index2GroundTransform[i][j].SetTranslation(glm::vec3(xCoord, 0.0f, yCoord));
             }
         }
@@ -91,6 +134,19 @@ public:
         // Ensure mesh and texture are valid before rendering
         if (currMesh && currTexture) {
             currMesh->Render(cameraObj, transformMat, currTexture);
+        }
+    }
+
+    // Function to randomly initialize the groundGrid
+    void RandomizeGroundGrid() {
+        // Seed the random number generator
+        std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                // Assign a random GroundType
+                groundGrid[i][j] = static_cast<GroundType>(std::rand() % LAST);
+            }
         }
     }
 };

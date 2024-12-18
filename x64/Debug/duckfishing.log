@@ -1,9 +1,6 @@
 ﻿  GameObject.cpp
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(91,21): error C2665: 'GeneralMesh::Render': no overloaded function could convert all the argument types
-E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.h(90,15): message : could be 'void GeneralMesh::Render(CameraObject &,glm::mat4 &,Texture *)'
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(91,21): message : 'void GeneralMesh::Render(CameraObject &,glm::mat4 &,Texture *)': cannot convert argument 2 from 'glm::mat4' to 'glm::mat4 &'
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(91,73): message : A non-const reference may only be bound to an lvalue
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(91,21): message : while trying to match the argument list '(CameraObject, glm::mat4, Texture *)'
 E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(98,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  stb_image.h
+  main.cpp
   Generating Code...
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(134): warning C4172: returning address of local variable or temporary: temp
+  duckfishing.vcxproj -> E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe

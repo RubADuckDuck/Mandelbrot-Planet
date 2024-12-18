@@ -6,6 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <mutex>
+#include "LOG.h"
 
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
@@ -36,7 +37,7 @@ public:
     }
 
     void Publish(const std::string& message) { 
-        std::cout << message << " triggered" << std::endl;
+        // std::cout << message << " triggered" << std::endl;
 
         std::lock_guard<std::mutex> lock(mutex);
         for (const auto& ptrListener : listeners) {
@@ -50,7 +51,7 @@ public:
     }
 
     void Publish(const std::string& tag, const std::string& message) {
-        std::cout << tag << "::" << message << " triggered" << std::endl;
+        // std::cout << tag << "::" << message << " triggered" << std::endl;
 
         std::lock_guard<std::mutex> lock(mutex);
         auto it = tag2Listener.find(tag); 
@@ -58,6 +59,7 @@ public:
         if (it != tag2Listener.end()) {
             for (const auto& ptrListener : it->second) {
                 try {
+                    LOG(LOG_DEBUG, "Triggering onEventFunctions")
                     (*ptrListener)(message);
                 }
                 catch (const std::exception& e) {
@@ -103,11 +105,18 @@ public:
     std::string tag = "keyInput"; 
 
     InputHandler() : quit(false) {
+        wPressed = aPressed = sPressed = dPressed = spacePressed = false;
+        quit = false;
 
-        if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-            std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
-            throw std::runtime_error("Failed to initialize SDL");
-        }
+
+
+        //if (SDL_Init(SDL_INIT_VIDEO) != 0) {    
+
+        //    std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
+        //    throw std::runtime_error("Failed to initialize SDL");
+        //}
+
+        SDL_SetEventFilter(NULL, NULL); // Remove any custom event filter
     }
 
     ~InputHandler() {
@@ -117,10 +126,13 @@ public:
     void pollEvents() { // this function will get called every update to check for input
         // Reset key states
         wPressed = aPressed = sPressed = dPressed = spacePressed = false;
+        // LOG(LOG_INFO, "Polling events");
 
         // Handle events
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
+            // LOG(LOG_INFO, "Event triggered");
+
             switch (event.type) {
             case SDL_QUIT:
                 quit = true;
@@ -156,7 +168,8 @@ public:
     void Publish(const std::string& msg) {
         // Get the singleton instance
         EventDispatcher& dispatcher = EventDispatcher::GetInstance();
-        dispatcher.Publish(this->tag, "w_down");
+        LOG(LOG_INFO, msg);
+        dispatcher.Publish(this->tag, msg);
     }
 
 private:
@@ -166,7 +179,7 @@ private:
 
 
     void handleKeyDown(SDL_Keycode key) { 
-        
+        LOG(LOG_INFO, "Keypressed");
 
         switch (key) {
         case SDLK_w: wPressed = true; this->Publish("w_down"); break;

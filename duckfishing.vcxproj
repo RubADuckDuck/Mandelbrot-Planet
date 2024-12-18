@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="LOG.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -152,6 +153,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="stb_image.h" />
     <ClCompile Include="Texture.cpp" />
@@ -164,9 +166,11 @@
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Gizmo.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LOG.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ShaderProgramLoader.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="utils.h" />

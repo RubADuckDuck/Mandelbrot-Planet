@@ -13,7 +13,8 @@
 #include <vector>  
 #include "Transform.h"
 #include "Texture.h"
-#include "Light.h"
+#include "Light.h" 
+#include "ShaderProgramLoader.h"
 
 #define MAX_NUM_BONES_PER_VERTEX 4 
 
@@ -42,6 +43,8 @@ struct Mesh {
 
 class GeneralMesh {
 public: 
+	static GLuint sharedShaderProgram; // Static shader program for all Gizmos
+	static bool shaderInitialized;     // Tracks if the shader is loaded 
 
 	struct BasicMeshEntry {
 		BasicMeshEntry()
@@ -65,7 +68,6 @@ public:
 	const aiScene* ptrScene = NULL;
 	std::vector<BasicMeshEntry> meshes;
 	std::vector<Texture> textures; 
-	GLuint shaderProgramIndex; 
 
 	// std::vector<Material> m_Materials; materials are currently not implemented 
 
@@ -75,9 +77,11 @@ public:
 	std::vector<glm::vec2> texCoords;
 	std::vector<unsigned int> indices; 
 
-	virtual ~GeneralMesh() {}
+	GeneralMesh();
 
-	void SetShaderProgram(GLuint shaderIndex) { this->shaderProgramIndex = shaderIndex; }
+	void InitShader();
+
+	virtual ~GeneralMesh() {}
 
 	virtual bool LoadMesh(const std::string& fileName) = 0;
 
@@ -86,6 +90,8 @@ public:
 	virtual void Render(CameraObject& camObj, glm::mat4& tranform, Texture* texture) = 0;
 
 protected:
+	virtual void LoadSharedShader();
+
 	virtual void Clear();
 
 	virtual bool InitFromScene(const aiScene* ptrScene, const std::string& filename); // why need file name when you have scene? 
@@ -124,6 +130,9 @@ public:
 
 	std::vector<glm::mat4> meshIndex2meshTransform; 
 
+	StaticMesh();
+
+	~StaticMesh();
 
 	bool LoadMesh(const std::string& fileName) override;
 
@@ -132,6 +141,14 @@ public:
 	void Render(CameraObject& camObj, glm::mat4& tranform, Texture* texture) override;
 
 protected:
+	void LoadSharedShader() override{
+		// Load shader from files
+		std::string vertShaderPath = "C:\\Users\\kmo73\\source\\repos\\apple\\websocketsharp\\duckfishing\\duckfishing\\shaders\\staticMesh_vertex.vs";
+		std::string fragShaderPath = "C:\\Users\\kmo73\\source\\repos\\apple\\websocketsharp\\duckfishing\\duckfishing\\shaders\\staticMesh_fragment.fs";
+
+		sharedShaderProgram = LoadAndCreateShaderProgram(vertShaderPath, fragShaderPath);
+		std::cout << "Shared shader loaded for Gizmos: " << sharedShaderProgram << std::endl;
+	}
 	
 	void ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const glm::mat4& ParentTransform);
 
@@ -198,8 +215,6 @@ public:
 	std::vector<BoneInfo> boneIndex2BoneInfo;  // map from boneIndex -> BoneInfo 
 	glm::mat4 GlobalInverseTransform; // wtf is this??????
 
-	RiggedMesh() {}; 
-
 	~RiggedMesh(); 
 
 	bool LoadMesh(const std::string& fileName) override; 
@@ -231,6 +246,15 @@ public:
 	void GetBoneTransforms(float animationTimeSec, std::vector<glm::mat4>& transforms); 
 
 private: 
+	void LoadSharedShader() override{
+		// Load shader from files
+		std::string vertShaderPath = "C:\\Users\\kmo73\\source\\repos\\apple\\websocketsharp\\duckfishing\\duckfishing\\shaders\\gizmo_vertex.vs";
+		std::string fragShaderPath = "C:\\Users\\kmo73\\source\\repos\\apple\\websocketsharp\\duckfishing\\duckfishing\\shaders\\gizmo_fragment.fs";
+
+		sharedShaderProgram = LoadAndCreateShaderProgram(vertShaderPath, fragShaderPath);
+		std::cout << "Shared shader loaded for Gizmos: " << sharedShaderProgram << std::endl;
+	}
+
 	void Clear(); 
 
 	// bool InitFromScene(const aiScene* ptrScene, const std::string& filename); // why need file name when you have scene? 

@@ -106,12 +106,7 @@ CameraObject::CameraObject()
 }
 
 // Function to set the viewProjectionMatrix
-void CameraObject::SetViewProjMat(float fov = 45.0f, float aspectRatio = 800.0f / 600.0f, float nearPlane = 0.1f, float farPlane = 100.0f) {
-	// Define camera parameters
-	glm::vec3 position(0.0f, 10.0f, 10.0f); // High angle position
-	glm::vec3 target(0.0f, 0.0f, 0.0f);      // Looking at origin
-	glm::vec3 up(0.0f, 1.0f, 0.0f);          // Up vector
-
+void CameraObject::SetViewProjMat() {
 	// Create view matrix
 	glm::mat4 view = glm::lookAt(position, target, up);
 
@@ -127,12 +122,52 @@ const glm::mat4& CameraObject::GetViewProjMat() const {
 	return viewProjectionMatrix;
 }
 
-void CameraObject::SetViewProjMat() {};
-glm::mat4& CameraObject::GetviewProjMat() { return viewProjectionMatrix; }
+glm::mat4& CameraObject::GetviewProjMat() { 
+	return viewProjectionMatrix; 
+}
 glm::vec3& CameraObject::GetGlobalCameraPosition() {
 	glm::vec3 temp = glm::vec3(1);
 	return temp;
 };
+
+void CameraObject::AddTarget(GameObject* targetGameObj) {
+	if (targetGameObj && targetGameObj->ptrTransform) {
+		targetGameObjects.push_back(targetGameObj);
+		std::cout << "Added target object at: " << targetGameObj->ptrTransform->GetTranslation() << std::endl;
+	}
+	else {
+		std::cerr << "Invalid target object or missing transform!" << std::endl;
+	}
+}
+
+void CameraObject::Update() {
+	if (targetGameObjects.empty()) {
+		return; // No targets, no update needed
+	}
+
+	glm::vec3 totalTranslation(0.0f);
+
+	// Calculate the average translation of target objects
+	for (const auto& targetGameObj : targetGameObjects) {
+		if (targetGameObj && targetGameObj->ptrTransform) {
+			totalTranslation += targetGameObj->ptrTransform->GetTranslation();
+		}
+	}
+
+	glm::vec3 averageTranslation = totalTranslation / static_cast<float>(targetGameObjects.size());
+
+	// Compute the desired camera position
+	glm::vec3 desiredPosition = averageTranslation + glm::vec3(0.0f, 10.0f, 10.0f);
+
+	// Smoothly interpolate the current position towards the desired position
+	position = glm::mix(position, desiredPosition, 0.1f); // LERP with factor 0.1f for smoothing
+
+	// Set target for the camera (useful for maintaining focus)
+	target = position - glm::vec3(0.0f, 10.0f, 10.0f);
+
+	// Update view-projection matrix
+	SetViewProjMat();
+}
 
 void CameraObject::DrawGameObject(CameraObject& cameraObj) {
 	if (this->showCamera && this != &cameraObj) {
@@ -144,18 +179,18 @@ void CameraObject::DrawGameObject(CameraObject& cameraObj) {
 // Method to initialize viewProjectionMatrix
 void CameraObject::InitializeCamera() {
 	// Define camera parameters
-	glm::vec3 position(0.0f, 10.0f, 10.0f); // High angle position
-	glm::vec3 target(0.0f, 0.0f, 0.0f);      // Looking at origin
-	glm::vec3 up(0.0f, 1.0f, 0.0f);          // Up vector
+	position = glm::vec3(0.0f, 10.0f, 10.0f); // High angle position
+	target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
+	up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
 
 	// Create view matrix using glm::lookAt
 	glm::mat4 view = glm::lookAt(position, target, up);
 
 	// Define projection parameters
-	float fov = 45.0f;                       // Field of view in degrees
-	float aspectRatio = 800.0f / 600.0f;     // Aspect ratio (adjust as needed)
-	float nearPlane = 0.1f;                  // Near clipping plane
-	float farPlane = 1000.0f;                  // Far clipping plane
+	fov = 45.0f;                       // Field of view in degrees
+	aspectRatio = 800.0f / 600.0f;     // Aspect ratio (adjust as needed)
+	nearPlane = 0.1f;                  // Near clipping plane
+	farPlane = 1000.0f;                  // Far clipping plane
 
 	// Create projection matrix using glm::perspective
 	glm::mat4 projection = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);

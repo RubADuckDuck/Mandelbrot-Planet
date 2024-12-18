@@ -40,9 +40,25 @@ public:
 class PlayableObject : public GameObject {
     void onEvent(const std::string& message) override{
         glm::vec3 curTranslation = ptrTransform->GetTranslation(); 
+        glm::vec3 temp = glm::vec3(0);
+        
 
-        curTranslation = curTranslation + glm::vec3(1, 0, 0);
+        if (message == "w_up") {
+            temp = glm::vec3(0, 0, -1);
+        } 
+        else if (message == "s_up") {
+            temp = glm::vec3(0, 0, 1);
+        }
+        else if (message == "d_up") {
+            temp = glm::vec3(1, 0, 0);
+        }
+        else if (message == "a_up") {
+            temp = glm::vec3(-1, 0, 0);
+        }
+        else {
 
+        }
+        curTranslation = curTranslation + temp;
         ptrTransform->SetTranslation(curTranslation);
     }
 };
@@ -165,20 +181,36 @@ public:
 class CameraObject : GameObject{
 public: 
 	bool showCamera; 
+
+    glm::vec3 position; // High angle position
+    glm::vec3 target;      // Looking at origin
+    glm::vec3 up;          // Up vector 
+
+    // Define projection parameters
+    float fov;                       // Field of view in degrees
+    float aspectRatio;     // Aspect ratio (adjust as needed)
+    float nearPlane;                  // Near clipping plane
+    float farPlane;                  // Far clipping plane 
+
+    std::vector<GameObject*> targetGameObjects; 
+
+    void AddTarget(GameObject* targetGameObj);
+
 	glm::mat4 viewProjectionMatrix; 
 
 	// Default Constructor
 	CameraObject();
 
 	// Function to set the viewProjectionMatrix
-	void SetViewProjMat(float fov, float aspectRatio, float nearPlane, float farPlane);
+    void SetViewProjMat();
 
 	// Getter for viewProjectionMatrix
 	const glm::mat4& GetViewProjMat() const;
 
-	void SetViewProjMat();
 	glm::mat4& GetviewProjMat();
 	glm::vec3& GetGlobalCameraPosition();
+
+    void Update() override;
 
 	void DrawGameObject(CameraObject& cameraObj) override;
 private:

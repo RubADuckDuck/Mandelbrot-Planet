@@ -5,7 +5,6 @@
 
 class GameEngine {
 public: 
-
 	CameraObject camera;
 
 	std::list<Listener> listeners;
@@ -23,6 +22,8 @@ public:
 
 	void Update() {
 		inputHandler.pollEvents(); 
+
+		camera.Update();
 
 		GameObject* curGameObjPtr; 
 
@@ -133,6 +134,12 @@ private:
 		inputHandler.Subscribe(&listeners.back());
 		LOG(LOG_INFO, "Subscribing game object as Listener");
 
-		gameObjects.push_back(gameObj);
+		gameObjects.push_back(gameObj); 
+
+		// Check if the game object is an instance of PlayableObject
+		if (PlayableObject* playableObj = dynamic_cast<PlayableObject*>(gameObj)) {
+			camera.AddTarget(playableObj); // Add to target list
+			LOG(LOG_INFO, "Added PlayableObject to target list: " + std::string(typeid(*playableObj).name()));
+		}
 	}
 };

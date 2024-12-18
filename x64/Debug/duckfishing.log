@@ -1,6 +1,4 @@
 ﻿  GameObject.cpp
 E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(98,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  main.cpp
-  Generating Code...
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(134): warning C4172: returning address of local variable or temporary: temp
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(130): warning C4172: returning address of local variable or temporary: temp
   duckfishing.vcxproj -> E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe

@@ -1,8 +1,10 @@
 E:\proj\[gameproj]\DontStarve\DuckFishing\Animation.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Animation.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\GameObject.obj
+E:\proj\[gameproj]\DontStarve\DuckFishing\GlobalMappings.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\GlobalMappings.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\LOG.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\LOG.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\main.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\main.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Mesh.obj
+E:\proj\[gameproj]\DontStarve\DuckFishing\MessageParser.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\MessageParser.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\ShaderProgramLoader.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\ShaderProgramLoader.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\src\glad.c;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\glad.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\stb_image.h;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\stb_image.obj

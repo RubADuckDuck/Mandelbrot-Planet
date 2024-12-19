@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <utility> // Required for std::pair
+
 #include "Mesh.h"
 #include "utils.h"
 #include "LOG.h"
@@ -61,6 +63,149 @@ class PlayableObject : public GameObject {
         curTranslation = curTranslation + temp;
         ptrTransform->SetTranslation(curTranslation);
     }
+}; 
+
+enum MapLayerType {
+    BIOME,        // Water, Grassland, volcano ...
+    STRUCTURE, // buildings, Primary Resources (one time use blocks)
+    DROPPEDITEM,  // Resources
+    PLAYER,
+    LAST
+};
+
+enum GroundType {
+    WATER,
+    GRASS,
+    LAST // dummy that for iteration
+};
+
+enum StructureType {
+    TREE, 
+    ROCK, 
+    WHEATFIELD,
+    BAKERY, 
+    TOOLFACTORY,
+    WALL,
+    LAST
+};
+
+enum ItemType {
+    WOOD, 
+    ROCK, 
+    IRON, 
+    RUBY,
+    PYTHON,
+    LAST
+};
+
+#define MAX_STRUCTURE_LENGTH 5; 
+
+using Publisher = std::function<void(const std::string&)>; // using 'Alias' = std::function<'returnType'('argType')>
+
+using Item2Probability = std::map<ItemType, float>; 
+
+
+class StructureObject : public GameObject {
+
+public: 
+    Publisher publisher; 
+
+    bool buildingShape[MAX_STRUCTURE_LENGTH][MAX_STRUCTURE_LENGTH]; 
+
+    virtual void TriggerInteraction(const std::string& msg) = 0;
+};
+
+struct Recipe {
+    std::vector<ItemType> inputPortIndex2RequiredItem;  
+    std::vector<Item2Probability*> outputPortIndex2ToProductItem;
+    float craftingDuration; 
+};
+
+class FactoryGameObjects : public StructureObject { 
+    /*
+        FactoryType Structures have input ports that receive certain kinds of resources and OutputPorts that throw the produced objects to a certain building.
+        InputPorts and Output ports are designated from a block that is part of the buildings shape. 
+
+    */
+
+    int nInputPort; 
+    int nOutputPort; // output port index is (nInputPort + index) 
+
+    std::vector<std::pair<int, int>> portIndex2PortPosition; 
+    std::vector<ItemType> portIndex2Item;
+
+    std::map<std::pair<int, int>, int> Position2PortIndex; 
+
+    std::vector<Recipe*> craftingRecipes; 
+    bool isCrafting; 
+
+    virtual void InitFactory() = 0; 
+
+    Item2Probability* CheckForMatchingIngredient(std::vector<ItemType>& ingredients) {
+        for (int j = 0; j < craftingRecipes.size(); j++) { Recipe* currRecipe = craftingRecipes[j];
+            for (int i = 0; i < ingredients.size(); i++) {
+                if (currRecipe->inputPortIndex2RequiredItem[i] != ingredients[i]) {
+                    // not the right recipe 
+                    break;
+                }
+                else {
+                    if (i == ingredients.size() - 1) {
+                        LOG(LOG_INFO, "Found recipe for current configuration");  
+
+                        return currRecipe->outputPortIndex2ToProductItem[j];
+                    }
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    void TriggerInteraction(const std::string& msg) {
+        // parse message to get which position the player is trying to interact 
+        std::pair<int, int> targetPosition = this->parsePosition(msg);
+        ItemType usedItem = this->parseItem(msg);
+
+        if (targetPosition in Position2PortIndex) {
+            int targetPortIndex = Position2PortIndex[targetPosition];
+            
+            // temporarily save what was in at targetport 
+            ItemType temp = portIndex2Item[targetPortIndex]; 
+
+            // add the used Item to the target port slot! / we don't have to take away Item from player.
+            // they probably already did that by themselves.
+            portIndex2Item[targetPortIndex] = usedItem; 
+
+            // If
+        }
+        else { 
+            return; 
+        }
+        
+
+    }
+};
+
+class NaturalResourceStructureObject : public StructureObject {
+    static std::map<ItemType, const std::string> itemType2ItemName; 
+    static std::map<const std::string, ItemType> itemName2ItemType;
+
+    std::map<ItemType, float> itemType2ProbabilityOfDroppingIt; 
+
+    void TriggerInteraction(const std::string& msg) {
+        // Decide Drop
+        ItemType currDrop = this->RandomRollDrop();
+
+        LOG(LOG_INFO, "DROP_" + itemType2ItemName[currDrop]);
+
+        (*publisher)("DROP_" + itemType2ItemName[currDrop]); // publish message
+    }
+
+    ItemType RandomRollDrop() {
+        // do a randomRoll
+        ItemType result; 
+
+        return result;
+    }
 };
 
 class TerrainObject : public GameObject {
@@ -69,18 +214,7 @@ public:
     float BLOCK_SIZE = 0.5f;
     float BLOCK_OFFSET = 1.0f;
 
-    enum MapLayerType {
-        BIOME,        // Water, Grassland, volcano ...
-        BUILDING,
-        DROPPEDITEM,  // Resources
-        PLAYER,
-    };
 
-    enum GroundType {
-        WATER,
-        GRASS,
-        LAST // dummy that for iteration
-    };
 
     GroundType groundGrid[GRID_SIZE][GRID_SIZE];
     Transform index2GroundTransform[GRID_SIZE][GRID_SIZE];
@@ -185,6 +319,8 @@ public:
     glm::vec3 position; // High angle position
     glm::vec3 target;      // Looking at origin
     glm::vec3 up;          // Up vector 
+
+    float angle = 0;
 
     // Define projection parameters
     float fov;                       // Field of view in degrees

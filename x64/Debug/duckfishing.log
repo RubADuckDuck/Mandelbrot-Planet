@@ -1,4 +1,11 @@
 ﻿  GameObject.cpp
 E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(98,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Mesh.cpp
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(153,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(185,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(206,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(249,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  main.cpp
+  Generating Code...
 E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(130): warning C4172: returning address of local variable or temporary: temp
   duckfishing.vcxproj -> E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe

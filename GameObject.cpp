@@ -140,7 +140,20 @@ void CameraObject::AddTarget(GameObject* targetGameObj) {
 	}
 }
 
+glm::vec3 rotateVector(const glm::vec3& v, float theta) {
+	// Create a rotation matrix around the Y-axis
+	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(theta), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// Convert the vector to a 4D vector for matrix multiplication
+	glm::vec4 rotatedVector = rotationMatrix * glm::vec4(v, 1.0f);
+
+	// Return the rotated vector (convert back to 3D)
+	return glm::vec3(rotatedVector);
+}
+
 void CameraObject::Update() {
+	angle = angle + 1;
+
 	if (targetGameObjects.empty()) {
 		return; // No targets, no update needed
 	}
@@ -157,13 +170,14 @@ void CameraObject::Update() {
 	glm::vec3 averageTranslation = totalTranslation / static_cast<float>(targetGameObjects.size());
 
 	// Compute the desired camera position
-	glm::vec3 desiredPosition = averageTranslation + glm::vec3(0.0f, 10.0f, 10.0f);
+	glm::vec3 desiredTargetPosition = averageTranslation;
 
 	// Smoothly interpolate the current position towards the desired position
-	position = glm::mix(position, desiredPosition, 0.1f); // LERP with factor 0.1f for smoothing
+	target = glm::mix(target, desiredTargetPosition, 0.1f); // LERP with factor 0.1f for smoothing
 
 	// Set target for the camera (useful for maintaining focus)
-	target = position - glm::vec3(0.0f, 10.0f, 10.0f);
+	glm::vec3 v(0.0f, 10.0f, 10.0f);
+	position = target + rotateVector(v, angle); 
 
 	// Update view-projection matrix
 	SetViewProjMat();

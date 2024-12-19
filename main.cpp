@@ -402,7 +402,7 @@ void debugging() {
 }
 
 void MainLoop() {
-	const int targetFPS = 30; // Target frame rate
+	const int targetFPS = 60; // Target frame rate
 	const float targetFrameTime = 1.0f / targetFPS; // Time per frame in seconds
 
 	while (!gQuit) {

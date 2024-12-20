@@ -123,49 +123,11 @@ void PlayableObject::onEvent(const std::string& message) {
 	ptrTransform->SetTranslation(curTranslation);
 }
 
-// Item2Probability -----------------------------
-ItemType Item2Probability::RandomRollDrop() {
-	float totalProbability = 0.0f;
-
-	for (const auto& pair : item2ProbMap) {
-		totalProbability += pair.second;
-	}
-
-	float randomValue = static_cast<float>(rand()) / RAND_MAX * totalProbability;
-	float cumulativeProbability = 0.0f;
-
-	for (const auto& pair : item2ProbMap) {
-		cumulativeProbability += pair.second;
-		if (randomValue <= cumulativeProbability) {
-			return pair.first;
-		}
-	}
-
-	return ItemType::LAST; // Default case if no item is selected
-}
 
 
 
-
-// NaturalResourceStructureObject-----------------------
-void NaturalResourceStructureObject::TriggerInteraction(const std::string& msg) {
-	// Decide Drop
-	ItemType currDrop = this->RandomRollDrop();
-
-	LOG(LOG_INFO, "DROP_" + itemType2ItemName[currDrop]);
-
-	publisher("DROP_" + itemType2ItemName[currDrop]); // publish message
-}
-
-ItemType NaturalResourceStructureObject::RandomRollDrop() {
-	// do a randomRoll
-	ItemType result = this->itemType2ProbabilityOfDroppingIt.RandomRollDrop();
-
-	return result;
-}
-
-// TerrainObject
-TerrainObject::TerrainObject() {
+// TerrainManager
+TerrainManager::TerrainManager() {
 	// Initialize paths for each GroundType
 	groundType2ObjPath[GroundType::WATER] = "E:/repos/[DuckFishing]/model/Water.obj";
 	groundType2ObjPath[GroundType::GRASS] = "E:/repos/[DuckFishing]/model/Grass.obj";
@@ -190,7 +152,7 @@ TerrainObject::TerrainObject() {
 	RandomizeGroundGrid();
 }
 
-void TerrainObject::Update() {
+void TerrainManager::Update() {
 	for (int i = 0; i < GRID_SIZE; i++) {
 		for (int j = 0; j < GRID_SIZE; j++) {
 			// Set the transform positions for each block
@@ -202,7 +164,7 @@ void TerrainObject::Update() {
 	}
 }
 
-void TerrainObject::DrawGameObject(CameraObject& cameraObj) {
+void TerrainManager::DrawGameObject(CameraObject& cameraObj) {
 	for (int i = 0; i < GRID_SIZE; i++) {
 		for (int j = 0; j < GRID_SIZE; j++) {
 			DrawBlockOfTerrainAt(i, j, cameraObj);
@@ -210,7 +172,7 @@ void TerrainObject::DrawGameObject(CameraObject& cameraObj) {
 	}
 }
 
-void TerrainObject::DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& cameraObj) {
+void TerrainManager::DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& cameraObj) {
 	// Retrieve transform, ground type, mesh, and texture
 	Transform& currTransform = index2GroundTransform[yIndex][xIndex];
 	glm::mat4 transformMat = currTransform.GetTransformMatrix();
@@ -226,7 +188,7 @@ void TerrainObject::DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& c
 }
 
 // Function to randomly initialize the groundGrid
-void TerrainObject::RandomizeGroundGrid() {
+void TerrainManager::RandomizeGroundGrid() {
 	// Seed the random number generator
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 

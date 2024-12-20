@@ -26,7 +26,7 @@ public:
 	Texture* ptrTexture;  
 	//Animation* ptrAnimation;  
 	Transform* ptrTransform;  
-
+    
     Publisher* singletonPublisher;
 
 	virtual ~GameObject();
@@ -60,26 +60,26 @@ enum class GroundType {
     LAST // dummy that for iteration
 };
 
-struct ReusableAsset {
-    int id;
-    std::string name;
-    std::string texturePath;
-    std::string objPath;
-
-    Texture texture;
-    StaticMesh mesh;
-
-    bool walkable;
-};
-
-
-struct TerrainType : ReusableAsset {
-    
-};
-
-struct StructureType {
-    
-};
+//struct ReusableAsset {
+//    int id;
+//    std::string name;
+//    std::string texturePath;
+//    std::string objPath;
+//
+//    Texture texture;
+//    StaticMesh mesh;
+//
+//    bool walkable;
+//};
+//
+//
+//struct TerrainType : ReusableAsset {
+//    
+//};
+//
+//struct StructureType {
+//    
+//};
 
 //enum class StructureType {
 //    TREE, 
@@ -96,51 +96,40 @@ struct StructureType {
 
 using Publisher = std::function<void(const std::string&)>; // using 'Alias' = std::function<'returnType'('argType')>
 
-struct Item2Probability {
-    std::map<ItemType, float> item2ProbMap; 
-
-    ItemType RandomRollDrop();
-};
-
-struct Recipe {
-    std::vector<ItemType> inputPortIndex2RequiredItem;
-    std::vector<Item2Probability*> outputPortIndex2ToProductItem;
-    float craftingDuration;
-};
 
 
 
-template <typename T> class LayerAssetManager {
-public: 
-    std::string baseDirectory;
+//template <typename T> class LayerAssetManager {
+//public: 
+//    std::string baseDirectory;
+//
+//    std::map<T, std::string> groundType2ObjPath; 
+//    std::map<T, GeneralMesh*> groundType2Mesh; 
+//
+//    std::map<T, std::string> groundType2TexturePath; 
+//    std::map<T, Texture*> groundType2Texture; 
+//
+//    LayerAssetManager(std::string& directory) {
+//        baseDirectory = directory; 
+//
+//        InitObjPaths();
+//        InitTexturePaths(); 
+//
+//        SetMeshes();
+//        SetTextures(); 
+//    }
+//
+//    void InitObjPaths() {
+//        // iterate through T 
+//        for ()
+//    }
+//    void InitTexturePaths(); 
+//
+//    void SetMeshes(); 
+//    void SetTextures();   
+//};
 
-    std::map<T, std::string> groundType2ObjPath; 
-    std::map<T, GeneralMesh*> groundType2Mesh; 
-
-    std::map<T, std::string> groundType2TexturePath; 
-    std::map<T, Texture*> groundType2Texture; 
-
-    LayerAssetManager(std::string& directory) {
-        baseDirectory = directory; 
-
-        InitObjPaths();
-        InitTexturePaths(); 
-
-        SetMeshes();
-        SetTextures(); 
-    }
-
-    void InitObjPaths() {
-        // iterate through T 
-        for ()
-    }
-    void InitTexturePaths(); 
-
-    void SetMeshes(); 
-    void SetTextures();   
-};
-
-class TerrainObject : public GameObject {
+class TerrainManager : public GameObject { // Manages Interaction between Player2Terrain Terrain2Terrain Interaction
 public:
     static const int GRID_SIZE = 100;
     float BLOCK_SIZE = 0.5f;
@@ -159,7 +148,7 @@ public:
     
     
 
-    TerrainObject();
+    TerrainManager();
 
     void Update() override;
 

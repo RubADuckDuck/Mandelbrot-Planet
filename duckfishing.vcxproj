@@ -144,6 +144,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalMappings.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="LOG.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -171,6 +172,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Gizmo.h" />
     <ClInclude Include="GlobalMappings.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="ItemType.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LOG.h" />

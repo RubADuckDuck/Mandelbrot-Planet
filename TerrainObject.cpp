@@ -1,13 +1,65 @@
 #include "TerrainObject.h"
+#include "Item.h"
+
+// TerrainObject----------------------------------
+bool& TerrainObject::CheckCondition(Condition condition) {
+	return terrainCondition[condition]; 
+}
+
+void TerrainObject::DropItem(Item* item) {
+	PublishItemDrop(item);
+}
+
+void TerrainObject::PublishItemDrop(Item* item) {
+	// to do
+}
+
+// FactoryComponentObject-------------------------
+FactoryComponentObject::FactoryComponentObject(FactoryComponentType componentType) {
+	myType = componentType;
+}
+
+FactoryComponentObject::~FactoryComponentObject() {}
+
+void FactoryComponentObject::Interact(Item* item) {
+	if (myType == INPUTPORT) {
+		// shout that Item is dropped
+		PublishItemDrop(heldItem);
+
+		// pick up item
+		this->heldItem = item;
+	}
+	else {
+		LOG(LOG_ERROR, "It was this moment, you realize you fu*k up.")
+	}
+}
+
+Item* FactoryComponentObject::GetHeldItem() {
+	return this->heldItem;
+}
+
+void FactoryComponentObject::DiscardHeldItem() {
+	delete heldItem; 
+	heldItem = nullptr;
+	return;
+}
+
+void FactoryComponentObject::ResetFactoryFromCrafting() {
+	ptrParentStructure->ResetCrafting();
+}
 
 // FactoryManagerObject --------------------------
-Recipe* FactoryManagerObject::CheckForMatchingIngredient(std::vector<ItemType>& ingredients) {
+Recipe* FactoryManagerObject::CheckForMatchingIngredient(std::vector<Item*>& ingredients) {
 	static std::vector<Item2Probability*> emptyResult; // Static empty vector to return in case of no match
 
 	for (int j = 0; j < craftingRecipes.size(); j++) {
 		Recipe* currRecipe = craftingRecipes[j];
+		ItemType curItemType;
+
 		for (int i = 0; i < ingredients.size(); i++) {
-			if (currRecipe->inputPortIndex2RequiredItem[i] != ingredients[i]) {
+			curItemType = ingredients[i]->itemType;
+
+			if (currRecipe->inputPortIndex2RequiredItem[i] != curItemType) {
 				// not the right recipe 
 				break;
 			}
@@ -22,37 +74,6 @@ Recipe* FactoryManagerObject::CheckForMatchingIngredient(std::vector<ItemType>& 
 	}
 	LOG(LOG_INFO, "No matching recipe found");
 	return nullptr;
-}
-
-void FactoryManagerObject::TriggerInteraction(const std::string& msg) {
-	try {
-		// Parse the message into key-value pairs
-		auto keyValues = MessageParser::parse(msg);
-
-		// Extract the target position and used item
-		std::pair<int, int> targetPosition = MessageParser::parsePosition(keyValues["position"]);
-		ItemType usedItem = MessageParser::parseItem(keyValues["item"]);
-
-		// Check if the target position is valid
-		if (Position2PortIndex.find(targetPosition) != Position2PortIndex.end()) {
-			int targetPortIndex = Position2PortIndex[targetPosition];
-
-			// Temporarily save the current item at the target port
-			ItemType temp = portIndex2Item[targetPortIndex];
-
-			// Add the used item to the target port
-			portIndex2Item[targetPortIndex] = usedItem;
-
-			// Reset crafting to evaluate the new configuration
-			this->ResetCrafting();
-		}
-		else {
-			LOG(LOG_WARNING, "Invalid position for interaction.");
-		}
-	}
-	catch (const std::exception& e) {
-		LOG(LOG_ERROR, e.what());
-	}
 }
 
 std::vector<Item*>& FactoryManagerObject::GetCurrentIngredients() {
@@ -93,6 +114,7 @@ void FactoryManagerObject::GenerateItemAndReset() {
 	for (int i = 0; i < this->nInputPort; i++) {
 		portIndex2FactoryComponent[i].DiscardHeldItem();
 	}
+
 	GenerateItem();
 
 	ResetCrafting();

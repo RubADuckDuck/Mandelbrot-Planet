@@ -393,7 +393,7 @@ void InitializaProgram() {
 		texturePath
 	);
 
-	TerrainObject* ptrTerrainObj = new TerrainObject();  
+	TerrainManager* ptrTerrainObj = new TerrainManager();  
 	gameEngine.DirectlyAddGameObject(ptrTerrainObj);
 }
 

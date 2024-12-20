@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.h" 
-
-
+#include "Item.h"
 
 enum Condition {
 	WALKABLE, 
@@ -16,21 +15,17 @@ enum FactoryComponentType {
     OUTPUTPORT
 };
 
-class Item : public TerrainObject {
-    ItemType itemType;
-};
+
 
 class FactoryManagerObject;
+
+class Item;
 
 class TerrainObject : public GameObject {
 public: 
 	int yCoord; int xCoord; // coordinate on Terrain ChartMap 
 
-	GeneralMesh* mesh; 
-	Texture* texture;  
-
 	std::map<Condition, bool> terrainCondition;  
-    
 
     ~TerrainObject() {};
 	
@@ -38,12 +33,12 @@ public:
 
     virtual void Interact(Item* item) = 0; // item designates the kind of interaction f: Item -> Interaction
 
-    virtual void DropItem(Item* item) {
-        PublishItemDrop(item);
-    }
+    virtual void DropItem(Item* item);
 
     virtual void PublishItemDrop(Item* item);
 };
+
+
 
 class FactoryComponentObject : public TerrainObject {
 public:
@@ -52,48 +47,21 @@ public:
     FactoryManagerObject* ptrParentStructure; 
     Item* heldItem;
 
-    FactoryComponentObject(FactoryComponentType componentType) {
-        myType = componentType; 
-    } 
+    FactoryComponentObject(FactoryComponentType componentType);
 
-    ~FactoryComponentObject() {}
+    ~FactoryComponentObject();
 
-    void Interact(Item* item) override {
-        if (myType == INPUTPORT) {
-            // shout that Item is dropped
-            PublishItemDrop(heldItem);
-
-            // pick up item
-            this->heldItem = item;
-        }
-        else {
-            LOG(LOG_ERROR, "It was this moment, you realize you fu*k up.")
-        }
-    }
+    void Interact(Item* item) override;
 
     Item* GetHeldItem();
 
-    void DiscardHeldItem(Item* item);
+    void DiscardHeldItem();
 
 private: 
-    void ResetFactoryFromCrafting() {
-        ptrParentStructure->ResetCrafting();
-    }
-};
+    void ResetFactoryFromCrafting();
+}; 
 
 
-
-struct Item2Probability {
-    std::map<ItemType, float> item2ProbMap;
-
-    Item* RandomRollDrop();
-};
-
-struct Recipe {
-    std::vector<ItemType> inputPortIndex2RequiredItem;
-    std::vector<Item2Probability*> outputPortIndex2ToProductItem;
-    float craftingDuration;
-};
 
 class StructureObject : public GameObject {
 public:
@@ -127,9 +95,7 @@ public:
 
     virtual void InitFactory() = 0;
 
-    Recipe* CheckForMatchingIngredient(std::vector<ItemType>& ingredients);
-
-    void TriggerInteraction(const std::string& msg);
+    Recipe* CheckForMatchingIngredient(std::vector<Item*>& ingredients);
 
     std::vector<Item*>& GetCurrentIngredients();
 
@@ -142,13 +108,4 @@ public:
     void GenerateItem();
 
     void Update(float deltaTime);
-};
-
-class NaturalResourceStructureObject : public StructureObject {
-
-    Item2Probability itemType2ProbabilityOfDroppingIt;
-
-    void TriggerInteraction(const std::string& msg);
-
-    ItemType RandomRollDrop();
 };

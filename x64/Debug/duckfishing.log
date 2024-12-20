@@ -1,6 +1,26 @@
 ﻿  GameObject.cpp
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C2143: syntax error: missing ';' before '*'
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,34): error C2238: unexpected token(s) preceding ';'
 E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(97,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  MessageParser.cpp
+  Item.cpp
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C2143: syntax error: missing ';' before '*'
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,34): error C2238: unexpected token(s) preceding ';'
+  main.cpp
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C2143: syntax error: missing ';' before '*'
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,34): error C2238: unexpected token(s) preceding ';'
+  Mesh.cpp
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C2143: syntax error: missing ';' before '*'
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,34): error C2238: unexpected token(s) preceding ';'
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(153,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(185,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(206,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(249,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  TerrainObject.cpp
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C2143: syntax error: missing ';' before '*'
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,14): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.h(30,34): error C2238: unexpected token(s) preceding ';'
   Generating Code...
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(379): warning C4172: returning address of local variable or temporary: temp
-  duckfishing.vcxproj -> E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe

@@ -27,7 +27,7 @@ public:
 	//Animation* ptrAnimation;  
 	Transform* ptrTransform;  
 
-	
+    Publisher* singletonPublisher;
 
 	virtual ~GameObject();
 
@@ -60,15 +60,36 @@ enum class GroundType {
     LAST // dummy that for iteration
 };
 
-enum class StructureType {
-    TREE, 
-    ROCK, 
-    WHEATFIELD,
-    BAKERY, 
-    TOOLFACTORY,
-    WALL,
-    LAST
+struct ReusableAsset {
+    int id;
+    std::string name;
+    std::string texturePath;
+    std::string objPath;
+
+    Texture texture;
+    StaticMesh mesh;
+
+    bool walkable;
 };
+
+
+struct TerrainType : ReusableAsset {
+    
+};
+
+struct StructureType {
+    
+};
+
+//enum class StructureType {
+//    TREE, 
+//    ROCK, 
+//    WHEATFIELD,
+//    BAKERY, 
+//    TOOLFACTORY,
+//    WALL,
+//    LAST
+//};
 
 
 #define MAX_STRUCTURE_LENGTH 5
@@ -87,60 +108,36 @@ struct Recipe {
     float craftingDuration;
 };
 
-class StructureObject : public GameObject {
 
+
+template <typename T> class LayerAssetManager {
 public: 
-    Publisher publisher; 
+    std::string baseDirectory;
 
-    bool buildingShape[MAX_STRUCTURE_LENGTH][MAX_STRUCTURE_LENGTH]; 
+    std::map<T, std::string> groundType2ObjPath; 
+    std::map<T, GeneralMesh*> groundType2Mesh; 
 
-    virtual void TriggerInteraction(const std::string& msg) = 0;
-};
+    std::map<T, std::string> groundType2TexturePath; 
+    std::map<T, Texture*> groundType2Texture; 
 
-class FactoryGameObjects : public StructureObject { 
-    /*
-        FactoryType Structures have input ports that receive certain kinds of resources and OutputPorts that throw the produced objects to a certain building.
-        InputPorts and Output ports are designated from a block that is part of the buildings shape. 
+    LayerAssetManager(std::string& directory) {
+        baseDirectory = directory; 
 
-    */
+        InitObjPaths();
+        InitTexturePaths(); 
 
-    int nInputPort; 
-    int nOutputPort; // output port index is (nInputPort + index) 
+        SetMeshes();
+        SetTextures(); 
+    }
 
-    std::vector<std::pair<int, int>> portIndex2PortPosition; 
-    std::vector<ItemType> portIndex2Item;
+    void InitObjPaths() {
+        // iterate through T 
+        for ()
+    }
+    void InitTexturePaths(); 
 
-    std::map<std::pair<int, int>, int> Position2PortIndex; 
-
-    std::vector<Recipe*> craftingRecipes; 
-    Recipe* isCrafting; 
-    float duration; 
-    float targetDuration; 
-
-    virtual void InitFactory() = 0; 
-
-    Recipe* CheckForMatchingIngredient(std::vector<ItemType>& ingredients);
-
-    void TriggerInteraction(const std::string& msg);
-
-    void ResetCrafting();
-
-    void SetCrafting(Recipe* currRecipe);
-
-    void GenerateItemAndReset();
-
-    void GenerateItem();
-
-    void Update(float deltaTime);
-};
-
-class NaturalResourceStructureObject : public StructureObject {
-
-    Item2Probability itemType2ProbabilityOfDroppingIt; 
-
-    void TriggerInteraction(const std::string& msg);
-
-    ItemType RandomRollDrop();
+    void SetMeshes(); 
+    void SetTextures();   
 };
 
 class TerrainObject : public GameObject {

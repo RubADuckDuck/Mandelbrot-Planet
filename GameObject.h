@@ -20,6 +20,10 @@ class Transform;
 class CameraObject;
 
 
+using Publisher = std::function<void(const std::string&)>; // using 'Alias' = std::function<'returnType'('argType')>
+
+
+
 class GameObject {
 public: 
 	GeneralMesh* ptrModel;
@@ -93,9 +97,6 @@ enum class GroundType {
 
 
 #define MAX_STRUCTURE_LENGTH 5
-
-using Publisher = std::function<void(const std::string&)>; // using 'Alias' = std::function<'returnType'('argType')>
-
 
 
 

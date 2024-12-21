@@ -87,9 +87,9 @@ void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	ptrModel->Render(cameraObj, transformMat, ptrTexture);
 }
 void GameObject::onEvent(const std::string& message) {};
-void GameObject::onEvent(Item* item) {
+void GameObject::onEvent(Item* item, int y, int x) {
 	if (!item) {
-		LOG(LOG_INFO, "Null item");
+		LOG(LOG_INFO, "Null item at: " + std::to_string(y) + ", " + std::to_string(x));
 	}
 }
 
@@ -118,7 +118,8 @@ void PlayableObject::onEvent(const std::string& message) {
 		xCoord = xCoord - 1;
 	}
 	else if (message== "space_up") {
-		this->PublishItem(heldItem);
+		LOG(LOG_INFO, "Publishing Item from Player");
+		this->PublishItem(heldItem, yCoord, xCoord);
 	}
 
 	if (yCoord < 0) {
@@ -127,8 +128,6 @@ void PlayableObject::onEvent(const std::string& message) {
 	if (xCoord < 0) {
 		xCoord = 0;
 	}
-
-	LOG(LOG_INFO, yCoord);
 }
 
 void PlayableObject::DrawGameObject(CameraObject& cameraObj) {

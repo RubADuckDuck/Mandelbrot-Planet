@@ -47,17 +47,17 @@ public:
 	virtual glm::mat4 GetModelMatrixFromTransform();
 	virtual void DrawGameObject(CameraObject& cameraObj); 
     virtual void onEvent(const std::string& message);
-	virtual void onEvent(Item* item);
+	virtual void onEvent(Item* item, int y, int x);
 
-	void PublishItem(Item* item) {
+	void PublishItem(Item* item, int y, int x) {
 		 EventDispatcher& dispatcher = EventDispatcher::GetInstance(); 
-		 dispatcher.Publish(item); // item is published!
+		 dispatcher.Publish(item, y, x); // item is published!
 	}
 
 	void SubscribeItemListener() {
-		itemListener = [this](Item* item) {
+		itemListener = [this](Item* item, int y, int x) {
 			LOG(LOG_INFO, "ItemListenerTriggered::Typeid of gameObj on which event is triggered: " + std::string(typeid(*this).name()));
-			this->onEvent(item);
+			this->onEvent(item, y, x);
 		};
 		
 		// Pass a pointer to the stored lambda

@@ -13,7 +13,7 @@ class Item;
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
 using Listener = std::function<void(const std::string&)>;
-using ItemListener = std::function<void(Item*)>;
+using ItemListener = std::function<void(Item*, int, int)>;
 
 
 
@@ -51,7 +51,7 @@ public:
     void Publish(const std::string& message) { 
         // std::cout << message << " triggered" << std::endl;
 
-        std::lock_guard<std::mutex> lock(mutex);
+        // std::lock_guard<std::mutex> lock(mutex);
         for (const auto& ptrListener : listeners) {
             try {
                 (*ptrListener)(message);
@@ -65,7 +65,7 @@ public:
     void Publish(const std::string& tag, const std::string& message) {
         // std::cout << tag << "::" << message << " triggered" << std::endl;
 
-        std::lock_guard<std::mutex> lock(mutex);
+        // std::lock_guard<std::mutex> lock(mutex);
         auto it = tag2Listener.find(tag); 
 
         if (it != tag2Listener.end()) {
@@ -81,12 +81,12 @@ public:
         }
     }
 
-    void Publish(Item* item) {
-        std::lock_guard<std::mutex> lock(mutex);
+    void Publish(Item* item, int y, int x) {
+        // std::lock_guard<std::mutex> lock(mutex);
 
         for (const auto& ptrItemListener : itemListeners) {
             try {
-                (*ptrItemListener)(item);
+                (*ptrItemListener)(item, y, x);
             }
             catch (const std::exception& e) {
                 std::cerr << "ItemListener exception: " << e.what() << std::endl;

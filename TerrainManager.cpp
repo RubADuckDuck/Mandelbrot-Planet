@@ -47,7 +47,7 @@ void TerrainManager::DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& 
 	Texture* currTexture = groundLoader.type2Texture[currGroundType].get();
 
 	// Ensure mesh and texture are valid before rendering
-	if (currMesh && currTexture) {
+	if (currMesh && currTexture) { // TerrainManager directly renders
 		currMesh->Render(cameraObj, transformMat, currTexture);
 	}
 }

@@ -7,10 +7,10 @@ public:
 	std::string assetDirectory;
 
 	std::map<T, std::string> type2ObjPath;
-	std::map<T, std::unique_ptr<GeneralMesh>> type2Mesh;
+	std::map<T, GeneralMesh*> type2Mesh;
 
 	std::map<T, std::string> type2TexturePath;
-	std::map<T, std::unique_ptr<Texture>> type2Texture;
+	std::map<T, Texture*> type2Texture;
 
 
 
@@ -66,11 +66,71 @@ public:
 
     Type2MeshAndTexture<GroundType> groundLoader;
     Type2MeshAndTexture<ItemType> itemLoader;
-    Type2MeshAndTexture<std::pair<FactoryType, FactoryComponentType>> factoryComponentLoader;
+    Type2MeshAndTexture<std::pair<FactoryType, FactoryComponentType>> factoryComponentLoader; // this could be a mistake. I could have been more general.
 
     TerrainManager();
 
-    void Update() override;
+	void DropItemAt(int yIndex, int xIndex, Item* item) {
+		DroppedItemObject* newDroppedItem = new DroppedItemObject(); 
+
+		newDroppedItem->SetCoordinates(yIndex, xIndex); 
+		newDroppedItem->SetItem(item); 
+	}
+
+	Item* GetNewItemGameObject(ItemType itemType) {
+		Item* newItem = new Item(itemType); 
+		
+		// get mesh and texture
+		GeneralMesh* ptrMesh = itemLoader.type2Mesh[itemType]; 
+		Texture* ptrTexture = itemLoader.type2Texture[itemType]; 
+
+		// item itself has default transform 
+		Transform* defaultTransform = new Transform(); 
+
+		newItem->SetMesh(ptrMesh);
+		newItem->SetTexture(ptrTexture); 
+		newItem->SetTransform(defaultTransform); 
+
+		return newItem;
+	}
+
+	void BuildFactoryAt(FactoryType factoryType) {
+		FactoryManagerObject* factoryManager = new FactoryManagerObject(factoryType); 
+
+		// example 
+		FactoryComponentType factoryComponentType; 
+		GetNewFactoryComponentObject(factoryType, factoryComponentType, factoryManager);
+	}
+
+	FactoryComponentObject* GetNewFactoryComponentObject(
+		FactoryType factoryType, 
+		FactoryComponentType factoryComponentType, 
+		FactoryManagerObject* factoryManager) 
+	{
+		FactoryComponentObject* newFactoryComponent = new FactoryComponentObject(factoryComponentType, factoryManager); 
+
+		// get mesh and texture 
+		std::pair<FactoryType, FactoryComponentType> componentType = { factoryType, factoryComponentType };
+		GeneralMesh* ptrMesh = factoryComponentLoader.type2Mesh[componentType]; 
+		Texture* ptrTexture = factoryComponentLoader.type2Texture[componentType]; 
+
+		Transform* defaultTransfrom = new Transform(); 
+
+		newFactoryComponent->SetMesh(ptrMesh); 
+		newFactoryComponent->SetTexture(ptrTexture); 
+		newFactoryComponent->SetTransform(defaultTransfrom); 
+	}
+
+	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, Item* item) {
+		DroppedItemObject* newDroppedItem = new DroppedItemObject(); 
+
+		newDroppedItem->SetCoordinates(yIndex, xIndex);
+		newDroppedItem->SetItem(item); 
+
+		itemGrid[yIndex][xIndex] = newDroppedItem;
+	} 
+
+
 
     void DrawGameObject(CameraObject& cameraObj) override;
 

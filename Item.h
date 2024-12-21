@@ -9,13 +9,16 @@ class GameObject;
 enum ItemState {
 	ON_GROUND, 
 	HELD_BY_PLAYER, 
-	IN_FACTORY
+	IN_FACTORY, 
+	INVALID_STATE
 };
 
 class Item : public GameObject {
 public:
     ItemType itemType;
 	ItemState itemState; 
+
+	Item(ItemType itemType) : itemType(itemType), itemState(INVALID_STATE){}
 
 	void DrawGameObject(CameraObject& cameraObj) override; // differentiate draw method based on ItemState
 };

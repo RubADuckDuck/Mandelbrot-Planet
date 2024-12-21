@@ -24,6 +24,11 @@ public:
 	std::map<Condition, bool> terrainCondition;  
 
     ~TerrainObject() {};
+
+    void SetCoordinates(int y, int x) {
+        yCoord = y; 
+        xCoord = x;
+    }
 	
 	bool& CheckCondition(Condition condition); 
 
@@ -35,10 +40,21 @@ public:
 };
 
 class DroppedItemObject : public TerrainObject {
+public:
+    Item* item; 
+
+    void SetItem(Item* ptrItem) {
+        this->item = ptrItem;
+    }
+
     void Interact(Item* item) override{
         item->itemState = ON_GROUND;
         DropItem(item); // drop players Item right here
     } 
+
+    void DrawGameObject(CameraObject& cameraObj, Transform transform) {
+
+    }
 };
 
 
@@ -49,7 +65,7 @@ public:
     FactoryManagerObject* ptrParentStructure; 
     Item* heldItem;
 
-    FactoryComponentObject(FactoryComponentType componentType);
+    FactoryComponentObject(FactoryComponentType componentType, FactoryManagerObject* factoryManager);
 
     ~FactoryComponentObject();
 
@@ -69,9 +85,9 @@ class StructureObject : public GameObject {
 public:
     Publisher publisher;
 
-    bool buildingShape[MAX_STRUCTURE_LENGTH][MAX_STRUCTURE_LENGTH];
+    // bool buildingShape[MAX_STRUCTURE_LENGTH][MAX_STRUCTURE_LENGTH];
 
-    virtual void TriggerInteraction(const std::string& msg) = 0;
+    // virtual void TriggerInteraction(const std::string& msg) = 0;
 };
 
 class FactoryManagerObject : public StructureObject {
@@ -97,7 +113,9 @@ public:
     float duration;
     float targetDuration;
 
-    virtual void InitFactory() = 0;
+    FactoryManagerObject(FactoryType factoryType) : factoryType(factoryType) { InitFactory(); }
+    
+    void InitFactory();
 
     Recipe* CheckForMatchingIngredient(std::vector<Item*>& ingredients);
 

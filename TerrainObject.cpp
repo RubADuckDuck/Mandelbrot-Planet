@@ -15,9 +15,8 @@ void TerrainObject::PublishItemDrop(Item* item) {
 }
 
 // FactoryComponentObject-------------------------
-FactoryComponentObject::FactoryComponentObject(FactoryComponentType componentType) {
-	myType = componentType;
-}
+FactoryComponentObject::FactoryComponentObject(FactoryComponentType componentType, FactoryManagerObject* factoryManager) 
+	: myType(componentType), heldItem(nullptr), ptrParentStructure(factoryManager) { }
 
 FactoryComponentObject::~FactoryComponentObject() {}
 

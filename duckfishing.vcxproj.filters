@@ -78,6 +78,9 @@
     <ClCompile Include="GroundType.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClCompile>
+    <ClCompile Include="TerrainManager.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameScene.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="FactoryType.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainManager.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
   </ItemGroup>

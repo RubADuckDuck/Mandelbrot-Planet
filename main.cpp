@@ -389,13 +389,13 @@ void InitializaProgram() {
 	glGenVertexArrays(1, &testVertArr);
 	std::cout << "Index of Vertex array generated for test purpose: " << testVertArr << std::endl;
 
-	gameEngine.CreateAndAddGameObject(
-		objPath,
-		texturePath
-	);
 
-	TerrainManager* ptrTerrainObj = new TerrainManager();  
-	gameEngine.DirectlyAddGameObject(ptrTerrainObj);
+	TerrainManager* ptrTerrainManager = new TerrainManager();  
+
+	ptrTerrainManager->SetGameEngine(&gameEngine);
+	ptrTerrainManager->CreateAndAddPlayer(objPath, texturePath);
+	
+	gameEngine.DirectlyAddGameObject(ptrTerrainManager);
 }
 
 void debugging() {

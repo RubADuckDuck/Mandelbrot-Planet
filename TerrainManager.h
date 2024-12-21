@@ -12,8 +12,6 @@ public:
 	std::map<T, std::string> type2TexturePath;
 	std::map<T, Texture*> type2Texture;
 
-
-
 	// Constructor takes the asset directory and mapping
 	Type2MeshAndTexture(
 		const std::string& directory,
@@ -75,12 +73,15 @@ class DroppedItemObject;
 class FactoryComponentObject;
 class Item; 
 class FactoryManagerObject;
+class GameEngine;
 
 class TerrainManager : public GameObject { // Manages Interaction between Player2Terrain Terrain2Terrain Interaction
 public:
     static const int GRID_SIZE = 100;
     float BLOCK_SIZE = 0.5f;
     float BLOCK_OFFSET = 1.0f;
+
+	GameEngine* gameEngine; 
 
     Transform* coord2Transform[GRID_SIZE][GRID_SIZE]; // 2d coordinate to transfrom
 	// every gm on (y,x) is transformed by coord2Transform[y, x]
@@ -91,9 +92,22 @@ public:
 
     Type2MeshAndTexture<GroundType> groundLoader;
     Type2MeshAndTexture<ItemType> itemLoader;
-    Type2MeshAndTexture<std::pair<FactoryType, FactoryComponentType>> factoryComponentLoader; // this could be a mistake. I could have been more general.
+    Type2MeshAndTexture<std::pair<FactoryType, FactoryComponentType>> factoryComponentLoader; // this could be a mistake. I could have been more general. 
+
+	std::vector<PlayableObject*> players;
 
     TerrainManager();
+
+	void SetGameEngine(GameEngine* ge) {
+		gameEngine = ge;
+	}
+
+	void CreateAndAddPlayer(
+		const std::string& meshPath,
+		std::string& texturePath
+	);
+
+	void AddPlayer(PlayableObject* newPlayer);
 
 	void DropItemAt(int yIndex, int xIndex, Item* item);
 
@@ -110,7 +124,9 @@ public:
 
 	void Update() override;
 
-    void DrawGameObject(CameraObject& cameraObj) override;
+    void DrawGameObject(CameraObject& cameraObj) override; 
+
+	void DrawPlayers(CameraObject& cameraObj);
 
     void DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& cameraObj); 
 

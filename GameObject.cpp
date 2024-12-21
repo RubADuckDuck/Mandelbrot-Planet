@@ -97,30 +97,33 @@ void RotatingGameObject::Update() {
 	radian = radian + 0.1;
 }
 
-
 // Playable ---------------------------
 void PlayableObject::onEvent(const std::string& message) {
-	glm::vec3 curTranslation = ptrTransform->GetTranslation();
-	glm::vec3 temp = glm::vec3(0);
 
-
-	if (message == "w_up") {
-		temp = glm::vec3(0, 0, -1);
+	if (message == "s_up") {
+		yCoord = yCoord + 1;
 	}
-	else if (message == "s_up") {
-		temp = glm::vec3(0, 0, 1);
+	else if (message == "w_up") {
+		yCoord = yCoord - 1;
 	}
 	else if (message == "d_up") {
-		temp = glm::vec3(1, 0, 0);
+		xCoord = xCoord + 1;
 	}
 	else if (message == "a_up") {
-		temp = glm::vec3(-1, 0, 0);
+		xCoord = xCoord - 1;
 	}
 	else {
 
 	}
-	curTranslation = curTranslation + temp;
-	ptrTransform->SetTranslation(curTranslation);
+
+	if (yCoord < 0) {
+		yCoord = 0;
+	} 
+	if (xCoord < 0) {
+		xCoord = 0;
+	}
+
+	LOG(LOG_INFO, yCoord);
 }
 
 

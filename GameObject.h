@@ -49,6 +49,9 @@ public:
 }; 
 
 class PlayableObject : public GameObject {
+public:
+	int yCoord = 0; int xCoord = 0;
+
     void onEvent(const std::string& message) override;
 }; 
 

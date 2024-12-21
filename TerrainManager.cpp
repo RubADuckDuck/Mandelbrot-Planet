@@ -1,9 +1,9 @@
 #include "TerrainManager.h"
 #include "TerrainObject.h"
 #include "Item.h"
+#include "GameEngine.h"
 
-
-// TerrainManager----------------------------------------------------------------------
+// TerrainManager::----------------------------------------------------------------------
 TerrainManager::TerrainManager() 
 	: groundLoader("E:/repos/[DuckFishing]/model", groundType2GroundName),
 	itemLoader("E:/repos/[DuckFishing]/model", itemType2ItemName),
@@ -17,6 +17,35 @@ TerrainManager::TerrainManager()
 
 	// Randomly initialize the ground grid
 	RandomizeGroundGrid();
+}
+
+void TerrainManager::CreateAndAddPlayer(
+	const std::string& meshPath,
+	std::string& texturePath
+)
+{
+	GeneralMesh* curMesh = new StaticMesh();
+	curMesh->LoadMesh(meshPath);
+
+	Texture* curTexture = new Texture();
+	curTexture->LoadandSetTextureIndexFromPath(texturePath);
+
+	Transform* defaultTransform = new Transform();
+	defaultTransform->SetScale(glm::vec3(0.2f));
+	defaultTransform->SetTranslation(glm::vec3(0, 1.0f, 0));
+
+	PlayableObject* gameObject = new PlayableObject();
+	gameObject->SetMesh(curMesh);
+	gameObject->SetTexture(curTexture);
+	gameObject->SetTransform(defaultTransform);
+
+	this->AddPlayer(gameObject);
+}
+
+void TerrainManager::AddPlayer(PlayableObject* newPlayer) {
+	this->gameEngine->ManuallySubscribe(newPlayer);
+
+	players.push_back(newPlayer);
 }
 
 void TerrainManager::DropItemAt(int yIndex, int xIndex, Item* item) {
@@ -108,6 +137,18 @@ void TerrainManager::Update() {
 				curFactoryComponent->SetTransform(curTransform);
 			}
 		}
+	} 
+
+	PlayableObject* curPlayer;
+
+	// Update player position 
+	for (int i = 0; i < players.size(); i++) {
+		curPlayer = players[i]; 
+		int yIndex = curPlayer->yCoord; 
+		int xIndex = curPlayer->xCoord; 
+
+		curTransform = coord2Transform[yIndex][xIndex]; 
+		curPlayer->SetTransform(curTransform);
 	}
 }
 
@@ -118,6 +159,14 @@ void TerrainManager::DrawGameObject(CameraObject& cameraObj) {
 			DrawDroppedItemAt(i, j, cameraObj);
 			DrawFactoryComponentAt(i, j, cameraObj);
 		}
+	}
+
+	DrawPlayers(cameraObj);
+}
+
+void TerrainManager::DrawPlayers(CameraObject& cameraObj) {
+	for (int i = 0; i < players.size(); i++) {
+		players[i]->DrawGameObject(cameraObj);
 	}
 }
 

@@ -5,9 +5,9 @@
 
 class GameEngine {
 public: 
-
 	CameraObject camera;
-	
+
+	std::list<Listener> listeners;
 	std::vector<GameObject*> gameObjects; 
 	 
 	std::vector<Mesh*> reusableMeshes; 
@@ -22,6 +22,9 @@ public:
 
 	void Update() {
 		inputHandler.pollEvents(); 
+
+		camera.Update();
+
 		GameObject* curGameObjPtr; 
 
 		for (int i = 0; i < gameObjects.size(); i++) {
@@ -36,7 +39,7 @@ public:
 		}
 	}
 
-	void CreateAndAddGameObject(
+	void CreateAndAddGameObject( // I recommed not to use this. Shaders are no longer manually passed.
 		const std::string& meshPath, 
 		std::string& texturePath,
 		GLuint shaderProgram
@@ -49,6 +52,8 @@ public:
 		curTexture->LoadandSetTextureIndexFromPath(texturePath);  
 
 		Transform* defaultTransform = new Transform();  
+		defaultTransform->SetScale(glm::vec3(0.2f));
+		defaultTransform->SetTranslation(glm::vec3(0,1.0f,0));
 
 		GameObject* gameObject = new RotatingGameObject(); 
 		gameObject->SetMesh(curMesh); 
@@ -70,8 +75,10 @@ public:
 		curTexture->LoadandSetTextureIndexFromPath(texturePath);
 
 		Transform* defaultTransform = new Transform();
+		defaultTransform->SetScale(glm::vec3(0.2f));
+		defaultTransform->SetTranslation(glm::vec3(0, 1.0f, 0));
 
-		GameObject* gameObject = new RotatingGameObject();
+		GameObject* gameObject = new PlayableObject();
 		gameObject->SetMesh(curMesh);
 		gameObject->SetTexture(curTexture);
 		gameObject->SetTransform(defaultTransform);
@@ -110,14 +117,29 @@ public:
 		// Add to game engine
 		this->AddGameObjectToGameEngine(gameObject);
 	}
+
+	void DirectlyAddGameObject(GameObject* newGameObject) {
+		AddGameObjectToGameEngine(newGameObject);
+	}
 	
 private: 
 	void AddGameObjectToGameEngine(GameObject* gameObj) {
-		Listener curListener; 
-		curListener = [gameObj](const std::string& message) {
+		// Store the lambda in a persistent container
+		listeners.emplace_back([gameObj](const std::string& message) {
+			LOG(LOG_INFO, "Typeid of gameObj on which event is triggered: " + std::string(typeid(*gameObj).name()));
 			gameObj->onEvent(message);
-		}; 
+			});
 
-		gameObjects.push_back(gameObj);
+		// Pass a pointer to the stored lambda
+		inputHandler.Subscribe(&listeners.back());
+		LOG(LOG_INFO, "Subscribing game object as Listener");
+
+		gameObjects.push_back(gameObj); 
+
+		// Check if the game object is an instance of PlayableObject
+		if (PlayableObject* playableObj = dynamic_cast<PlayableObject*>(gameObj)) {
+			camera.AddTarget(playableObj); // Add to target list
+			LOG(LOG_INFO, "Added PlayableObject to target list: " + std::string(typeid(*playableObj).name()));
+		}
 	}
 };

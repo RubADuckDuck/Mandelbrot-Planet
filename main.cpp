@@ -16,13 +16,13 @@
 
 #include "Mesh.h"
 #include "GameEngine.h"
+#include "TerrainManager.h"
 
 // Globals 
-int gScreenHeight = 480;
-int gScreenWidth = 640;
+int gScreenHeight = 960;
+int gScreenWidth = 1280;
 SDL_Window* gGraphicsApplicationWindow = nullptr;
 SDL_GLContext gOpenGLContext = nullptr;
-
 
 bool gQuit = false;
 
@@ -383,7 +383,7 @@ void InitializaProgram() {
 	
 	// load meshmanager and load model
 	std::string objPath = "E:\\repos\\[DuckFishing]\\model\\duck.obj";
-	std::string texturePath = "E:\\repos\\[DuckFishing]\\model\\texture\\Poliigon_RattanWeave_6945\\2K\\Poliigon_RattanWeave_6945_BaseColor.jpg"; 
+	std::string texturePath = "E:/repos/[DuckFishing]/model/texture/duck.png"; 
 
 	GLuint testVertArr;
 	glGenVertexArrays(1, &testVertArr);
@@ -391,23 +391,11 @@ void InitializaProgram() {
 
 	gameEngine.CreateAndAddGameObject(
 		objPath,
-		texturePath,
-		shaderProgram
+		texturePath
 	);
-}
 
-
-
-void Input() {
-	SDL_Event e;
-
-	while (SDL_PollEvent(&e) != 0) {
-		if (e.type == SDL_QUIT) {
-			std::cout << "Goodbye" << std::endl;
-
-			gQuit = true;
-		}
-	}
+	TerrainManager* ptrTerrainObj = new TerrainManager();  
+	gameEngine.DirectlyAddGameObject(ptrTerrainObj);
 }
 
 void debugging() {
@@ -415,20 +403,23 @@ void debugging() {
 }
 
 void MainLoop() {
-	const int targetFPS = 30; // Target frame rate
+	const int targetFPS = 60; // Target frame rate
 	const float targetFrameTime = 1.0f / targetFPS; // Time per frame in seconds
 
 	while (!gQuit) {
 		// Start frame timer
 		Uint64 startTicks = SDL_GetPerformanceCounter();
 
-		// Handle inputs
-		Input();
 
 		// debugging();
 
 		// Update game state
 		gameEngine.Update();
+
+		if (gameEngine.inputHandler.isQuit()) {
+			gQuit = true;
+			LOG(LOG_INFO, "GoodBye, Closing SDL");
+		}
 
 		// Render game state
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear buffer

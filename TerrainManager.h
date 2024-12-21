@@ -27,29 +27,54 @@ public:
 	}
 
 	void InitObjPaths(const std::map<T, const std::string>& typeToNameMap) {
-		for (const auto& [type, name] : typeToNameMap) {
+		for (const auto& pair : typeToNameMap) {
+			const T& type = pair.first;
+			const std::string& name = pair.second;
+
 			type2ObjPath[type] = assetDirectory + "/" + name + ".obj";
 		}
 	}
 
-	void InitTexturePaths(const std::map<T,const std::string>& typeToNameMap) {
-		for (const auto& [type, name] : typeToNameMap) {
-			type2TexturePath[type] = assetDirectory + "/" + name + ".png";
+
+	void InitTexturePaths(const std::map<T, const std::string>& typeToNameMap) {
+		for (const auto& pair : typeToNameMap) {
+			const T& type = pair.first;
+			const std::string& name = pair.second;
+
+			type2TexturePath[type] = assetDirectory + "/texture/" + name + ".png";
 		}
 	}
+
 
 	void SetMeshes() {
-		for (const auto& [type, path] : type2ObjPath) {
-			type2Mesh[type] = std::make_unique<GeneralMesh>(path);
+		GeneralMesh* currMesh;
+		for (const auto& pair : type2ObjPath) {
+			const auto& type = pair.first;
+			const auto& path = pair.second;
+
+			currMesh = new StaticMesh();
+			currMesh->LoadMesh(path);
+			type2Mesh[type] = currMesh;
 		}
 	}
 
-	void SetTextures() {
-		for (const auto& [type, path] : type2TexturePath) {
-			type2Texture[type] = std::make_unique<Texture>(path);
+	void SetTextures() { 
+		Texture* currTexture;
+		for (const auto& pair : type2TexturePath) {
+			const auto& type = pair.first;
+			const auto& path = pair.second;
+
+			currTexture = new Texture;
+			currTexture->LoadandSetTextureIndexFromPath(path);
+			type2Texture[type] = currTexture;
 		}
 	}
 };
+
+class DroppedItemObject; 
+class FactoryComponentObject;
+class Item; 
+class FactoryManagerObject;
 
 class TerrainManager : public GameObject { // Manages Interaction between Player2Terrain Terrain2Terrain Interaction
 public:
@@ -57,7 +82,7 @@ public:
     float BLOCK_SIZE = 0.5f;
     float BLOCK_OFFSET = 1.0f;
 
-    Transform coord2Transform[GRID_SIZE][GRID_SIZE]; // 2d coordinate to transfrom
+    Transform* coord2Transform[GRID_SIZE][GRID_SIZE]; // 2d coordinate to transfrom
 	// every gm on (y,x) is transformed by coord2Transform[y, x]
 
     GroundType groundGrid[GRID_SIZE][GRID_SIZE];
@@ -70,67 +95,20 @@ public:
 
     TerrainManager();
 
-	void DropItemAt(int yIndex, int xIndex, Item* item) {
-		DroppedItemObject* newDroppedItem = new DroppedItemObject(); 
+	void DropItemAt(int yIndex, int xIndex, Item* item);
 
-		newDroppedItem->SetCoordinates(yIndex, xIndex); 
-		newDroppedItem->SetItem(item); 
-	}
+	Item* GetNewItemGameObject(ItemType itemType);
 
-	Item* GetNewItemGameObject(ItemType itemType) {
-		Item* newItem = new Item(itemType); 
-		
-		// get mesh and texture
-		GeneralMesh* ptrMesh = itemLoader.type2Mesh[itemType]; 
-		Texture* ptrTexture = itemLoader.type2Texture[itemType]; 
-
-		// item itself has default transform 
-		Transform* defaultTransform = new Transform(); 
-
-		newItem->SetMesh(ptrMesh);
-		newItem->SetTexture(ptrTexture); 
-		newItem->SetTransform(defaultTransform); 
-
-		return newItem;
-	}
-
-	void BuildFactoryAt(FactoryType factoryType) {
-		FactoryManagerObject* factoryManager = new FactoryManagerObject(factoryType); 
-
-		// example 
-		FactoryComponentType factoryComponentType; 
-		GetNewFactoryComponentObject(factoryType, factoryComponentType, factoryManager);
-	}
+	void BuildFactoryAt(FactoryType factoryType);
 
 	FactoryComponentObject* GetNewFactoryComponentObject(
-		FactoryType factoryType, 
-		FactoryComponentType factoryComponentType, 
-		FactoryManagerObject* factoryManager) 
-	{
-		FactoryComponentObject* newFactoryComponent = new FactoryComponentObject(factoryComponentType, factoryManager); 
+		FactoryType factoryType,
+		FactoryComponentType factoryComponentType,
+		FactoryManagerObject* factoryManager);
 
-		// get mesh and texture 
-		std::pair<FactoryType, FactoryComponentType> componentType = { factoryType, factoryComponentType };
-		GeneralMesh* ptrMesh = factoryComponentLoader.type2Mesh[componentType]; 
-		Texture* ptrTexture = factoryComponentLoader.type2Texture[componentType]; 
+	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, Item* item);
 
-		Transform* defaultTransfrom = new Transform(); 
-
-		newFactoryComponent->SetMesh(ptrMesh); 
-		newFactoryComponent->SetTexture(ptrTexture); 
-		newFactoryComponent->SetTransform(defaultTransfrom); 
-	}
-
-	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, Item* item) {
-		DroppedItemObject* newDroppedItem = new DroppedItemObject(); 
-
-		newDroppedItem->SetCoordinates(yIndex, xIndex);
-		newDroppedItem->SetItem(item); 
-
-		itemGrid[yIndex][xIndex] = newDroppedItem;
-	} 
-
-
+	void Update() override;
 
     void DrawGameObject(CameraObject& cameraObj) override;
 

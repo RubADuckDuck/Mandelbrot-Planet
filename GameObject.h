@@ -12,7 +12,6 @@
 #include "GlobalMappings.h"
 #include "FactoryType.h"
 #include "GroundType.h"
-#include "TerrainObject.h"
 
 //class Animation; 
 
@@ -41,7 +40,7 @@ public:
 	void SetMesh(GeneralMesh* ptrModel);
 	void SetTexture(Texture* ptrTexture);
 	//void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
-	void SetTransform(Transform* ptrTransform);
+	virtual void SetTransform(Transform* ptrTransform);
 
 	virtual void Update();
 	virtual glm::mat4 GetModelMatrixFromTransform();

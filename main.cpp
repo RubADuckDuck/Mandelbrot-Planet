@@ -16,6 +16,7 @@
 
 #include "Mesh.h"
 #include "GameEngine.h"
+#include "TerrainManager.h"
 
 // Globals 
 int gScreenHeight = 960;

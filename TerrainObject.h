@@ -1,7 +1,9 @@
 #pragma once
 #include "GameObject.h" 
-#include "Item.h"
 #include "FactoryType.h"
+
+class Item;
+class Recipe;
 
 enum Condition {
 	WALKABLE, 
@@ -43,18 +45,13 @@ class DroppedItemObject : public TerrainObject {
 public:
     Item* item; 
 
-    void SetItem(Item* ptrItem) {
-        this->item = ptrItem;
-    }
+    void SetItem(Item* ptrItem);
 
-    void Interact(Item* item) override{
-        item->itemState = ON_GROUND;
-        DropItem(item); // drop players Item right here
-    } 
+    void Interact(Item* item) override;
 
-    void DrawGameObject(CameraObject& cameraObj, Transform transform) {
+    void SetTransform(Transform* transform) override;
 
-    }
+    void DrawGameObject(CameraObject& cameraObj);
 };
 
 
@@ -75,10 +72,16 @@ public:
 
     void DiscardHeldItem();
 
+    void SetTransform(Transform* transform) override;
+
+    void DrawGameObject(CameraObject& cameraObj);
+
 private: 
     void ResetFactoryFromCrafting();
 }; 
 
+
+using Publisher = std::function<void(const std::string&)>; // using 'Alias' = std::function<'returnType'('argType')>
 
 
 class StructureObject : public GameObject {

@@ -1,4 +1,3 @@
-
 #include "Item.h"
 
 Item* Item2Probability::RandomRollDrop() {

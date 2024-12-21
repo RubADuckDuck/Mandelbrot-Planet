@@ -14,6 +14,26 @@ void TerrainObject::PublishItemDrop(Item* item) {
 	// to do
 }
 
+// DroppedItemObject:: --------------------------
+void DroppedItemObject::SetItem(Item* ptrItem) {
+	this->item = ptrItem;
+}
+
+void DroppedItemObject::Interact(Item* item) {
+	item->itemState = ON_GROUND;
+	DropItem(item); // drop players Item right here
+}
+
+void DroppedItemObject::SetTransform(Transform* transform) {
+	ptrTransform = transform;
+	item->SetTransform(transform);
+}
+
+void DroppedItemObject::DrawGameObject(CameraObject& cameraObj) {
+	// droppedItem iteself don't have nothing to draw.
+	item->DrawGameObject(cameraObj);
+}
+
 // FactoryComponentObject-------------------------
 FactoryComponentObject::FactoryComponentObject(FactoryComponentType componentType, FactoryManagerObject* factoryManager) 
 	: myType(componentType), heldItem(nullptr), ptrParentStructure(factoryManager) { }
@@ -44,11 +64,26 @@ void FactoryComponentObject::DiscardHeldItem() {
 	return;
 }
 
+void FactoryComponentObject::SetTransform(Transform* transform) {
+	ptrTransform = transform;
+	heldItem->SetTransform(transform);
+}
+
+void FactoryComponentObject::DrawGameObject(CameraObject& cameraObj) {
+	GameObject::DrawGameObject(cameraObj); // draw this object
+	heldItem->DrawGameObject(cameraObj); // draw held object
+}
+
+
 void FactoryComponentObject::ResetFactoryFromCrafting() {
 	ptrParentStructure->ResetCrafting();
 }
 
 // FactoryManagerObject --------------------------
+void FactoryManagerObject::InitFactory() {
+
+}
+
 Recipe* FactoryManagerObject::CheckForMatchingIngredient(std::vector<Item*>& ingredients) {
 	static std::vector<Item2Probability*> emptyResult; // Static empty vector to return in case of no match
 

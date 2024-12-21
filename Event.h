@@ -8,9 +8,14 @@
 #include <mutex>
 #include "LOG.h"
 
+class Item;
+
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
 using Listener = std::function<void(const std::string&)>;
+using ItemListener = std::function<void(Item*)>;
+
+
 
 class EventDispatcher {
 public:
@@ -24,6 +29,13 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         if (std::find(listeners.begin(), listeners.end(), ptrListener) == listeners.end()) {
             listeners.push_back(ptrListener);
+        }
+    }
+
+    void Subscribe(ItemListener* ptrItemListener) {
+        std::lock_guard<std::mutex> lock(mutex); 
+        if (std::find(itemListeners.begin(), itemListeners.end(), ptrItemListener) == itemListeners.end()) {
+            itemListeners.push_back(ptrItemListener); 
         }
     }
 
@@ -69,10 +81,23 @@ public:
         }
     }
 
+    void Publish(Item* item) {
+        std::lock_guard<std::mutex> lock(mutex);
+
+        for (const auto& ptrItemListener : itemListeners) {
+            try {
+                (*ptrItemListener)(item);
+            }
+            catch (const std::exception& e) {
+                std::cerr << "ItemListener exception: " << e.what() << std::endl;
+            }
+        }
+    }
+
     void Unsubscribe(Listener* ptrListener) {
         std::lock_guard<std::mutex> lock(mutex);
         listeners.erase(std::remove(listeners.begin(), listeners.end(), ptrListener), listeners.end());
-    }
+    } 
 
     void Unsubscribe(const std::string& tag, Listener* ptrListener) {
         std::lock_guard<std::mutex> lock(mutex);
@@ -85,6 +110,11 @@ public:
         }
     }
 
+    void Unsubscribe(ItemListener* ptrItemListener) {
+        std::lock_guard<std::mutex> lock(mutex);
+        itemListeners.erase(std::remove(itemListeners.begin(), itemListeners.end(), ptrItemListener), itemListeners.end());
+    }
+
 private:
     // Private constructor to prevent direct instantiation
     EventDispatcher() = default;
@@ -95,6 +125,10 @@ private:
 
     std::vector<Listener*> listeners;
     std::map<std::string, std::vector<Listener*>> tag2Listener;
+
+
+    std::vector<ItemListener*> itemListeners; 
+    // std::map<std::string, std::vector<ItemListener*>> tag2ItemListeners; // itemListeners are by iteself specific
     std::mutex mutex;
 };
 
@@ -186,7 +220,7 @@ private:
         case SDLK_a: aPressed = true; this->Publish("a_down"); break;
         case SDLK_s: sPressed = true; this->Publish("s_down"); break;
         case SDLK_d: dPressed = true; this->Publish("d_down"); break;
-        case SDLK_SPACE: spacePressed = true; break;
+        case SDLK_SPACE: spacePressed = true; this->Publish("space_down"); break;
         default: break;
         }
     }
@@ -200,7 +234,7 @@ private:
         case SDLK_a: aPressed = false; this->Publish("a_up"); break;
         case SDLK_s: sPressed = false; this->Publish("s_up"); break;
         case SDLK_d: dPressed = false; this->Publish("d_up"); break;
-        case SDLK_SPACE: spacePressed = false; break;
+        case SDLK_SPACE: spacePressed = false; this->Publish("space_up"); break;
         default: break;
         }
     }

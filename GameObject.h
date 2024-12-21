@@ -12,6 +12,7 @@
 #include "GlobalMappings.h"
 #include "FactoryType.h"
 #include "GroundType.h"
+#include "Event.h"
 
 //class Animation; 
 
@@ -21,9 +22,9 @@ class Transform;
 
 class CameraObject;
 
+class Item;
 
 using Publisher = std::function<void(const std::string&)>; // using 'Alias' = std::function<'returnType'('argType')>
-
 
 
 class GameObject {
@@ -33,7 +34,7 @@ public:
 	//Animation* ptrAnimation;  
 	Transform* ptrTransform;  
     
-    Publisher* singletonPublisher;
+	ItemListener itemListener;
 
 	virtual ~GameObject();
 
@@ -46,13 +47,35 @@ public:
 	virtual glm::mat4 GetModelMatrixFromTransform();
 	virtual void DrawGameObject(CameraObject& cameraObj); 
     virtual void onEvent(const std::string& message);
+	virtual void onEvent(Item* item);
+
+	void PublishItem(Item* item) {
+		 EventDispatcher& dispatcher = EventDispatcher::GetInstance(); 
+		 dispatcher.Publish(item); // item is published!
+	}
+
+	void SubscribeItemListener() {
+		itemListener = [this](Item* item) {
+			LOG(LOG_INFO, "ItemListenerTriggered::Typeid of gameObj on which event is triggered: " + std::string(typeid(*this).name()));
+			this->onEvent(item);
+		};
+		
+		// Pass a pointer to the stored lambda
+		EventDispatcher& dispatcher = EventDispatcher::GetInstance();
+		dispatcher.Subscribe(&itemListener);
+		LOG(LOG_INFO, "Subscribing game object as Listener");
+	}
 }; 
+
+
 
 class PlayableObject : public GameObject {
 public:
 	int yCoord = 0; int xCoord = 0;
+	Item* heldItem;
 
     void onEvent(const std::string& message) override;
+	void DrawGameObject(CameraObject& cameraObj) override;
 }; 
 
 enum class MapLayerType {

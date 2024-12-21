@@ -74,7 +74,7 @@ public:
 
     void SetTransform(Transform* transform) override;
 
-    void DrawGameObject(CameraObject& cameraObj);
+    void DrawGameObject(CameraObject& cameraObj) override;
 
 private: 
     void ResetFactoryFromCrafting();

@@ -394,6 +394,7 @@ void InitializaProgram() {
 
 	ptrTerrainManager->SetGameEngine(&gameEngine);
 	ptrTerrainManager->CreateAndAddPlayer(objPath, texturePath);
+	ptrTerrainManager->SubscribeItemListener();
 	
 	gameEngine.DirectlyAddGameObject(ptrTerrainManager);
 }

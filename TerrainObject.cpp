@@ -71,7 +71,9 @@ void FactoryComponentObject::SetTransform(Transform* transform) {
 
 void FactoryComponentObject::DrawGameObject(CameraObject& cameraObj) {
 	GameObject::DrawGameObject(cameraObj); // draw this object
-	heldItem->DrawGameObject(cameraObj); // draw held object
+	if (heldItem) {
+		heldItem->DrawGameObject(cameraObj); // draw held object
+	}
 }
 
 

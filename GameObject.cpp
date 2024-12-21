@@ -3,6 +3,7 @@
 #include "Texture.h"    // Assuming Texture class handles texture binding
 #include "Transform.h"
 #include "Animation.h"  // Assuming Animation class handles animation
+#include "Item.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -86,7 +87,11 @@ void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	ptrModel->Render(cameraObj, transformMat, ptrTexture);
 }
 void GameObject::onEvent(const std::string& message) {};
-
+void GameObject::onEvent(Item* item) {
+	if (!item) {
+		LOG(LOG_INFO, "Null item");
+	}
+}
 
 RotatingGameObject::~RotatingGameObject() {
 	std::cout << "RotatingGameObject Destructor" << std::endl;
@@ -112,8 +117,8 @@ void PlayableObject::onEvent(const std::string& message) {
 	else if (message == "a_up") {
 		xCoord = xCoord - 1;
 	}
-	else {
-
+	else if (message== "space_up") {
+		this->PublishItem(heldItem);
 	}
 
 	if (yCoord < 0) {
@@ -126,7 +131,12 @@ void PlayableObject::onEvent(const std::string& message) {
 	LOG(LOG_INFO, yCoord);
 }
 
-
+void PlayableObject::DrawGameObject(CameraObject& cameraObj) {
+	GameObject::DrawGameObject(cameraObj); // draw this object
+	if (heldItem) {
+		heldItem->DrawGameObject(cameraObj); // draw held object
+	}
+}
 
 // CameraObject -------------------------------------------------------
 

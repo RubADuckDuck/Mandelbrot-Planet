@@ -23,8 +23,9 @@ FactoryComponentObject::~FactoryComponentObject() {}
 
 void FactoryComponentObject::Interact(Item* item) {
 	if (myType == INPUTPORT) {
-		// shout that Item is dropped
-		PublishItemDrop(heldItem);
+		// shout that Item is dropped 
+		heldItem->itemState = IN_FACTORY;
+		this->DropItem(heldItem);
 
 		// pick up item
 		this->heldItem = item;

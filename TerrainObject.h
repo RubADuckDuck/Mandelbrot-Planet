@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h" 
 #include "Item.h"
+#include "FactoryType.h"
 
 enum Condition {
 	WALKABLE, 
@@ -8,11 +9,6 @@ enum Condition {
 	IS_INPUTPORT,
 	IS_OUTPUTPORT,
 	IS_BUTTON
-};
-
-enum FactoryComponentType {
-    INPUTPORT,
-    OUTPUTPORT
 };
 
 
@@ -38,6 +34,12 @@ public:
     virtual void PublishItemDrop(Item* item);
 };
 
+class DroppedItemObject : public TerrainObject {
+    void Interact(Item* item) override{
+        item->itemState = ON_GROUND;
+        DropItem(item); // drop players Item right here
+    } 
+};
 
 
 class FactoryComponentObject : public TerrainObject {
@@ -79,6 +81,8 @@ public:
         InputPorts and Output ports are designated from a block that is part of the buildings shape.
 
     */
+
+    FactoryType factoryType;
 
     int nInputPort;
     int nOutputPort; // output port index is (nInputPort + index) 

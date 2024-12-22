@@ -26,9 +26,15 @@ void TerrainManager::onEvent(GameObject* who, Item* item, int y, int x) {
 }
 
 void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x) {
-	if (factoryGrid[y][x] && factoryGrid[y][x]->componentType == INPUTPORT) {
-		// if factory component is occupied and is a input port 
-		factoryGrid[y][x]->Interact(item);
+	if (factoryGrid[y][x]) {
+		if (factoryGrid[y][x]->componentType == INPUTPORT) {
+			// if factory component is occupied and is a input port 
+			factoryGrid[y][x]->Interact(item);
+		}
+		else {
+			// go interact somewhere else ;) 
+			this->HandleInteraction(who, item, y + 1, x + 1); // might cause unintended behavior, let's leave it for now
+		}
 	}
 
 	else if (item) {
@@ -38,6 +44,8 @@ void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x
 			// 			
 			// dynamic cast
 			if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
+				LOG(LOG_INFO, "TerrainManager::PlayerDropped x and Picked up y");
+
 				// if player 
 				Item* pickUp = itemGrid[y][x]->item;
 				ptrPlayer->PickUpItem(pickUp); 
@@ -52,6 +60,7 @@ void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x
 		}
 		if (!itemGrid[y][x] && groundGrid[y][x] == GroundType::GRASS) { // todo: Grass -> walkable
 			// if no item is on it and ground is walkable 
+			LOG(LOG_INFO, "TerrainManager::PlayerDropped x");
 			this->DropItemAt(y, x, item);
 		}
 		else {
@@ -61,6 +70,7 @@ void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x
 	}
 	else {
 		// item doesn't exist do nothing
+		LOG(LOG_INFO, "TerrainManager::Player go brrrrr");
 	}
 
 }

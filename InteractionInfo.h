@@ -1,4 +1,5 @@
 #pragma once
+#include "PlayerDirection.h"
 
 class GameObject;
 class Item; 
@@ -8,4 +9,6 @@ struct InteractionInfo {
 	Item* item; 
 	int yCoord; 
 	int xCoord;
+
+	Direction goingWhere = Direction::IDLE;
 };

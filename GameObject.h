@@ -69,21 +69,27 @@ public:
 	}
 }; 
 
-
-
-class PlayableObject : public GameObject {
-public:
+class GameObjectOnGrid : public GameObject {
+public: 
 	int yCoord = 0; int xCoord = 0;
-	int targetY = 0; int targetX = 0; 
 	Direction direction = Direction::UP;
-	
+
+	void SetCoordinates(int y, int x) {
+		yCoord = y;
+		xCoord = x;
+	}
+};
+
+class PlayableObject : public GameObjectOnGrid {
+public:
 	Item* heldItem;
 
     void onEvent(const std::string& message) override;
 	void DrawGameObject(CameraObject& cameraObj) override;
 	void DropItem();
+	void RequestWalk();
+	void Walk(); 
 	void PickUpItem(Item* item); 
-
 }; 
 
 enum class MapLayerType {

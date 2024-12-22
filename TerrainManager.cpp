@@ -25,100 +25,177 @@ void TerrainManager::onEvent(InteractionInfo* interactionInfo) {
 	this->HandleInteraction(interactionInfo);
 }
 
+void directionActOnCoord(Direction direction, int& yCoord, int& xCoord) {
+	// Assume the object has xCoord and yCoord representing its position
+	switch (direction) {
+	case Direction::UP:
+		yCoord--; // Move up (decrease y)
+		break;
+	case Direction::DOWN:
+		yCoord++; // Move down (increase y)
+		break;
+	case Direction::LEFT:
+		xCoord--; // Move left (decrease x)
+		break;
+	case Direction::RIGHT:
+		xCoord++; // Move right (increase x)
+		break;
+	case Direction::IDLE:
+		// Do nothing, the object remains in place
+		break;
+	default:
+		// Handle unexpected direction (optional)
+		break;
+	}
+}
+
 void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
 	GameObject* who = interactionInfo->who;
 	Item* item = interactionInfo->item;
 	int y = interactionInfo->yCoord;
 	int x = interactionInfo->xCoord;
+	Direction curDirection = interactionInfo->goingWhere;
 
 	bool isPlayer = false;
-	int targetY = 0; 
-	int targetX = 0;
+	int targetY = y; 
+	int targetX = x; 
+
+	directionActOnCoord(curDirection, targetY, targetX);
 
 	if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
 		isPlayer = true; 
-
-		// if player 
-		targetY = ptrPlayer->targetY;
-		targetX = ptrPlayer->targetX; 
 	}
 
-	if (isPlayer && factoryGrid[targetY][targetX]!=nullptr) {
-		// if factory exist in target
-		LOG(LOG_INFO, "TerrainManager::Attempt to interact with factory"); 
-		if (factoryGrid[targetY][targetX]->componentType == INPUTPORT) {
-			// if factory component is input port 
-			LOG(LOG_INFO, "TerrainManager::Interact with inputPort of factory");
-			factoryGrid[targetY][targetX]->Interact(item);
+	if (curDirection != Direction::IDLE) {
+		// Somebody Requested Walk 
+		if (factoryGrid[targetY][targetX] != nullptr) {
+			if (isPlayer) {
+				// throw current held Item to target
 
-			return; // end interaction
-		}
-		else {
-			// interaction not satisfied
-		}
-	}
-	if (itemGrid[y][x]) {
-		// Item Exist on Grid
-		// 			
-		// dynamic cast
-		if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
-			LOG(LOG_INFO, "TerrainManager::Player Picked up: " + itemType2ItemName[itemGrid[y][x]->item->itemType]);
-				
-			// if player 
-			Item* pickUp = itemGrid[y][x]->item;
-			ptrPlayer->PickUpItem(pickUp);
+				// if factory exist in target
+				LOG(LOG_INFO, "TerrainManager::Attempt to interact with factory");
+				if (factoryGrid[targetY][targetX]->componentType == INPUTPORT) {
+					// if factory component is input port 
+					LOG(LOG_INFO, "TerrainManager::Interact with inputPort of factory");
+					factoryGrid[targetY][targetX]->Interact(item);
+					
+					// drop players item
+					PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who); 
+					ptrPlayer->heldItem = nullptr;
 
-			itemGrid[y][x] = nullptr; 
-
-			return; 
-		}
-	}
-	else if (item) {
-		// item exists
-		if (itemGrid[y][x]) {
-			// if item already exists 
-			// 			
-			// dynamic cast
-			if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
-				LOG(LOG_INFO, "TerrainManager::PlayerDropped x and Picked up y");
-
-				// if player 
-				Item* pickUp = itemGrid[y][x]->item;
-				ptrPlayer->PickUpItem(pickUp); 
-
-				this->DropItemAt(y, x, item);
-				
-				return;
+					return; // end interaction
+				}
+				else {
+					// you can do nothing 
+					return;
+				}
 			}
 			else {
-				// if not a player, since another item is already occupying space, 
-				// try somewhere else
-				interactionInfo->yCoord += 1;
-				this->HandleInteraction(interactionInfo); // todo, dynamic casting of 'who' is going to be retried isn't that a waste? 
-				
+				// you can't walk on factories
+
 				return;
 			}
-		}
-		if (!itemGrid[y][x] && groundGrid[y][x] == GroundType::GRASS) { // todo: Grass -> walkable
-			// if no item is on it and ground is walkable 
-			LOG(LOG_INFO, "TerrainManager::PlayerDropped x");
-			this->DropItemAt(y, x, item); 
 
-			return; 
 		}
-		else {
-			// go interact somewhere else ;) 
-			interactionInfo->yCoord += 1;
-			this->HandleInteraction(interactionInfo); // might cause unintended behavior, let's leave it for now
+		else if (groundGrid[targetY][targetX] == GroundType::WATER) {
+			// throw in water? fishing?
+			if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
+				// if ptrPlayer->heldItem->itemType == FISHING_ROD // todo
+			}
+			else {
+				// you can't walk on water. Or can you?
+			} 
 
 			return;
 		}
+		else {
+			// No water no factory
+			// you can walk now. 
+			if (GameObjectOnGrid* gameobjectOnGrid= dynamic_cast<GameObjectOnGrid*>(who)) {
+				gameobjectOnGrid->SetCoordinates(targetY, targetX);
+			}
+			return;
+		}
+		return;
 	}
-	else {
-		// item doesn't exist do nothing
-		LOG(LOG_INFO, "TerrainManager::Player go brrrrr");
-	}
+	else { 
+		// is IDLE 
+		if (factoryGrid[targetY][targetX] != nullptr && factoryGrid[targetY][targetX]->componentType == INPUTPORT) {
+			// the gameobject is facing the input port
+			if (isPlayer) {
+				// players can interact with factory by attempting to walk on it 
+				// don't end interaction player might one to grab something infront of the InputPort
+			}
+			else {
+				// if factory component is input port 
+				LOG(LOG_INFO, "TerrainManager::Non-Player GameObject Interacting with Factory InputPort");
+				factoryGrid[targetY][targetX]->Interact(item);
 
+				return; // end interaction
+			}
+		}
+		else if (itemGrid[y][x]) {
+			// Item Exist on Grid
+			// 			
+			// dynamic cast
+			if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
+				LOG(LOG_INFO, "TerrainManager::Player Picked up: " + itemType2ItemName[itemGrid[y][x]->item->itemType]);
+
+				// if player 
+				Item* pickUp = itemGrid[y][x]->item;
+				ptrPlayer->PickUpItem(pickUp);
+
+				itemGrid[y][x] = nullptr;
+
+				return;
+			}
+		}
+		else if (item) {
+			// item exists in hand
+			if (itemGrid[y][x]) {
+				// if item already exists on Ground
+				// 			
+				// dynamic cast
+				if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
+					LOG(LOG_INFO, "TerrainManager::PlayerDropped x and Picked up y");
+
+					// if player 
+					Item* pickUp = itemGrid[y][x]->item;
+					ptrPlayer->PickUpItem(pickUp);
+
+					this->DropItemAt(y, x, item);
+
+					return;
+				}
+				else {
+					// if not a player, since another item is already occupying space, 
+					// try somewhere else
+					interactionInfo->yCoord += 1;
+					this->HandleInteraction(interactionInfo); // todo, dynamic casting of 'who' is going to be retried isn't that a waste? 
+
+					return;
+				}
+			}
+			if (!itemGrid[y][x] && groundGrid[y][x] == GroundType::GRASS) { // todo: Grass -> walkable
+				// if no item is on it and ground is walkable 
+				LOG(LOG_INFO, "TerrainManager::PlayerDropped x");
+				this->DropItemAt(y, x, item);
+
+				return;
+			}
+			else {
+				// go interact somewhere else ;) 
+				interactionInfo->yCoord += 1;
+				this->HandleInteraction(interactionInfo); // might cause unintended behavior, let's leave it for now
+
+				return;
+			}
+		}
+		else {
+			// item doesn't exist do nothing
+			LOG(LOG_INFO, "TerrainManager::Player go brrrrr");
+		}
+	}
 }
 
 void TerrainManager::CreateAndAddPlayer(
@@ -364,18 +441,72 @@ void TerrainManager::DrawFactoryComponentAt(int yIndex, int xIndex, CameraObject
 	}
 }
 
-// Function to randomly initialize the groundGrid
 void TerrainManager::RandomizeGroundGrid() {
 	// Seed the random number generator
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
+	// Step 1: Initialize the grid with weighted probabilities
 	for (int i = 0; i < GRID_SIZE; i++) {
 		for (int j = 0; j < GRID_SIZE; j++) {
-			// Generate a random integer in the range of GroundType
-			int randomValue = std::rand() % static_cast<int>(GroundType::LAST);
+			// Weighted randomization: 70% GRASS, 30% WATER
+			int randomValue = std::rand() % 100; // Random value between 0-99
+			if (randomValue < 70) {
+				groundGrid[i][j] = GroundType::GRASS;
+			}
+			else {
+				groundGrid[i][j] = GroundType::WATER;
+			}
+		}
+	}
 
-			// Assign a random GroundType
-			groundGrid[i][j] = static_cast<GroundType>(randomValue);
+	// Step 2: Smooth the grid to create clusters
+	for (int iteration = 0; iteration < 3; iteration++) { // Repeat smoothing for better results
+		SmoothGroundGrid();
+	}
+}
+
+void TerrainManager::SmoothGroundGrid() {
+	GroundType tempGrid[GRID_SIZE][GRID_SIZE];
+
+	for (int i = 0; i < GRID_SIZE; i++) {
+		for (int j = 0; j < GRID_SIZE; j++) {
+			int grassCount = 0;
+			int waterCount = 0;
+
+			// Count neighbors
+			for (int di = -1; di <= 1; di++) {
+				for (int dj = -1; dj <= 1; dj++) {
+					if (di == 0 && dj == 0) continue; // Skip the current cell
+
+					int ni = i + di;
+					int nj = j + dj;
+
+					// Check bounds
+					if (ni >= 0 && ni < GRID_SIZE && nj >= 0 && nj < GRID_SIZE) {
+						if (groundGrid[ni][nj] == GroundType::GRASS) {
+							grassCount++;
+						}
+						else if (groundGrid[ni][nj] == GroundType::WATER) {
+							waterCount++;
+						}
+					}
+				}
+			}
+
+			// Smooth based on neighbor counts
+			if (grassCount > waterCount) {
+				tempGrid[i][j] = GroundType::GRASS;
+			}
+			else {
+				tempGrid[i][j] = GroundType::WATER;
+			}
+		}
+	}
+
+	// Copy tempGrid back to groundGrid
+	for (int i = 0; i < GRID_SIZE; i++) {
+		for (int j = 0; j < GRID_SIZE; j++) {
+			groundGrid[i][j] = tempGrid[i][j];
 		}
 	}
 }

@@ -140,4 +140,5 @@ public:
 
     // Function to randomly initialize the groundGrid
     void RandomizeGroundGrid();
+	void SmoothGroundGrid();
 };

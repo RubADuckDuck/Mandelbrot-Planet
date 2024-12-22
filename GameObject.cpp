@@ -113,31 +113,27 @@ void PlayableObject::onEvent(const std::string& message) {
 
 	if (message == "s_up") {
 		direction = Direction::DOWN;
-		yCoord = yCoord + 1;
+		// yCoord = yCoord + 1;
 
-		targetY = yCoord + 1;  
-		targetX = xCoord;
+		RequestWalk();
 	}
 	else if (message == "w_up") {
 		direction = Direction::UP;
-		yCoord = yCoord - 1;
+		// yCoord = yCoord - 1;
 
-		targetY = yCoord - 1;
-		targetX = xCoord;
+		RequestWalk();
 	}
 	else if (message == "d_up") {
 		direction = Direction::RIGHT;
-		xCoord = xCoord + 1;
+		// xCoord = xCoord + 1;
 
-		targetY = yCoord;
-		targetX = xCoord + 1;
+		RequestWalk();
 	}
 	else if (message == "a_up") {
 		direction = Direction::LEFT;
-		xCoord = xCoord - 1;
+		// xCoord = xCoord - 1;
 
-		targetY = yCoord;
-		targetX = xCoord - 1;
+		RequestWalk();
 	}
 	else if (message== "space_up") {
 		LOG(LOG_INFO, "Publishing Item from Player");
@@ -175,6 +171,45 @@ void PlayableObject::DropItem() {
 
 	// this will have to be fixed once events are excuted at different times but for now
 	delete newInteraction;
+}
+
+void PlayableObject::RequestWalk() {
+	// We don't drop item... yet
+	
+	InteractionInfo* newInteraction = new InteractionInfo(); 
+	newInteraction->item = heldItem; 
+	newInteraction->who = this; 
+	newInteraction->yCoord = this->yCoord; 
+	newInteraction->xCoord = this->xCoord; 
+	newInteraction->goingWhere = this->direction; 
+
+	PublishItem(newInteraction); 
+
+	delete newInteraction;
+}
+
+void PlayableObject::Walk() {
+	// Assume the object has xCoord and yCoord representing its position
+	switch (this->direction) {
+	case Direction::UP:
+		yCoord--; // Move up (decrease y)
+		break;
+	case Direction::DOWN:
+		yCoord++; // Move down (increase y)
+		break;
+	case Direction::LEFT:
+		xCoord--; // Move left (decrease x)
+		break;
+	case Direction::RIGHT:
+		xCoord++; // Move right (increase x)
+		break;
+	case Direction::IDLE:
+		// Do nothing, the object remains in place
+		break;
+	default:
+		// Handle unexpected direction (optional)
+		break;
+	}
 }
 
 void PlayableObject::PickUpItem(Item* item) {

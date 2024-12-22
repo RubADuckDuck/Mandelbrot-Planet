@@ -19,18 +19,12 @@ class FactoryManagerObject;
 
 class Item;
 
-class TerrainObject : public GameObject {
+class TerrainObject : public GameObjectOnGrid {
 public: 
-	int yCoord; int xCoord; // coordinate on Terrain ChartMap 
-
 	std::map<Condition, bool> terrainCondition;  
 
     ~TerrainObject() {};
 
-    void SetCoordinates(int y, int x) {
-        yCoord = y; 
-        xCoord = x;
-    }
 	bool& CheckCondition(Condition condition); 
 
     virtual void Interact(Item* item) = 0; // item designates the kind of interaction f: Item -> Interaction

@@ -182,10 +182,14 @@ void TerrainManager::BuildFactoryAt(FactoryType factoryType, int yCoord, int xCo
 
 			if (curComponentType != EMPTY) { 
 				curY = yCoord + i; curX = xCoord + j; 
+
 				// make factory component
 				curFactoryComponent = GetNewFactoryComponentObject(factoryType, curComponentType, factoryManager);
+
 				// set coord 
 				curFactoryComponent->SetCoordinates(curY, curX); 
+				curFactoryComponent->SetLocalCoord(i, j); 
+				curFactoryComponent->SetOffset(yCoord, xCoord);
 
 				this->factoryGrid[curY][curX] = curFactoryComponent;
 			}

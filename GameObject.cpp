@@ -114,21 +114,29 @@ void PlayableObject::onEvent(const std::string& message) {
 	if (message == "s_up") {
 		direction = Direction::DOWN;
 		yCoord = yCoord + 1;
-		targetY = yCoord + 1; 
+
+		targetY = yCoord + 1;  
+		targetX = xCoord;
 	}
 	else if (message == "w_up") {
 		direction = Direction::UP;
 		yCoord = yCoord - 1;
+
 		targetY = yCoord - 1;
+		targetX = xCoord;
 	}
 	else if (message == "d_up") {
 		direction = Direction::RIGHT;
 		xCoord = xCoord + 1;
+
+		targetY = yCoord;
 		targetX = xCoord + 1;
 	}
 	else if (message == "a_up") {
 		direction = Direction::LEFT;
 		xCoord = xCoord - 1;
+
+		targetY = yCoord;
 		targetX = xCoord - 1;
 	}
 	else if (message== "space_up") {

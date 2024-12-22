@@ -8,11 +8,21 @@ bool& TerrainObject::CheckCondition(Condition condition) {
 }
 
 void TerrainObject::DropItem(Item* item) {
-	PublishItemDrop(item);
+	PublishItemDrop(item, this->yCoord, this->xCoord);
 }
 
-void TerrainObject::PublishItemDrop(Item* item) {
-	// to do
+void TerrainObject::PublishItemDrop(Item* item, int y, int x) {
+    EventDispatcher& dispatcher = EventDispatcher::GetInstance(); 
+
+    InteractionInfo* interactInfo = new InteractionInfo();
+    interactInfo->who = this; 
+    interactInfo->item = item; 
+    interactInfo->yCoord = y; 
+    interactInfo->xCoord = x; 
+
+    dispatcher.Publish(interactInfo); 
+
+    delete interactInfo;
 }
 
 // DroppedItemObject:: --------------------------
@@ -43,9 +53,12 @@ FactoryComponentObject::~FactoryComponentObject() {}
 
 void FactoryComponentObject::Interact(Item* item) {
 	if (componentType == INPUTPORT) {
+        LOG(LOG_INFO, "FactoryComponentObject::BeingInteracted Upon");
+
 		// shout that Item is dropped 
-		heldItem->itemState = IN_FACTORY;
-		this->DropItem(heldItem);
+        if (heldItem) {
+            this->DropItem(heldItem);
+        }
 
 		// pick up item
 		this->heldItem = item;
@@ -57,6 +70,48 @@ void FactoryComponentObject::Interact(Item* item) {
 
 Item* FactoryComponentObject::GetHeldItem() {
 	return this->heldItem;
+}
+
+void FactoryComponentObject::DropItem(Item* item) {
+    // Possible directions: up, down, left, right
+    // {deltaY, deltaX}
+    std::vector<std::pair<int, int>> directions = {
+        { -1,  0 }, // up
+        {  1,  0 }, // down
+        {  0, -1 }, // left
+        {  0,  1 }  // right
+    };
+
+    // Shuffle directions for randomness
+    std::random_shuffle(directions.begin(), directions.end());
+
+    // Attempt to find one adjacent empty tile
+    bool foundSpot = false;
+    std::pair<int, int> globalDropCoord;
+
+    for (auto& d : directions) {
+        int curY = this->yLocalCoord + d.first;
+        int curX = this->xLocalCoord + d.second;
+
+        if (curY < 0 || curY >= MAX_STRUCTURE_LENGTH || curX < 0 || curX >= MAX_STRUCTURE_LENGTH) {
+            globalDropCoord = this->Local2GlobalCoord(curY, curX); 
+            foundSpot = true;
+        }
+        else if (this->ptrParentStructure->buildingShape[curY][curX]==EMPTY) {
+            globalDropCoord = this->Local2GlobalCoord(curY, curX);
+            foundSpot = true;
+            break;
+        }
+    }
+
+    if (!foundSpot) {
+        LOG(LOG_ERROR, "FactoryComponentObject::DropItem: Fatal Error");
+        return;
+    }
+    else {
+        PublishItemDrop(item, globalDropCoord.first, globalDropCoord.second);
+        return;
+    }    
 }
 
 void FactoryComponentObject::DiscardHeldItem() {

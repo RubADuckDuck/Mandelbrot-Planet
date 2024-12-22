@@ -31,14 +31,13 @@ public:
         yCoord = y; 
         xCoord = x;
     }
-	
 	bool& CheckCondition(Condition condition); 
 
     virtual void Interact(Item* item) = 0; // item designates the kind of interaction f: Item -> Interaction
 
     virtual void DropItem(Item* item);
 
-    virtual void PublishItemDrop(Item* item);
+    virtual void PublishItemDrop(Item* item, int y, int x);
 };
 
 class DroppedItemObject : public TerrainObject {
@@ -57,6 +56,24 @@ public:
 
 class FactoryComponentObject : public TerrainObject {
 public:
+    int initY; int initX; // offset 
+    int yLocalCoord; int xLocalCoord; // Global = Init + Local 
+
+    void SetLocalCoord(int y, int x) {
+        yLocalCoord = y; 
+        xLocalCoord = x; 
+    }
+    void SetOffset(int y, int x) {
+        initY = y; 
+        initX = x; 
+    }
+    std::pair<int, int> Global2LocalCoord(int y, int x) {
+        return { y - initY, x - initX };
+    }
+    std::pair<int, int> Local2GlobalCoord(int y, int x) {
+        return { y + initY, x + initX };
+    }
+
     FactoryComponentType componentType; 
 
     FactoryManagerObject* ptrParentStructure; 
@@ -69,6 +86,8 @@ public:
     void Interact(Item* item) override;
 
     Item* GetHeldItem();
+
+    void DropItem(Item* item) override;
 
     void DiscardHeldItem();
 

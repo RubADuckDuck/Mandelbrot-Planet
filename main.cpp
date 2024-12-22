@@ -395,6 +395,10 @@ void InitializaProgram() {
 	ptrTerrainManager->SetGameEngine(&gameEngine);
 	ptrTerrainManager->CreateAndAddPlayer(objPath, texturePath);
 	ptrTerrainManager->SubscribeItemListener();
+
+	{
+		ptrTerrainManager->CreateAndAddDroppedItemAt(1, 1, ItemType::PYTHON);
+	}
 	
 	gameEngine.DirectlyAddGameObject(ptrTerrainManager);
 }

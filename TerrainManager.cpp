@@ -104,13 +104,6 @@ void TerrainManager::AddPlayer(PlayableObject* newPlayer) {
 	players.push_back(newPlayer);
 }
 
-void TerrainManager::DropItemAt(int yIndex, int xIndex, Item* item) {
-	DroppedItemObject* newDroppedItem = new DroppedItemObject();
-
-	newDroppedItem->SetCoordinates(yIndex, xIndex);
-	newDroppedItem->SetItem(item);
-}
-
 Item* TerrainManager::GetNewItemGameObject(ItemType itemType) {
 	Item* newItem = new Item(itemType);
 
@@ -147,7 +140,6 @@ FactoryComponentObject* TerrainManager::GetNewFactoryComponentObject(
 	std::pair<FactoryType, FactoryComponentType> componentType = { factoryType, factoryComponentType };
 	GeneralMesh* ptrMesh = factoryComponentLoader.type2Mesh[componentType];
 	Texture* ptrTexture = factoryComponentLoader.type2Texture[componentType];
-
 	Transform* defaultTransfrom = new Transform();
 
 	newFactoryComponent->SetMesh(ptrMesh);
@@ -157,11 +149,31 @@ FactoryComponentObject* TerrainManager::GetNewFactoryComponentObject(
 	return newFactoryComponent;
 }
 
-void TerrainManager::CreateAndAddDroppedItemAt(int yIndex, int xIndex, Item* item) {
+void TerrainManager::DropItemAt(int yIndex, int xIndex, Item* item) {
 	DroppedItemObject* newDroppedItem = new DroppedItemObject();
 
 	newDroppedItem->SetCoordinates(yIndex, xIndex);
 	newDroppedItem->SetItem(item);
+
+	itemGrid[yIndex][xIndex] = newDroppedItem;
+}
+
+void TerrainManager::CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType itemType) {
+	Item* newItem = new Item(itemType);  
+
+	// load mesh and texture
+	GeneralMesh* ptrMesh = itemLoader.type2Mesh[itemType];
+	Texture* ptrTexture = itemLoader.type2Texture[itemType]; 
+	Transform* defaultTransform = new Transform();
+
+	newItem->SetMesh(ptrMesh); 
+	newItem->SetTexture(ptrTexture); 
+	newItem->SetTransform(defaultTransform);
+
+	DroppedItemObject* newDroppedItem = new DroppedItemObject();
+
+	newDroppedItem->SetCoordinates(yIndex, xIndex);
+	newDroppedItem->SetItem(newItem);
 
 	itemGrid[yIndex][xIndex] = newDroppedItem;
 }

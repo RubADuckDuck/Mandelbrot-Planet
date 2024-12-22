@@ -124,7 +124,7 @@ public:
 		FactoryComponentType factoryComponentType,
 		FactoryManagerObject* factoryManager);
 
-	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, Item* item);
+	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType itemType);
 
 	void Update() override;
 

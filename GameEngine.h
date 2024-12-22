@@ -141,22 +141,22 @@ public:
 	}
 private: 
 	void AddGameObjectToGameEngine(GameObject* gameObj) {
-		// Store the lambda in a persistent container
-		listeners.emplace_back([gameObj](const std::string& message) {
-			LOG(LOG_INFO, "Typeid of gameObj on which event is triggered: " + std::string(typeid(*gameObj).name()));
-			gameObj->onEvent(message);
-			});
+		//// Store the lambda in a persistent container
+		//listeners.emplace_back([gameObj](const std::string& message) {
+		//	LOG(LOG_INFO, "Typeid of gameObj on which event is triggered: " + std::string(typeid(*gameObj).name()));
+		//	gameObj->onEvent(message);
+		//	});
 
-		// Pass a pointer to the stored lambda
-		inputHandler.Subscribe(&listeners.back());
-		LOG(LOG_INFO, "Subscribing game object as Listener");
+		//// Pass a pointer to the stored lambda
+		//inputHandler.Subscribe(&listeners.back());
+
+		//LOG(LOG_INFO, "Subscribing game object as Listener"); 
 
 		gameObjects.push_back(gameObj); 
 
 		// Check if the game object is an instance of PlayableObject
 		if (PlayableObject* playableObj = dynamic_cast<PlayableObject*>(gameObj)) {
-			camera.AddTarget(playableObj); // Add to target list
-			LOG(LOG_INFO, "Added PlayableObject to target list: " + std::string(typeid(*playableObj).name()));
+			ManuallySubscribe(playableObj);
 		}
 	}
 };

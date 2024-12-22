@@ -36,12 +36,12 @@ void DroppedItemObject::DrawGameObject(CameraObject& cameraObj) {
 
 // FactoryComponentObject-------------------------
 FactoryComponentObject::FactoryComponentObject(FactoryComponentType componentType, FactoryManagerObject* factoryManager) 
-	: myType(componentType), heldItem(nullptr), ptrParentStructure(factoryManager) { }
+	: componentType(componentType), heldItem(nullptr), ptrParentStructure(factoryManager) { }
 
 FactoryComponentObject::~FactoryComponentObject() {}
 
 void FactoryComponentObject::Interact(Item* item) {
-	if (myType == INPUTPORT) {
+	if (componentType == INPUTPORT) {
 		// shout that Item is dropped 
 		heldItem->itemState = IN_FACTORY;
 		this->DropItem(heldItem);

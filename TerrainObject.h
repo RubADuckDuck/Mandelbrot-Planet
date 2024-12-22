@@ -57,7 +57,7 @@ public:
 
 class FactoryComponentObject : public TerrainObject {
 public:
-    FactoryComponentType myType; 
+    FactoryComponentType componentType; 
 
     FactoryManagerObject* ptrParentStructure; 
     Item* heldItem;

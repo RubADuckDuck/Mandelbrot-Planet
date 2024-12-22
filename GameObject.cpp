@@ -87,9 +87,10 @@ void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	ptrModel->Render(cameraObj, transformMat, ptrTexture);
 }
 void GameObject::onEvent(const std::string& message) {};
-void GameObject::onEvent(Item* item, int y, int x) {
+void GameObject::onEvent(GameObject* who, Item* item, int y, int x) {
 	if (!item) {
-		LOG(LOG_INFO, "Null item at: " + std::to_string(y) + ", " + std::to_string(x));
+		// todo: log who did it
+		LOG(LOG_INFO, "Null item Dropped at: (" + std::to_string(y) + ", " + std::to_string(x) + ")");
 	}
 }
 
@@ -119,7 +120,8 @@ void PlayableObject::onEvent(const std::string& message) {
 	}
 	else if (message== "space_up") {
 		LOG(LOG_INFO, "Publishing Item from Player");
-		this->PublishItem(heldItem, yCoord, xCoord);
+
+		this->PublishItem(this, heldItem, yCoord, xCoord);
 	}
 
 	if (yCoord < 0) {
@@ -135,6 +137,16 @@ void PlayableObject::DrawGameObject(CameraObject& cameraObj) {
 	if (heldItem) {
 		heldItem->DrawGameObject(cameraObj); // draw held object
 	}
+}
+
+void PlayableObject::DropItem() {
+	Item* temp = heldItem; 
+	temp = nullptr; 
+	PublishItem(this, temp, yCoord, xCoord);
+}
+
+void PlayableObject::PickUpItem(Item* item) {
+	heldItem = item;
 }
 
 // CameraObject -------------------------------------------------------

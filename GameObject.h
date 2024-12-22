@@ -47,17 +47,17 @@ public:
 	virtual glm::mat4 GetModelMatrixFromTransform();
 	virtual void DrawGameObject(CameraObject& cameraObj); 
     virtual void onEvent(const std::string& message);
-	virtual void onEvent(Item* item, int y, int x);
+	virtual void onEvent(GameObject* who, Item* item, int y, int x);
 
-	void PublishItem(Item* item, int y, int x) {
+	void PublishItem(GameObject* who, Item* item, int y, int x) {
 		 EventDispatcher& dispatcher = EventDispatcher::GetInstance(); 
-		 dispatcher.Publish(item, y, x); // item is published!
+		 dispatcher.Publish(who, item, y, x); // item is published!
 	}
 
 	void SubscribeItemListener() {
-		itemListener = [this](Item* item, int y, int x) {
+		itemListener = [this](GameObject* who, Item* item, int y, int x) {
 			LOG(LOG_INFO, "ItemListenerTriggered::Typeid of gameObj on which event is triggered: " + std::string(typeid(*this).name()));
-			this->onEvent(item, y, x);
+			this->onEvent(who, item, y, x);
 		};
 		
 		// Pass a pointer to the stored lambda
@@ -76,6 +76,8 @@ public:
 
     void onEvent(const std::string& message) override;
 	void DrawGameObject(CameraObject& cameraObj) override;
+	void DropItem();
+	void PickUpItem(Item* item); 
 }; 
 
 enum class MapLayerType {

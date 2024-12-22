@@ -102,6 +102,10 @@ public:
 		gameEngine = ge;
 	}
 
+	void onEvent(GameObject* who, Item* item, int y, int x) override;
+
+	void HandleInteraction(GameObject* who, Item* item, int y, int x);
+
 	void CreateAndAddPlayer(
 		const std::string& meshPath,
 		std::string& texturePath

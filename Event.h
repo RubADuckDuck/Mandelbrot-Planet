@@ -9,12 +9,12 @@
 #include "LOG.h"
 
 class Item;
+class GameObject;
 
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
 using Listener = std::function<void(const std::string&)>;
-using ItemListener = std::function<void(Item*, int, int)>;
-
+using ItemListener = std::function<void(GameObject*, Item*, int, int)>; // args are (who, what, where1, where2)
 
 
 class EventDispatcher {
@@ -81,12 +81,12 @@ public:
         }
     }
 
-    void Publish(Item* item, int y, int x) {
+    void Publish(GameObject* who, Item* item, int y, int x) {
         // std::lock_guard<std::mutex> lock(mutex);
 
-        for (const auto& ptrItemListener : itemListeners) {
+        for (const ItemListener* ptrItemListener : itemListeners) {
             try {
-                (*ptrItemListener)(item, y, x);
+                (*ptrItemListener)(who, item, y, x);
             }
             catch (const std::exception& e) {
                 std::cerr << "ItemListener exception: " << e.what() << std::endl;

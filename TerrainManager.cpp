@@ -2,21 +2,67 @@
 #include "TerrainObject.h"
 #include "Item.h"
 #include "GameEngine.h"
+#include "GameObject.h"
 
 // TerrainManager::----------------------------------------------------------------------
-TerrainManager::TerrainManager() 
+TerrainManager::TerrainManager()
 	: groundLoader("E:/repos/[DuckFishing]/model", groundType2GroundName),
 	itemLoader("E:/repos/[DuckFishing]/model", itemType2ItemName),
-	factoryComponentLoader("E:/repos/[DuckFishing]/model", factoryType2FactoryName) { 
+	factoryComponentLoader("E:/repos/[DuckFishing]/model", factoryType2FactoryName) {
 
 	for (int i = 0; i < GRID_SIZE; i++) {
-		for (int j = 0; j < GRID_SIZE; j++) { 
+		for (int j = 0; j < GRID_SIZE; j++) {
 			coord2Transform[i][j] = new Transform();
 		}
 	}
 
 	// Randomly initialize the ground grid
 	RandomizeGroundGrid();
+}
+
+void TerrainManager::onEvent(GameObject* who, Item* item, int y, int x) {
+	GameObject::onEvent(who, item, y, x); 
+	this->HandleInteraction(who, item, y, x);
+}
+
+void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x) {
+	if (factoryGrid[y][x] && factoryGrid[y][x]->componentType == INPUTPORT) {
+		// if factory component is occupied and is a input port 
+		factoryGrid[y][x]->Interact(item);
+	}
+
+	else if (item) {
+		// item exists
+		if (itemGrid[y][x]) {
+			// if item already exists 
+			// 			
+			// dynamic cast
+			if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
+				// if player 
+				Item* pickUp = itemGrid[y][x]->item;
+				ptrPlayer->PickUpItem(pickUp); 
+
+				this->DropItemAt(y, x, item);
+			}
+			else {
+				// if not a player, since another item is already occupying space, 
+				// try somewhere else
+				this->HandleInteraction(who, item, y + 1, x); // todo, dynamic casting of 'who' is going to be retried isn't that a waste?
+			}
+		}
+		if (!itemGrid[y][x] && groundGrid[y][x] == GroundType::GRASS) { // todo: Grass -> walkable
+			// if no item is on it and ground is walkable 
+			this->DropItemAt(y, x, item);
+		}
+		else {
+			// go interact somewhere else ;) 
+			this->HandleInteraction(who ,item, y + 1, x + 1); // might cause unintended behavior, let's leave it for now
+		}
+	}
+	else {
+		// item doesn't exist do nothing
+	}
+
 }
 
 void TerrainManager::CreateAndAddPlayer(

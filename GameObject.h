@@ -14,6 +14,7 @@
 #include "GroundType.h"
 #include "Event.h"
 #include "InteractionInfo.h"
+#include "PlayerDirection.h"
 
 //class Animation; 
 
@@ -73,6 +74,9 @@ public:
 class PlayableObject : public GameObject {
 public:
 	int yCoord = 0; int xCoord = 0;
+	int targetY = 0; int targetX = 0; 
+	Direction direction = Direction::UP;
+	
 	Item* heldItem;
 
     void onEvent(const std::string& message) override;

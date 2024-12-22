@@ -31,17 +31,33 @@ void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
 	int y = interactionInfo->yCoord;
 	int x = interactionInfo->xCoord;
 
-	if (factoryGrid[y][x]) {
-		if (factoryGrid[y][x]->componentType == INPUTPORT) {
-			// if factory component is occupied and is a input port 
-			factoryGrid[y][x]->Interact(item);
+	bool isPlayer = false;
+	int targetY = 0; 
+	int targetX = 0;
+
+	if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
+		isPlayer = true; 
+
+		// if player 
+		targetY = ptrPlayer->targetY;
+		targetX = ptrPlayer->targetX; 
+	}
+
+	if (isPlayer && factoryGrid[targetY][targetX]!=nullptr) {
+		// if factory exist in target
+		LOG(LOG_INFO, "TerrainManager::Attempt to interact with factory"); 
+		if (factoryGrid[targetY][targetX]->componentType == INPUTPORT) {
+			// if factory component is input port 
+			LOG(LOG_INFO, "TerrainManager::Interact with inputPort of factory");
+			factoryGrid[targetY][targetX]->Interact(item);
+
+			return; // end interaction
 		}
 		else {
-			// go interact somewhere else ;) 
-			this->HandleInteraction(interactionInfo); // might cause unintended behavior, let's leave it for now
+			// interaction not satisfied
 		}
 	}
-	else if (itemGrid[y][x]) {
+	if (itemGrid[y][x]) {
 		// Item Exist on Grid
 		// 			
 		// dynamic cast
@@ -52,7 +68,9 @@ void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
 			Item* pickUp = itemGrid[y][x]->item;
 			ptrPlayer->PickUpItem(pickUp);
 
-			itemGrid[y][x] = nullptr;
+			itemGrid[y][x] = nullptr; 
+
+			return; 
 		}
 	}
 	else if (item) {
@@ -69,23 +87,31 @@ void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
 				ptrPlayer->PickUpItem(pickUp); 
 
 				this->DropItemAt(y, x, item);
+				
+				return;
 			}
 			else {
 				// if not a player, since another item is already occupying space, 
 				// try somewhere else
 				interactionInfo->yCoord += 1;
-				this->HandleInteraction(interactionInfo); // todo, dynamic casting of 'who' is going to be retried isn't that a waste?
+				this->HandleInteraction(interactionInfo); // todo, dynamic casting of 'who' is going to be retried isn't that a waste? 
+				
+				return;
 			}
 		}
 		if (!itemGrid[y][x] && groundGrid[y][x] == GroundType::GRASS) { // todo: Grass -> walkable
 			// if no item is on it and ground is walkable 
 			LOG(LOG_INFO, "TerrainManager::PlayerDropped x");
-			this->DropItemAt(y, x, item);
+			this->DropItemAt(y, x, item); 
+
+			return; 
 		}
 		else {
 			// go interact somewhere else ;) 
 			interactionInfo->yCoord += 1;
 			this->HandleInteraction(interactionInfo); // might cause unintended behavior, let's leave it for now
+
+			return;
 		}
 	}
 	else {
@@ -236,6 +262,27 @@ void TerrainManager::Update() {
 		int xIndex = curPlayer->xCoord; 
 
 		curTransform = coord2Transform[yIndex][xIndex]; 
+
+		// Rotate the transform based on the player's facing direction
+		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
+		float rotationAngle = 0.0f;
+
+		switch (curPlayer->direction) {
+		case Direction::UP:
+			rotationAngle = glm::radians(180.0f); // No rotation needed
+			break;
+		case Direction::DOWN:
+			rotationAngle = glm::radians(0.0f); // Rotate 180 degrees
+			break;
+		case Direction::LEFT:
+			rotationAngle = glm::radians(-90.0f); // Rotate 90 degrees counterclockwise
+			break;
+		case Direction::RIGHT:
+			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
+			break;
+		}
+		curTransform->SetRotation(rotationAngle, rotationAxis);
+
 		curPlayer->SetTransform(curTransform);
 		
 		if (curPlayer->heldItem) {

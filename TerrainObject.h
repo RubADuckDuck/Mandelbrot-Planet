@@ -88,8 +88,6 @@ class StructureObject : public GameObject {
 public:
     Publisher publisher;
 
-    // bool buildingShape[MAX_STRUCTURE_LENGTH][MAX_STRUCTURE_LENGTH];
-
     // virtual void TriggerInteraction(const std::string& msg) = 0;
 };
 
@@ -103,22 +101,27 @@ public:
 
     FactoryType factoryType;
 
+    FactoryComponentType buildingShape[MAX_STRUCTURE_LENGTH][MAX_STRUCTURE_LENGTH];
+
     int nInputPort;
     int nOutputPort; // output port index is (nInputPort + index) 
 
     std::vector<std::pair<int, int>> portIndex2PortPosition;
-    std::vector<FactoryComponentObject> portIndex2FactoryComponent;
+    std::map<std::pair<int, int>, int> position2PortIndex;
 
-    std::map<std::pair<int, int>, int> Position2PortIndex;
+    std::vector<FactoryComponentObject*> portIndex2FactoryComponent;
 
     std::vector<Recipe*> craftingRecipes;
     Recipe* isCrafting;
     float duration;
     float targetDuration;
 
-    FactoryManagerObject(FactoryType factoryType) : factoryType(factoryType) { InitFactory(); }
+
+    FactoryManagerObject(FactoryType factoryType, int nInput, int nOutput) : factoryType(factoryType), nInputPort(nInput), nOutputPort(nOutput) {
+        RandomlyGenerateBuildingShape(); 
+    }
     
-    void InitFactory();
+    void RandomlyGenerateBuildingShape();
 
     Recipe* CheckForMatchingIngredient(std::vector<Item*>& ingredients);
 

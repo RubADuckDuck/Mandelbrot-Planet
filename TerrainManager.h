@@ -117,7 +117,7 @@ public:
 
 	Item* GetNewItemGameObject(ItemType itemType);
 
-	void BuildFactoryAt(FactoryType factoryType);
+	void BuildFactoryAt(FactoryType factoryType, int yCoord, int xCoord, int nInput, int nOutput);
 
 	FactoryComponentObject* GetNewFactoryComponentObject(
 		FactoryType factoryType,

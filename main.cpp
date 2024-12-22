@@ -399,6 +399,9 @@ void InitializaProgram() {
 	{
 		ptrTerrainManager->CreateAndAddDroppedItemAt(1, 1, ItemType::PYTHON);
 	}
+	{
+		ptrTerrainManager->BuildFactoryAt(FactoryType::Bakery, 5, 5, 2, 1);
+	}
 	
 	gameEngine.DirectlyAddGameObject(ptrTerrainManager);
 }

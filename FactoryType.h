@@ -7,5 +7,6 @@ enum FactoryType {
 enum FactoryComponentType {
     INPUTPORT,
     OUTPUTPORT,
-    DEFAULT
+    DEFAULT, 
+    EMPTY
 };

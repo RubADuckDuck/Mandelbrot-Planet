@@ -167,12 +167,30 @@ Item* TerrainManager::GetNewItemGameObject(ItemType itemType) {
 	return newItem;
 }
 
-void TerrainManager::BuildFactoryAt(FactoryType factoryType) {
-	FactoryManagerObject* factoryManager = new FactoryManagerObject(factoryType);
+void TerrainManager::BuildFactoryAt(FactoryType factoryType, int yCoord, int xCoord, int nInput, int nOutput) {
+	FactoryManagerObject* factoryManager = new FactoryManagerObject(factoryType, nInput, nOutput);
 
-	// example 
-	FactoryComponentType factoryComponentType = DEFAULT;
-	GetNewFactoryComponentObject(factoryType, factoryComponentType, factoryManager);
+	FactoryComponentType curComponentType;
+	FactoryComponentObject* curFactoryComponent; 
+
+	int curY; int curX;
+
+	// iterate through building 
+	for (int i = 0; i < MAX_STRUCTURE_LENGTH; i++) {
+		for (int j = 0; j < MAX_STRUCTURE_LENGTH; j++) {
+			curComponentType = factoryManager->buildingShape[i][j];  
+
+			if (curComponentType != EMPTY) { 
+				curY = yCoord + i; curX = xCoord + j; 
+				// make factory component
+				curFactoryComponent = GetNewFactoryComponentObject(factoryType, curComponentType, factoryManager);
+				// set coord 
+				curFactoryComponent->SetCoordinates(curY, curX); 
+
+				this->factoryGrid[curY][curX] = curFactoryComponent;
+			}
+		}
+	}
 }
 
 FactoryComponentObject* TerrainManager::GetNewFactoryComponentObject(

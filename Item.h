@@ -13,7 +13,7 @@ enum ItemState {
 
 class Item : public GameObject {
 public:
-    ItemType itemType;
+    ItemType itemType = ItemType::INVALID;
 	ItemState itemState; 
 
 	Item(ItemType itemType) : itemType(itemType), itemState(INVALID_STATE){}

@@ -11,5 +11,5 @@ public:
 	void SetTextureIndex(GLuint textureIndex) { this->textureIndex = textureIndex; }
 	GLuint GetTextureIndex() { return textureIndex; } 
 
-	void LoadandSetTextureIndexFromPath(const std::string& path);
+	void LoadandSetTextureIndexFromPath(const std::string& path, bool retry=false);
 };

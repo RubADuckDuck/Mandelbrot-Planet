@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "LOG.h"
 
-void Texture::LoadandSetTextureIndexFromPath(const std::string& path) {
+void Texture::LoadandSetTextureIndexFromPath(const std::string& path, bool retry) {
 	GLuint resTextureIndex;
 	glGenTextures(1, &resTextureIndex);
 	glBindTexture(GL_TEXTURE_2D, resTextureIndex);
@@ -14,10 +14,15 @@ void Texture::LoadandSetTextureIndexFromPath(const std::string& path) {
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		LOG(LOG_INFO, "Successfully loaded texture from:" + path)
+		LOG(LOG_INFO, "Successfully loaded texture from:" + path);
 	}
 	else {
-		LOG(LOG_ERROR, "Faile to load texture from:" + path)
+		LOG(LOG_ERROR, "Failed to load texture from:" + path); 
+		if (!retry) {
+			this->LoadandSetTextureIndexFromPath("E:/repos/[DuckFishing]/model/texture/Error.png", true);
+		}
+		
+		return; 
 	}
 	stbi_image_free(data);
 

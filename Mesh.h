@@ -83,7 +83,7 @@ public:
 
 	virtual ~GeneralMesh() {}
 
-	virtual bool LoadMesh(const std::string& fileName) = 0;
+	virtual bool LoadMesh(const std::string& fileName, bool retry=false) = 0;
 
 	virtual void Render(CameraObject& camObj, glm::mat4& tranform) = 0; 
 
@@ -134,7 +134,7 @@ public:
 
 	~StaticMesh();
 
-	bool LoadMesh(const std::string& fileName) override;
+	bool LoadMesh(const std::string& fileName, bool retry=false) override;
 
 	void Render(CameraObject& camObj, glm::mat4& tranform) override; 
 
@@ -217,7 +217,7 @@ public:
 
 	~RiggedMesh(); 
 
-	bool LoadMesh(const std::string& fileName) override; 
+	bool LoadMesh(const std::string& fileName, bool retry = false) override;
 
 	void Render(CameraObject& camObj, glm::mat4& tranform) override; 
 

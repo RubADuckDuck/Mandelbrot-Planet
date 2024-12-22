@@ -191,7 +191,7 @@ void RiggedMesh::Clear()
     }
 }
 
-bool StaticMesh::LoadMesh(const std::string& filename) {
+bool StaticMesh::LoadMesh(const std::string& filename, bool retry) {
     // Init shader 
     this->InitShader();
 
@@ -222,10 +222,14 @@ bool StaticMesh::LoadMesh(const std::string& filename) {
         // Bone_n -> ... -> Global -> RootNode. Not, Bone_n -> ... -> Global
         // that is why we keep the inverse as member var.
         Ret = this->InitFromScene(ptrScene, filename);
-
+        LOG(LOG_INFO, "Successfully Loaded Obj from:" + filename);
     }
     else {
-        printf("Error parsing '%s': '%s'\n", filename.c_str(), Importer.GetErrorString());
+        LOG(LOG_ERROR, "Failed to Load Obj from:" + filename); 
+
+        if (!retry) {
+            Ret = this->LoadMesh("E:/repos/[DuckFishing]/model/Error.obj", true);
+        }
     }
 
     // Make sure the VAO is not changed from the outside
@@ -234,7 +238,7 @@ bool StaticMesh::LoadMesh(const std::string& filename) {
     return Ret;
 }
 
-bool RiggedMesh::LoadMesh(const std::string& filename) {
+bool RiggedMesh::LoadMesh(const std::string& filename, bool retry) {
     // Init shader 
     this->InitShader();
 

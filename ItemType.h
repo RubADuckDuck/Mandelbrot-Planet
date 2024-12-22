@@ -6,5 +6,5 @@ enum class ItemType {
     IRON,
     RUBY,
     PYTHON,
-    LAST
+    INVALID
 };

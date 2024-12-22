@@ -5,7 +5,7 @@ E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(103,18): warning C4244:
 E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(153,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
 E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(185,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
 E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(206,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(249,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(253,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   TerrainManager.cpp
 E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,15): warning C4099: 'Recipe': type name first seen using 'class' now seen using 'struct'
 E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,8): message : see declaration of 'Recipe'

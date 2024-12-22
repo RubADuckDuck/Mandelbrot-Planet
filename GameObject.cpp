@@ -87,7 +87,12 @@ void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	ptrModel->Render(cameraObj, transformMat, ptrTexture);
 }
 void GameObject::onEvent(const std::string& message) {};
-void GameObject::onEvent(GameObject* who, Item* item, int y, int x) {
+void GameObject::onEvent(InteractionInfo* interactionInfo) {
+	GameObject* who = interactionInfo->who; 
+	Item* item = interactionInfo->item;
+	int y = interactionInfo->yCoord; 
+	int x = interactionInfo->xCoord; 
+
 	if (!item) {
 		// todo: log who did it
 		LOG(LOG_INFO, "Null item Dropped at: (" + std::to_string(y) + ", " + std::to_string(x) + ")");
@@ -142,7 +147,18 @@ void PlayableObject::DrawGameObject(CameraObject& cameraObj) {
 void PlayableObject::DropItem() {
 	Item* temp = heldItem; 
 	heldItem = nullptr; 
-	PublishItem(this, temp, yCoord, xCoord);
+
+	// remember to delete after use 
+	InteractionInfo* newInteraction = new InteractionInfo(); 
+	newInteraction->item = temp;
+	newInteraction->who = this; 
+	newInteraction->yCoord = this->yCoord; 
+	newInteraction->xCoord = this->xCoord;
+
+	PublishItem(newInteraction);
+
+	// this will have to be fixed once events are excuted at different times but for now
+	delete newInteraction;
 }
 
 void PlayableObject::PickUpItem(Item* item) {

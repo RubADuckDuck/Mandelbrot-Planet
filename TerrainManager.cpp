@@ -20,12 +20,17 @@ TerrainManager::TerrainManager()
 	RandomizeGroundGrid();
 }
 
-void TerrainManager::onEvent(GameObject* who, Item* item, int y, int x) {
-	GameObject::onEvent(who, item, y, x); 
-	this->HandleInteraction(who, item, y, x);
+void TerrainManager::onEvent(InteractionInfo* interactionInfo) {
+	GameObject::onEvent(interactionInfo); 
+	this->HandleInteraction(interactionInfo);
 }
 
-void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x) {
+void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
+	GameObject* who = interactionInfo->who;
+	Item* item = interactionInfo->item;
+	int y = interactionInfo->yCoord;
+	int x = interactionInfo->xCoord;
+
 	if (factoryGrid[y][x]) {
 		if (factoryGrid[y][x]->componentType == INPUTPORT) {
 			// if factory component is occupied and is a input port 
@@ -33,7 +38,7 @@ void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x
 		}
 		else {
 			// go interact somewhere else ;) 
-			this->HandleInteraction(who, item, y + 1, x + 1); // might cause unintended behavior, let's leave it for now
+			this->HandleInteraction(interactionInfo); // might cause unintended behavior, let's leave it for now
 		}
 	}
 	else if (itemGrid[y][x]) {
@@ -68,7 +73,8 @@ void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x
 			else {
 				// if not a player, since another item is already occupying space, 
 				// try somewhere else
-				this->HandleInteraction(who, item, y + 1, x); // todo, dynamic casting of 'who' is going to be retried isn't that a waste?
+				interactionInfo->yCoord += 1;
+				this->HandleInteraction(interactionInfo); // todo, dynamic casting of 'who' is going to be retried isn't that a waste?
 			}
 		}
 		if (!itemGrid[y][x] && groundGrid[y][x] == GroundType::GRASS) { // todo: Grass -> walkable
@@ -78,7 +84,8 @@ void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x
 		}
 		else {
 			// go interact somewhere else ;) 
-			this->HandleInteraction(who ,item, y + 1, x + 1); // might cause unintended behavior, let's leave it for now
+			interactionInfo->yCoord += 1;
+			this->HandleInteraction(interactionInfo); // might cause unintended behavior, let's leave it for now
 		}
 	}
 	else {

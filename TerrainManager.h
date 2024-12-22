@@ -102,9 +102,9 @@ public:
 		gameEngine = ge;
 	}
 
-	void onEvent(GameObject* who, Item* item, int y, int x) override;
+	void onEvent(InteractionInfo* interactionInfo) override;
 
-	void HandleInteraction(GameObject* who, Item* item, int y, int x);
+	void HandleInteraction(InteractionInfo* interactionInfo);
 
 	void CreateAndAddPlayer(
 		const std::string& meshPath,

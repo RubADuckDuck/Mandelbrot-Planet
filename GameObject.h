@@ -13,6 +13,7 @@
 #include "FactoryType.h"
 #include "GroundType.h"
 #include "Event.h"
+#include "InteractionInfo.h"
 
 //class Animation; 
 
@@ -47,17 +48,17 @@ public:
 	virtual glm::mat4 GetModelMatrixFromTransform();
 	virtual void DrawGameObject(CameraObject& cameraObj); 
     virtual void onEvent(const std::string& message);
-	virtual void onEvent(GameObject* who, Item* item, int y, int x);
+	virtual void onEvent(InteractionInfo* interactionInfo);
 
-	void PublishItem(GameObject* who, Item* item, int y, int x) {
+	void PublishItem(InteractionInfo* interactionInfo) {
 		 EventDispatcher& dispatcher = EventDispatcher::GetInstance(); 
-		 dispatcher.Publish(who, item, y, x); // item is published!
+		 dispatcher.Publish(interactionInfo); // item is published!
 	}
 
 	void SubscribeItemListener() {
-		itemListener = [this](GameObject* who, Item* item, int y, int x) {
+		itemListener = [this](InteractionInfo* interactionInfo) {
 			LOG(LOG_INFO, "ItemListenerTriggered::Typeid of gameObj on which event is triggered: " + std::string(typeid(*this).name()));
-			this->onEvent(who, item, y, x);
+			this->onEvent(interactionInfo);
 		};
 		
 		// Pass a pointer to the stored lambda

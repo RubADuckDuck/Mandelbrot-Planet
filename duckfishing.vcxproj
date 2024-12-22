@@ -175,6 +175,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Gizmo.h" />
     <ClInclude Include="GlobalMappings.h" />
+    <ClInclude Include="InteractionInfo.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemType.h" />
     <ClInclude Include="Light.h" />

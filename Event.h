@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <mutex>
 #include "LOG.h"
+#include "InteractionInfo.h"
 
 class Item;
 class GameObject;
@@ -14,7 +15,7 @@ class GameObject;
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
 using Listener = std::function<void(const std::string&)>;
-using ItemListener = std::function<void(GameObject*, Item*, int, int)>; // args are (who, what, where1, where2)
+using ItemListener = std::function<void(InteractionInfo*)>; // args are (who, what, where1, where2)
 
 
 class EventDispatcher {
@@ -81,12 +82,12 @@ public:
         }
     }
 
-    void Publish(GameObject* who, Item* item, int y, int x) {
+    void Publish(InteractionInfo* interactionInfo) {
         // std::lock_guard<std::mutex> lock(mutex);
 
         for (const ItemListener* ptrItemListener : itemListeners) {
             try {
-                (*ptrItemListener)(who, item, y, x);
+                (*ptrItemListener)(interactionInfo);
             }
             catch (const std::exception& e) {
                 std::cerr << "ItemListener exception: " << e.what() << std::endl;

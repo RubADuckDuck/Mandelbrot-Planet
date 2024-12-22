@@ -78,6 +78,7 @@ public:
 	void DrawGameObject(CameraObject& cameraObj) override;
 	void DropItem();
 	void PickUpItem(Item* item); 
+
 }; 
 
 enum class MapLayerType {

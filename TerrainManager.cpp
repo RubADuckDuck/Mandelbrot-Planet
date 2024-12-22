@@ -36,7 +36,20 @@ void TerrainManager::HandleInteraction(GameObject* who, Item* item, int y, int x
 			this->HandleInteraction(who, item, y + 1, x + 1); // might cause unintended behavior, let's leave it for now
 		}
 	}
+	else if (itemGrid[y][x]) {
+		// Item Exist on Grid
+		// 			
+		// dynamic cast
+		if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
+			LOG(LOG_INFO, "TerrainManager::Player Picked up: " + itemType2ItemName[itemGrid[y][x]->item->itemType]);
+				
+			// if player 
+			Item* pickUp = itemGrid[y][x]->item;
+			ptrPlayer->PickUpItem(pickUp);
 
+			itemGrid[y][x] = nullptr;
+		}
+	}
 	else if (item) {
 		// item exists
 		if (itemGrid[y][x]) {
@@ -217,6 +230,10 @@ void TerrainManager::Update() {
 
 		curTransform = coord2Transform[yIndex][xIndex]; 
 		curPlayer->SetTransform(curTransform);
+		
+		if (curPlayer->heldItem) {
+			curPlayer->heldItem->SetTransform(curTransform);
+		}
 	}
 }
 

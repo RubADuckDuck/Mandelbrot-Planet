@@ -121,7 +121,7 @@ void PlayableObject::onEvent(const std::string& message) {
 	else if (message== "space_up") {
 		LOG(LOG_INFO, "Publishing Item from Player");
 
-		this->PublishItem(this, heldItem, yCoord, xCoord);
+		DropItem();
 	}
 
 	if (yCoord < 0) {
@@ -141,7 +141,7 @@ void PlayableObject::DrawGameObject(CameraObject& cameraObj) {
 
 void PlayableObject::DropItem() {
 	Item* temp = heldItem; 
-	temp = nullptr; 
+	heldItem = nullptr; 
 	PublishItem(this, temp, yCoord, xCoord);
 }
 

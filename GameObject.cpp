@@ -272,32 +272,46 @@ glm::vec3 rotateVector(const glm::vec3& v, float theta) {
 }
 
 void CameraObject::Update() {
-	angle = angle + 1;
+	
+	{
+		glm::vec3 prevPosition = position; 
+		glm::vec3 prevTarget = target; 
+		glm::vec3 prevUp = up; 
 
-	if (targetGameObjects.empty()) {
-		return; // No targets, no update needed
-	}
+		// Define camera parameters
+		position = glm::vec3(50.0f, 50.0f, 50.0f); // High angle position
+		target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
+		up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
 
-	glm::vec3 totalTranslation(0.0f);
+		glm::mat4 totalTransform(0.0f);
 
-	// Calculate the average translation of target objects
-	for (const auto& targetGameObj : targetGameObjects) {
-		if (targetGameObj && targetGameObj->ptrTransform) {
-			totalTranslation += targetGameObj->ptrTransform->GetTranslation();
+		// Calculate the average translation of target objects
+		for (const auto& targetGameObj : targetGameObjects) {
+			if (targetGameObj && targetGameObj->ptrTransform) {
+				totalTransform += targetGameObj->ptrTransform->GetTransformMatrix();
+			}
 		}
+
+		glm::mat4 averageTransform = totalTransform / static_cast<float>(targetGameObjects.size()); 
+
+		position = glm::vec3(averageTransform * glm::vec4(position, 1));
+		target = glm::vec3(averageTransform * glm::vec4(target, 1)); 
+		
+
+		// Extract the rotation component from the average transformation matrix
+		glm::mat3 rotationMatrix = glm::mat3(averageTransform);
+
+		// Apply the rotation to the up vector
+		up = glm::normalize(rotationMatrix * up);
+
+		// Lerp factor (t), between 0 and 1
+		float t = 0.01f; // Example value, update this based on your logic (e.g., time)
+
+		// Apply linear interpolation (lerp) for smooth transitions
+		position = glm::mix(prevPosition, position, t);
+		target = glm::mix(prevTarget, target, t);
+		up = glm::mix(prevUp, up, t);
 	}
-
-	glm::vec3 averageTranslation = totalTranslation / static_cast<float>(targetGameObjects.size());
-
-	// Compute the desired camera position
-	glm::vec3 desiredTargetPosition = averageTranslation;
-
-	// Smoothly interpolate the current position towards the desired position
-	target = glm::mix(target, desiredTargetPosition, 0.1f); // LERP with factor 0.1f for smoothing
-
-	// Set target for the camera (useful for maintaining focus)
-	glm::vec3 v(0.0f, 10.0f, 10.0f);
-	position = target + rotateVector(v, angle); 
 
 	// Update view-projection matrix
 	SetViewProjMat();

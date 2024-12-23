@@ -3,6 +3,7 @@
 #include "Item.h"
 #include "GameEngine.h"
 #include "GameObject.h"
+#include <cmath>
 
 // TerrainManager::----------------------------------------------------------------------
 TerrainManager::TerrainManager()
@@ -25,20 +26,32 @@ void TerrainManager::onEvent(InteractionInfo* interactionInfo) {
 	this->HandleInteraction(interactionInfo);
 }
 
-void directionActOnCoord(Direction direction, int& yCoord, int& xCoord) {
+void directionActOnCoord(Direction direction, int& yCoord, int& xCoord, int gridSizeY, int gridSizeX) {
 	// Assume the object has xCoord and yCoord representing its position
 	switch (direction) {
 	case Direction::UP:
 		yCoord--; // Move up (decrease y)
+		if (yCoord < 0) {
+			yCoord = gridSizeY - 1;
+		}
 		break;
 	case Direction::DOWN:
 		yCoord++; // Move down (increase y)
+		if (yCoord >= gridSizeY) {
+			yCoord = 0; 
+		}
 		break;
 	case Direction::LEFT:
 		xCoord--; // Move left (decrease x)
+		if (xCoord < 0) {
+			xCoord = gridSizeX - 1;
+		}
 		break;
 	case Direction::RIGHT:
 		xCoord++; // Move right (increase x)
+		if (xCoord >= gridSizeX) {
+			xCoord = 0;
+		}
 		break;
 	case Direction::IDLE:
 		// Do nothing, the object remains in place
@@ -60,7 +73,7 @@ void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
 	int targetY = y; 
 	int targetX = x; 
 
-	directionActOnCoord(curDirection, targetY, targetX);
+	directionActOnCoord(curDirection, targetY, targetX, this->GRID_SIZE, this->GRID_SIZE);
 
 	if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
 		isPlayer = true; 
@@ -330,24 +343,92 @@ void TerrainManager::Update() {
 	DroppedItemObject* curDroppedItem; 
 	FactoryComponentObject* curFactoryComponent;
 
+	float radius1 = 1; 
+	float degreePerStep1 = 360 / GRID_SIZE; 
+
+	float curDegree1 = 0; 
+	float curRadian1 = 0;
+
+	float radius2 = 4; 
+	float degreePerStep2 = 360 / GRID_SIZE;
+
+	float curDegree2 = 0; 
+	float curRadian2 = 0; 
+
+	bool normalMode = false;
+	bool torus = true;
+
 	for (int i = 0; i < GRID_SIZE; i++) {
+		curDegree1 += degreePerStep1; 
+		curRadian1 = glm::radians(curDegree1);
 		for (int j = 0; j < GRID_SIZE; j++) {
-			// Set the transform positions for each block
-			float yCoord = i * BLOCK_OFFSET;
-			float xCoord = j * BLOCK_OFFSET;
-			
-			coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
-			coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, 0.0f, yCoord));
+			curDegree2 -= degreePerStep2; 
+			curRadian2 = glm::radians(curDegree2);
+			if (normalMode) {
+				// Set the transform positions for each block
+				float yCoord = i * BLOCK_OFFSET;
+				float xCoord = j * BLOCK_OFFSET;
 
-			curTransform = coord2Transform[i][j]; 
-			curDroppedItem = itemGrid[i][j]; 
-			curFactoryComponent = factoryGrid[i][j];
+				coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+				coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, 0.0f, yCoord));
 
-			if (curDroppedItem) {
-				curDroppedItem->SetTransform(curTransform);
+				curTransform = coord2Transform[i][j];
+				curDroppedItem = itemGrid[i][j];
+				curFactoryComponent = factoryGrid[i][j];
+
+				if (curDroppedItem) {
+					curDroppedItem->SetTransform(curTransform);
+				}
+				if (curFactoryComponent) {
+					curFactoryComponent->SetTransform(curTransform);
+				}
 			}
-			if (curFactoryComponent) {
-				curFactoryComponent->SetTransform(curTransform);
+			else if(!torus) {
+				// Set the transform positions for each block
+				
+				float zCoord = radius1 * cos(curRadian1);
+				float yCoord = radius1 * sin(curRadian1);
+				float xCoord = j * BLOCK_OFFSET;
+
+
+				coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+				coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, zCoord, yCoord));
+				coord2Transform[i][j]->SetRotation(glm::radians(curDegree1), glm::vec3(1, 0, 0));
+
+				curTransform = coord2Transform[i][j];
+				curDroppedItem = itemGrid[i][j];
+				curFactoryComponent = factoryGrid[i][j];
+
+				if (curDroppedItem) {
+					curDroppedItem->SetTransform(curTransform);
+				}
+				if (curFactoryComponent) {
+					curFactoryComponent->SetTransform(curTransform);
+				}
+			}
+			else {
+				// Set the transform positions for each block
+
+				float zCoord = radius1 * cos(curRadian1); // leave the z 
+				float yCoord = sin(curRadian2) * (radius2 + radius1 * sin(curRadian1));
+				float xCoord = cos(curRadian2) * (radius2 + radius1 * sin(curRadian1));
+
+
+				coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+				coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, zCoord, yCoord));
+				coord2Transform[i][j]->SetRotation(glm::radians( - curDegree1), glm::vec3(0, 0, 1));
+				coord2Transform[i][j]->AddRotation(glm::radians( - curDegree2), glm::vec3(0, 1, 0));
+
+				curTransform = coord2Transform[i][j];
+				curDroppedItem = itemGrid[i][j];
+				curFactoryComponent = factoryGrid[i][j];
+
+				if (curDroppedItem) {
+					curDroppedItem->SetTransform(curTransform);
+				}
+				if (curFactoryComponent) {
+					curFactoryComponent->SetTransform(curTransform);
+				}
 			}
 		}
 	} 
@@ -380,7 +461,7 @@ void TerrainManager::Update() {
 			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
 			break;
 		}
-		curTransform->SetRotation(rotationAngle, rotationAxis);
+		// curTransform->SetRotation(rotationAngle, rotationAxis);
 
 		curPlayer->SetTransform(curTransform);
 		

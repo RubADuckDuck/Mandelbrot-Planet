@@ -77,7 +77,7 @@ class GameEngine;
 
 class TerrainManager : public GameObject { // Manages Interaction between Player2Terrain Terrain2Terrain Interaction
 public:
-    static const int GRID_SIZE = 100;
+    static const int GRID_SIZE = 10;
     float BLOCK_SIZE = 0.5f;
     float BLOCK_OFFSET = 1.0f;
 

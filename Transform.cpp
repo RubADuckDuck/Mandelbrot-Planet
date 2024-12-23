@@ -28,6 +28,15 @@ void Transform::SetRotation(float radians, const glm::vec3& axis) {
     this->rotation = glm::angleAxis(radians, normAxis);
 }
 
+void Transform::AddRotation(float radians, const glm::vec3& axis) {
+    // Add to the current rotation
+    glm::vec3 normAxis = glm::normalize(axis);
+    glm::quat additionalRotation = glm::angleAxis(radians, normAxis);
+
+    // Combine the current rotation with the new rotation
+    this->rotation = additionalRotation * this->rotation; // Note: Order matters
+}
+
 void Transform::SetScale(const glm::vec3& s) {
     this->scale = s;
 }

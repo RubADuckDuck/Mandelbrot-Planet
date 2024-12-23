@@ -12,6 +12,7 @@ public:
 
     void SetTranslation(const glm::vec3& t);
     void SetRotation(float radians, const glm::vec3& axis);
+    void AddRotation(float radians, const glm::vec3& axis);
     void SetScale(const glm::vec3& s);
 
     // Optional: Additional setters/getters if you want finer control

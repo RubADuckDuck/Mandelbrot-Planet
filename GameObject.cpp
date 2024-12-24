@@ -279,7 +279,7 @@ void CameraObject::Update() {
 		glm::vec3 prevUp = up; 
 
 		// Define camera parameters
-		position = glm::vec3(50.0f, 50.0f, 50.0f); // High angle position
+		position = glm::vec3(5.0f, 20.0f, 20.0f); // High angle position
 		target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
 		up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
 

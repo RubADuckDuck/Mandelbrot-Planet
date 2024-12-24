@@ -355,8 +355,8 @@ void TerrainManager::Update() {
 	float curDegree2 = 0; 
 	float curRadian2 = 0; 
 
-	bool normalMode = false;
-	bool torus = true;
+	bool normalMode = true;
+	bool torus = false;
 
 	for (int i = 0; i < GRID_SIZE; i++) {
 		curDegree1 += degreePerStep1; 

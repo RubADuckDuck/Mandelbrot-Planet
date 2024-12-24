@@ -144,6 +144,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalMappings.cpp" />
+    <ClCompile Include="GridManager.h" />
     <ClCompile Include="GroundType.h" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="LOG.cpp" />

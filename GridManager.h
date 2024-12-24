@@ -15,6 +15,7 @@ using Int2RotationOnInt = std::map<int, RotationsOnInt>;
 
 
 class ParallelTransporter {
+public:
 	static int Direction2Int(Direction xDir) {
 		return static_cast<int>(xDir);
 	}
@@ -35,6 +36,7 @@ class ParallelTransporter {
 	static int StayStraight(int x) {
 		return x;
 	}
+	static Int2RotationOnInt int2Rotation;
 
 	/* 
 		This could be thought of as a map f: Direction x Direction -> Direction 
@@ -99,6 +101,10 @@ public:
 		directionInt2RotationInt = x; 
 	} 
 
+	void SetDirectionInt2RotationInt(int directionInt, int rotationInt) {
+		directionInt2RotationInt[directionInt] = int2Rotation[rotationInt];
+	}
+
 	Direction CalculateDireciton(Direction facingWhere, Direction goingWhere) {
 		int facingInt = Direction2Int(facingWhere); 
 		int goingInt = Direction2Int(goingWhere); 
@@ -112,6 +118,7 @@ public:
 		return Int2Direction(resultingDirectionInt);
 	}
 };
+
 
 
 class MovementManager {
@@ -139,6 +146,119 @@ public:
 				// Initialize the ParallelTransporter for the current cell
 				grid2ParallelTransporter[y][x] = new ParallelTransporter();
 			}
+		}
+	}
+
+	void InitPlanaFigure(int startY, int startX, int size) {
+
+		int curY = 0; 
+		int curX = 0; 
+		Direction curDirection = Direction::UP;
+		int curCurvatureFromLateralFace2BottomBase = 0; 
+		int curCurvatureFromLateralFace2UpperBase = 0;
+
+
+		Action2Coord2d curAction2Coord;
+		ParallelTransporter curParallelTransporter;
+
+		int curIndex = 0; 
+		for (int i = 0; i < 4; i++) { 
+			for (int j = 0; j < size; j++) { 
+				curCurvatureFromLateralFace2BottomBase = ( - j) % 4;
+				curCurvatureFromLateralFace2UpperBase = j % 4; 
+				if (i == 0) { 
+					curY = 0; 
+					curX = j; 
+					curDirection = Direction::UP; 
+				}
+				else if (i == 1) {
+					curY = j; 
+					curX = size - 1; 
+					curDirection = Direction::RIGHT;
+				}
+				else if (i == 2) {
+					curY = size - 1; 
+					curX = size - j - 1; 
+					curDirection = Direction::DOWN;
+				}
+				else {
+					curY = size - j - 1; 
+					curX = 0; 
+					curDirection = Direction::LEFT;
+				}
+
+				curY = curY + startY; 
+				curX = curX + startX + size * 5; // bottom starts at size * 5 
+
+				// remember 
+				// right -> 0 
+				// up -> 1 
+				// left -> 2 
+				// down -> 3
+
+				// bottom rim 
+				// latteral face 2 base 
+				curAction2Coord = *grid2Transporter[startY + size - 1][startX + curIndex];
+				curAction2Coord[Direction::DOWN] = { curY, curX};
+				curParallelTransporter = *grid2ParallelTransporter[startY + size - 1][startX + curIndex]; 
+				curParallelTransporter.SetDirectionInt2RotationInt(3, curCurvatureFromLateralFace2BottomBase);
+				// base 2 latteral face 
+				curAction2Coord = *grid2Transporter[curY][curX];
+				curAction2Coord[curDirection] = { startY + size - 1, startX + curIndex };
+				curParallelTransporter = *grid2ParallelTransporter[curY][curX];
+				curParallelTransporter.SetDirectionInt2RotationInt(3,  (- curCurvatureFromLateralFace2BottomBase) % 4);
+
+
+				if (i == 0) {
+					curY = size - 1;
+					curX = j;
+					curDirection = Direction::DOWN;
+				}
+				else if (i == 1) {
+					curY = size - j - 1;
+					curX = size - 1;
+					curDirection = Direction::RIGHT;
+				}
+				else if (i == 2) {
+					curY = 0;
+					curX = size - j - 1;
+					curDirection = Direction::UP;
+				}
+				else {
+					curY = j;
+					curX = 0;
+					curDirection = Direction::LEFT;
+				}
+
+				curY = curY + startY;
+				curX = curX + startX + size * 4; // bottom starts at size * 4 
+
+				// upper rim 
+				curAction2Coord = *grid2Transporter[startY + 0][startX + curIndex];
+				curAction2Coord[Direction::DOWN] = { curY, curX };
+				curParallelTransporter = *grid2ParallelTransporter[startY + 0][startX + curIndex];
+				curParallelTransporter.SetDirectionInt2RotationInt(0, curCurvatureFromLateralFace2UpperBase);
+
+				curAction2Coord = *grid2Transporter[curY][curX];
+				curAction2Coord[curDirection] = { startY + 0, startX + curIndex };
+				curParallelTransporter = *grid2ParallelTransporter[curY][curX];
+				curParallelTransporter.SetDirectionInt2RotationInt(0, curCurvatureFromLateralFace2UpperBase);
+
+				// end
+				curIndex += 1;
+			}
+		}
+
+		// stitch up the latteral faces
+		for (int i = 0; i < size; i++) {
+			// left to right
+			curAction2Coord = *grid2Transporter[startY + i][startX + 0];
+			curAction2Coord[Direction::LEFT] = { startY + i, startX + size * 4 - 1 };
+
+
+			// right to left
+			curAction2Coord = *grid2Transporter[startY + i][startX + size * 4 - 1];
+			curAction2Coord[Direction::RIGHT] = { startY + i, startX + 0 };
 		}
 	}
 

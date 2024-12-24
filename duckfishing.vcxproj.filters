@@ -84,6 +84,9 @@
     <ClCompile Include="GridManager.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="GridManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameScene.h">

@@ -344,6 +344,114 @@ void TerrainManager::CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType 
 	itemGrid[yIndex][xIndex] = newDroppedItem;
 }
 
+void TerrainManager::UpdateIntoCube() {
+	Transform* curTransform;
+
+	// ground is manually drawn
+	DroppedItemObject* curDroppedItem;
+	FactoryComponentObject* curFactoryComponent;
+
+	int facePieceSize = 4; // Number of pieces per face
+	float faceSize = facePieceSize * BLOCK_SIZE; // Physical size of one face of the cube
+
+	int curFaceIndex = 0; 
+	float curZ = 0; 
+	float curY = 0; 
+	float curX = 0;  
+
+	for (int i = 0; i < facePieceSize; i++) {
+		for (int j = 0; j < facePieceSize * 6; j++) {
+			curFaceIndex = j / 4;  
+
+			switch (curFaceIndex) {
+			case 0: //
+				curZ = i;
+				curY = 0;
+				curX = j % 4;
+
+				curY -= 1; 
+				break;
+			case 1:
+				curZ = i;
+				curY = j % 4;
+				curX = facePieceSize - 1; 
+
+				curX += 1; 
+				break;
+			case 2:
+				curZ = i;
+				curY = facePieceSize - 1;
+				curX = facePieceSize - (j % 4) - 1;
+
+				curY += 1;
+				break;
+			case 3:
+				curZ = i;
+				curY = facePieceSize - (j % 4) - 1;
+				curX = 0;
+
+				curX -= 1;
+				break;
+			}
+			// curZ = 0;
+			curZ *= BLOCK_OFFSET;
+			curY *= - BLOCK_OFFSET;
+			curX *= BLOCK_OFFSET;
+
+			coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+			coord2Transform[i][j]->SetTranslation(glm::vec3(curX, curY, curZ));
+
+			curTransform = coord2Transform[i][j];
+			curDroppedItem = itemGrid[i][j];
+			curFactoryComponent = factoryGrid[i][j];
+
+			if (curDroppedItem) {
+				curDroppedItem->SetTransform(curTransform);
+			}
+			if (curFactoryComponent) {
+				curFactoryComponent->SetTransform(curTransform);
+			}
+		}
+	}
+
+	PlayableObject* curPlayer;
+
+	// Update player position 
+	for (int i = 0; i < players.size(); i++) {
+		curPlayer = players[i];
+		int yIndex = curPlayer->yCoord;
+		int xIndex = curPlayer->xCoord;
+
+		curTransform = coord2Transform[yIndex][xIndex];
+
+		// Rotate the transform based on the player's facing direction
+		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
+		float rotationAngle = 0.0f;
+
+		switch (curPlayer->direction) {
+		case Direction::UP:
+			rotationAngle = glm::radians(180.0f); // No rotation needed
+			break;
+		case Direction::DOWN:
+			rotationAngle = glm::radians(0.0f); // Rotate 180 degrees
+			break;
+		case Direction::LEFT:
+			rotationAngle = glm::radians(-90.0f); // Rotate 90 degrees counterclockwise
+			break;
+		case Direction::RIGHT:
+			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
+			break;
+		}
+		curTransform->SetRotation(rotationAngle, rotationAxis);
+
+		curPlayer->SetTransform(curTransform);
+
+		if (curPlayer->heldItem) {
+			curPlayer->heldItem->SetTransform(curTransform);
+		}
+	}
+}
+
 void TerrainManager::Update() {
 	Transform* curTransform;
 	
@@ -365,7 +473,13 @@ void TerrainManager::Update() {
 
 	bool normalMode = true;
 	bool torus = false;
+	bool cube = false; 
 
+	if (cube) {
+		UpdateIntoCube(); 
+
+		return;
+	}
 	for (int i = 0; i < GRID_SIZE; i++) {
 		curDegree1 += degreePerStep1; 
 		curRadian1 = glm::radians(curDegree1);

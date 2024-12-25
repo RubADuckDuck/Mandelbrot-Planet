@@ -129,6 +129,8 @@ public:
 
 	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType itemType);
 
+	void UpdateIntoCube();
+
 	void Update() override;
 
     void DrawGameObject(CameraObject& cameraObj) override; 

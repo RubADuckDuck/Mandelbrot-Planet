@@ -208,7 +208,7 @@ NavigationInfo MovementManager::Move(Coord2d position, Direction movingDirection
 	Direction newFacingDirection = curParallelTransporter->CalculateDireciton(facingDirection, movingDirection);
 
 	NavigationInfo newInfo = NavigationInfo();
-	newInfo.pos = targetCoord2d;  
+	newInfo.pos = targetCoord2d;  // sometimes 0. why?
 	newInfo.direction = newFacingDirection; 
 	newInfo.changeOfOrientation = curParallelTransporter->int2Int[static_cast<int>(movingDirection)];
 

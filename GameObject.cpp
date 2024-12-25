@@ -112,37 +112,72 @@ void RotatingGameObject::Update() {
 void PlayableObject::onEvent(const std::string& message) {
 	int curDirectionInt = 0; 
 
-	if (message == "s_up") {
-		direction = Direction::DOWN;
-		// yCoord = yCoord + 1;
+	bool originalWalk = false; 
 
-		curDirectionInt = static_cast<int>(direction) + orientation;
-		direction = static_cast<Direction>(curDirectionInt);
-		RequestWalk();
+	if (message == "s_up") {
+		if (originalWalk) {
+			direction = Direction::DOWN;
+			// yCoord = yCoord + 1;
+
+			curDirectionInt = static_cast<int>(direction) + orientation;
+			curDirectionInt = curDirectionInt % 4;
+			direction = static_cast<Direction>(curDirectionInt);
+			RequestWalk();
+		}
+		else {
+			curDirectionInt += 2; // turn around
+			curDirectionInt += static_cast<int>(direction);
+			curDirectionInt = curDirectionInt % 4;
+			direction = static_cast<Direction>(curDirectionInt);
+		}
 	}
 	else if (message == "w_up") {
-		direction = Direction::UP;
-		// yCoord = yCoord - 1;
+		if (originalWalk) {
+			direction = Direction::UP;
+			// yCoord = yCoord - 1;
 
-		curDirectionInt = static_cast<int>(direction) + orientation;
-		direction = static_cast<Direction>(curDirectionInt);
-		RequestWalk();
+			curDirectionInt = static_cast<int>(direction) + orientation;
+			curDirectionInt = curDirectionInt % 4;
+			direction = static_cast<Direction>(curDirectionInt);
+			RequestWalk();
+		}
+		else {
+			RequestWalk();
+		}
 	}
 	else if (message == "d_up") {
-		direction = Direction::RIGHT;
-		// xCoord = xCoord + 1;
+		if (originalWalk) {
+			direction = Direction::RIGHT;
+			// xCoord = xCoord + 1;
 
-		curDirectionInt = static_cast<int>(direction) + orientation;
-		direction = static_cast<Direction>(curDirectionInt);
-		RequestWalk();
+			curDirectionInt = static_cast<int>(direction) + orientation;
+			curDirectionInt = curDirectionInt % 4;
+			direction = static_cast<Direction>(curDirectionInt);
+			RequestWalk();
+		}
+		else {
+			curDirectionInt += 3; // turn right
+			curDirectionInt += static_cast<int>(direction);
+			curDirectionInt = curDirectionInt % 4;
+			direction = static_cast<Direction>(curDirectionInt);
+		}
 	}
 	else if (message == "a_up") {
-		direction = Direction::LEFT;
-		// xCoord = xCoord - 1;
+		if (originalWalk) {
+			direction = Direction::LEFT;
+			// xCoord = xCoord - 1;
 
-		curDirectionInt = static_cast<int>(direction) + orientation;
-		direction = static_cast<Direction>(curDirectionInt);
-		RequestWalk();
+			curDirectionInt = static_cast<int>(direction) + orientation;
+			curDirectionInt = curDirectionInt % 4;
+			direction = static_cast<Direction>(curDirectionInt);
+			RequestWalk();
+		}
+		else {
+			curDirectionInt += 1; // turn right
+			curDirectionInt += static_cast<int>(direction);
+			curDirectionInt = curDirectionInt % 4;
+			direction = static_cast<Direction>(curDirectionInt);
+		}
 	}
 	else if (message== "space_up") {
 		LOG(LOG_INFO, "Publishing Item from Player");
@@ -289,8 +324,10 @@ void CameraObject::Update() {
 		glm::vec3 prevTarget = target; 
 		glm::vec3 prevUp = up; 
 
+
+		int distance = 50;
 		// Define camera parameters
-		position = glm::vec3(5.0f, 20.0f, 20.0f); // High angle position
+		position = glm::vec3(5.0f, distance * 1.0f,- distance * 1.0f); // High angle position
 		target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
 		up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
 

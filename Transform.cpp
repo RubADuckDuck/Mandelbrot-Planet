@@ -8,6 +8,14 @@ Transform::Transform()
     // Initialize translation to zero, rotation to identity quaternion, scale to 1
 }
 
+Transform::Transform(const Transform& other)
+    : translation(other.translation),
+    rotation(other.rotation),
+    scale(other.scale) {
+    // No additional initialization needed; this simply copies the values.
+}
+
+
 glm::mat4 Transform::GetTransformMatrix() const {
     // Construct transformation matrix in order: Translate * Rotate * Scale
     glm::mat4 T = glm::translate(glm::mat4(1.0f), translation);
@@ -28,13 +36,21 @@ void Transform::SetRotation(float radians, const glm::vec3& axis) {
     this->rotation = glm::angleAxis(radians, normAxis);
 }
 
+
 void Transform::AddRotation(float radians, const glm::vec3& axis) {
-    // Add to the current rotation
+    AddRotationLeft(radians, axis); // Default behavior as right
+}
+
+void Transform::AddRotationLeft(float radians, const glm::vec3& axis) {
     glm::vec3 normAxis = glm::normalize(axis);
     glm::quat additionalRotation = glm::angleAxis(radians, normAxis);
+    rotation = additionalRotation * rotation; // Pre-multiply
+}
 
-    // Combine the current rotation with the new rotation
-    this->rotation = additionalRotation * this->rotation; // Note: Order matters
+void Transform::AddRotationRight(float radians, const glm::vec3& axis) {
+    glm::vec3 normAxis = glm::normalize(axis);
+    glm::quat additionalRotation = glm::angleAxis(radians, normAxis);
+    rotation = rotation * additionalRotation; // Post-multiply
 }
 
 void Transform::SetScale(const glm::vec3& s) {

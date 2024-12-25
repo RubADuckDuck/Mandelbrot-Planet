@@ -377,6 +377,8 @@ void TerrainManager::UpdateIntoCube() {
 				curX = facePieceSize - 1; 
 
 				curX += 1; 
+				
+				coord2Transform[i][j]->SetRotation(glm::radians(- 90.0f), glm::vec3(0, 0, 1));
 				break;
 			case 2:
 				curZ = i;
@@ -384,6 +386,8 @@ void TerrainManager::UpdateIntoCube() {
 				curX = facePieceSize - (j % 4) - 1;
 
 				curY += 1;
+
+				coord2Transform[i][j]->SetRotation(glm::radians(-180.0f), glm::vec3(0, 0, 1));
 				break;
 			case 3:
 				curZ = i;
@@ -391,6 +395,27 @@ void TerrainManager::UpdateIntoCube() {
 				curX = 0;
 
 				curX -= 1;
+
+				coord2Transform[i][j]->SetRotation(glm::radians(-270.0f), glm::vec3(0, 0, 1));
+				break;
+			case 4: // top
+				curZ = -1;
+				curY = facePieceSize - i;
+				curX = j % 4;
+
+				curY -= 1;
+
+				coord2Transform[i][j]->SetRotation(glm::radians(- 90.0f), glm::vec3(1, 0, 0));
+				break;
+			case 5: // bottom
+				curZ = 4;
+				curY = +1 + i;
+				curX = j % 4;
+
+				curY -= 1;
+
+				coord2Transform[i][j]->SetRotation(glm::radians(90.0f), glm::vec3(1, 0, 0));
+				break;
 				break;
 			}
 			// curZ = 0;
@@ -415,14 +440,15 @@ void TerrainManager::UpdateIntoCube() {
 	}
 
 	PlayableObject* curPlayer;
+	Transform* curPlayersTransform; 
 
 	// Update player position 
 	for (int i = 0; i < players.size(); i++) {
 		curPlayer = players[i];
 		int yIndex = curPlayer->yCoord;
 		int xIndex = curPlayer->xCoord;
-
-		curTransform = coord2Transform[yIndex][xIndex];
+		
+		curPlayersTransform = new Transform(*coord2Transform[yIndex][xIndex]);
 
 		// Rotate the transform based on the player's facing direction
 		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
@@ -442,12 +468,12 @@ void TerrainManager::UpdateIntoCube() {
 			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
 			break;
 		}
-		curTransform->SetRotation(rotationAngle, rotationAxis);
+		curPlayersTransform->AddRotationRight(rotationAngle, rotationAxis);
 
-		curPlayer->SetTransform(curTransform);
+		curPlayer->SetTransform(curPlayersTransform);
 
 		if (curPlayer->heldItem) {
-			curPlayer->heldItem->SetTransform(curTransform);
+			curPlayer->heldItem->SetTransform(curPlayersTransform);
 		}
 	}
 }
@@ -473,7 +499,7 @@ void TerrainManager::Update() {
 
 	bool normalMode = true;
 	bool torus = false;
-	bool cube = false; 
+	bool cube = true; 
 
 	if (cube) {
 		UpdateIntoCube(); 
@@ -653,7 +679,7 @@ void TerrainManager::RandomizeGroundGrid() {
 		for (int j = 0; j < GRID_SIZE; j++) {
 			// Weighted randomization: 70% GRASS, 30% WATER
 			int randomValue = std::rand() % 100; // Random value between 0-99
-			if (randomValue < 70) {
+			if (randomValue < 1100) {
 				groundGrid[i][j] = GroundType::GRASS;
 			}
 			else {

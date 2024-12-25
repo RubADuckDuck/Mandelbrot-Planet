@@ -83,7 +83,7 @@ void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
 	if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
 		isPlayer = true; 
 		ptrPlayer->direction = curCoord2dandDir.direction; 
-		ptrPlayer->orientation -= curCoord2dandDir.changeOfOrientation;
+		ptrPlayer->orientation += curCoord2dandDir.changeOfOrientation;
 		ptrPlayer->orientation = PositiveModulo(ptrPlayer->orientation, 4);
 	}
 

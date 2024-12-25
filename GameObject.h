@@ -73,6 +73,7 @@ class GameObjectOnGrid : public GameObject {
 public: 
 	int yCoord = 0; int xCoord = 0;
 	Direction direction = Direction::UP;
+	int orientation = 0; 
 
 	void SetCoordinates(int y, int x) {
 		yCoord = y;

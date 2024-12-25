@@ -110,29 +110,38 @@ void RotatingGameObject::Update() {
 
 // Playable ---------------------------
 void PlayableObject::onEvent(const std::string& message) {
+	int curDirectionInt = 0; 
 
 	if (message == "s_up") {
 		direction = Direction::DOWN;
 		// yCoord = yCoord + 1;
 
+		curDirectionInt = static_cast<int>(direction) + orientation;
+		direction = static_cast<Direction>(curDirectionInt);
 		RequestWalk();
 	}
 	else if (message == "w_up") {
 		direction = Direction::UP;
 		// yCoord = yCoord - 1;
 
+		curDirectionInt = static_cast<int>(direction) + orientation;
+		direction = static_cast<Direction>(curDirectionInt);
 		RequestWalk();
 	}
 	else if (message == "d_up") {
 		direction = Direction::RIGHT;
 		// xCoord = xCoord + 1;
 
+		curDirectionInt = static_cast<int>(direction) + orientation;
+		direction = static_cast<Direction>(curDirectionInt);
 		RequestWalk();
 	}
 	else if (message == "a_up") {
 		direction = Direction::LEFT;
 		// xCoord = xCoord - 1;
 
+		curDirectionInt = static_cast<int>(direction) + orientation;
+		direction = static_cast<Direction>(curDirectionInt);
 		RequestWalk();
 	}
 	else if (message== "space_up") {
@@ -140,6 +149,8 @@ void PlayableObject::onEvent(const std::string& message) {
 
 		DropItem();
 	}
+
+
 
 	if (yCoord < 0) {
 		yCoord = 0;

@@ -1,2 +1,4 @@
-﻿  GridManager.cpp
+﻿  TerrainManager.cpp
+E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,15): warning C4099: 'Recipe': type name first seen using 'class' now seen using 'struct'
+E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,8): message : see declaration of 'Recipe'
   duckfishing.vcxproj -> E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe

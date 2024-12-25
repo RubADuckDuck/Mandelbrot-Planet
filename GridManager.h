@@ -14,6 +14,12 @@ using Action2Coord2d = std::map<Direction, Coord2d>;  // when given action, get 
 using RotationsOnInt = std::function<int(int)>;
 using Int2RotationOnInt = std::map<int, RotationsOnInt>;
 
+struct NavigationInfo {
+	Coord2d pos = { 0,0 }; 
+	Direction direction = Direction::RIGHT; 
+	int changeOfOrientation = 0; 
+};
+
 int PositiveModulo(int x, int mod);
 
 class ParallelTransporter {
@@ -77,7 +83,8 @@ public:
 	*/
 	bool isDefault = true;
 
-	Int2RotationOnInt directionInt2RotationInt;
+	Int2RotationOnInt directionInt2RotationInt; 
+	std::map<int, int> int2Int;
 
 
 	ParallelTransporter();
@@ -106,5 +113,6 @@ public:
 
 	void InitPlanaFigure(int startY, int startX, int size);
 
-	Coord2dWithDirection Move(Coord2d position, Direction movingDirection, Direction facingDirection);
+	NavigationInfo Move(Coord2d position, Direction movingDirection, Direction facingDirection); 
+
 };

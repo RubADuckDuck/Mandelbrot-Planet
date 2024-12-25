@@ -44,6 +44,7 @@ ParallelTransporter::ParallelTransporter(Int2RotationOnInt x) {
 
 void ParallelTransporter::SetDirectionInt2RotationInt(int directionInt, int rotationInt) {
 	directionInt2RotationInt[directionInt] = int2Rotation[rotationInt];
+	int2Int[directionInt] = rotationInt;
 }
 
 Direction ParallelTransporter::CalculateDireciton(Direction facingWhere, Direction goingWhere) {
@@ -196,7 +197,7 @@ void MovementManager::InitPlanaFigure(int startY, int startX, int size) {
 	}
 }
 
-Coord2dWithDirection MovementManager::Move(Coord2d position, Direction movingDirection, Direction facingDirection) {
+NavigationInfo MovementManager::Move(Coord2d position, Direction movingDirection, Direction facingDirection) {
 	int curY = position.first;
 	int curX = position.second;
 
@@ -206,5 +207,10 @@ Coord2dWithDirection MovementManager::Move(Coord2d position, Direction movingDir
 	ParallelTransporter* curParallelTransporter = grid2ParallelTransporter[curY][curX];
 	Direction newFacingDirection = curParallelTransporter->CalculateDireciton(facingDirection, movingDirection);
 
-	return { targetCoord2d, newFacingDirection };
+	NavigationInfo newInfo = NavigationInfo();
+	newInfo.pos = targetCoord2d;  
+	newInfo.direction = newFacingDirection; 
+	newInfo.changeOfOrientation = curParallelTransporter->int2Int[static_cast<int>(movingDirection)];
+
+	return newInfo;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "GlobalMappings.h"
+#include "GridManager.h" 
 
 template <typename T> class Type2MeshAndTexture {
 public:
@@ -77,11 +78,13 @@ class GameEngine;
 
 class TerrainManager : public GameObject { // Manages Interaction between Player2Terrain Terrain2Terrain Interaction
 public:
-    static const int GRID_SIZE = 10;
+    static const int GRID_SIZE = 24;
     float BLOCK_SIZE = 0.5f;
     float BLOCK_OFFSET = 1.0f;
 
 	GameEngine* gameEngine; 
+
+	MovementManager movementManager;  
 
     Transform* coord2Transform[GRID_SIZE][GRID_SIZE]; // 2d coordinate to transfrom
 	// every gm on (y,x) is transformed by coord2Transform[y, x]

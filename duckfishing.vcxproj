@@ -145,7 +145,6 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalMappings.cpp" />
     <ClCompile Include="GridManager.cpp" />
-    <ClCompile Include="GridManager.h" />
     <ClCompile Include="GroundType.h" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="LOG.cpp" />
@@ -177,6 +176,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Gizmo.h" />
     <ClInclude Include="GlobalMappings.h" />
+    <ClInclude Include="GridManager.h" />
     <ClInclude Include="InteractionInfo.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemType.h" />

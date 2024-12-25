@@ -19,6 +19,7 @@ TerrainManager::TerrainManager()
 
 	// Randomly initialize the ground grid
 	RandomizeGroundGrid();
+	movementManager = MovementManager();
 }
 
 void TerrainManager::onEvent(InteractionInfo* interactionInfo) {
@@ -73,10 +74,15 @@ void TerrainManager::HandleInteraction(InteractionInfo* interactionInfo) {
 	int targetY = y; 
 	int targetX = x; 
 
-	directionActOnCoord(curDirection, targetY, targetX, this->GRID_SIZE, this->GRID_SIZE);
+	// directionActOnCoord(curDirection, targetY, targetX, this->GRID_SIZE, this->GRID_SIZE);
+	Coord2dWithDirection curCoord2dandDir = movementManager.Move({ y, x }, curDirection, curDirection);
+	targetY = curCoord2dandDir.first.first; 
+	targetX = curCoord2dandDir.first.second; 
+	
 
 	if (PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(who)) {
 		isPlayer = true; 
+		ptrPlayer->direction = curCoord2dandDir.second;
 	}
 
 	if (curDirection != Direction::IDLE) {
@@ -461,7 +467,7 @@ void TerrainManager::Update() {
 			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
 			break;
 		}
-		// curTransform->SetRotation(rotationAngle, rotationAxis);
+		curTransform->SetRotation(rotationAngle, rotationAxis);
 
 		curPlayer->SetTransform(curTransform);
 		

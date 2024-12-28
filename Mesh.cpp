@@ -677,10 +677,6 @@ void RiggedMesh::PopulateBuffers()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);
 }
 
-
-
-
-
 void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 {
     if (!sharedShaderProgram) {

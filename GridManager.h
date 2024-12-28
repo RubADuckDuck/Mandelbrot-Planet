@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 #include <iostream>
+#include "Transform.h"
 
 using Coord2d = std::pair<int, int>;
 
@@ -105,13 +106,18 @@ class MovementManager {
 		This class Helps the playes and other objects to move through the Geodisics of space
 	*/
 	static const int GRID_SIZE = 24;
+	float BLOCK_SIZE = 0.5f;
+	float BLOCK_OFFSET = 1.0f;
 public:
 	std::vector<std::vector<Action2Coord2d*>> grid2Transporter;
 	std::vector<std::vector<ParallelTransporter*>> grid2ParallelTransporter;
+	std::vector<std::vector<Transform*>> grid2Transform; 
 
 	MovementManager();
 
-	void InitPlanaFigure(int startY, int startX, int size);
+	void InitPlanarFigure(int startY, int startX, int size);
+	void InitTransporters(int startY, int startX, int size);  
+	void InitTransforms(int startY, int startX, int size); 
 
 	NavigationInfo Move(Coord2d position, Direction movingDirection, Direction facingDirection); 
 

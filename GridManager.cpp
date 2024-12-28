@@ -64,6 +64,7 @@ Direction ParallelTransporter::CalculateDireciton(Direction facingWhere, Directi
 MovementManager::MovementManager() {
 	grid2Transporter.resize(GRID_SIZE, std::vector<Action2Coord2d*>(GRID_SIZE, nullptr));
 	grid2ParallelTransporter.resize(GRID_SIZE, std::vector<ParallelTransporter*>(GRID_SIZE, nullptr));
+	grid2Transform.resize(GRID_SIZE, std::vector<Transform*>(GRID_SIZE, nullptr)); 
 
 	for (int y = 0; y < GRID_SIZE; ++y) {
 		for (int x = 0; x < GRID_SIZE; ++x) {
@@ -76,14 +77,20 @@ MovementManager::MovementManager() {
 				});
 
 			// Initialize the ParallelTransporter for the current cell
-			grid2ParallelTransporter[y][x] = new ParallelTransporter();
+			grid2ParallelTransporter[y][x] = new ParallelTransporter(); 
+			grid2Transform[y][x] = new Transform();
 		}
 	}
 
-	this->InitPlanaFigure(0, 0, 4);
+	this->InitPlanarFigure(0, 0, 4);
 }
 
-void MovementManager::InitPlanaFigure(int startY, int startX, int size) {
+void MovementManager::InitPlanarFigure(int startY, int startX, int size) {
+	this->InitTransporters(startY, startX, size);
+	this->InitTransforms(startY, startX, size); 
+}
+
+void MovementManager::InitTransporters(int startY, int startX, int size) {
 	int curY = 0;
 	int curX = 0;
 	Direction curDirection = Direction::UP;
@@ -100,7 +107,7 @@ void MovementManager::InitPlanaFigure(int startY, int startX, int size) {
 		curCurvatureFromLateralFace2UpperBase = i % 4;
 		for (int j = 0; j < size; j++) {
 
-			
+
 			if (i == 0) {
 				curY = 0;
 				curX = j;
@@ -194,6 +201,78 @@ void MovementManager::InitPlanaFigure(int startY, int startX, int size) {
 		// right to left
 		curAction2Coord = grid2Transporter[startY + i][startX + size * 4 - 1];
 		(*curAction2Coord)[Direction::RIGHT] = { startY + i, startX + 0 };
+	}
+}
+
+void MovementManager::InitTransforms(int startY, int startX, int size) {
+	Transform* curTransform;
+
+	int facePieceSize = size; // Number of pieces per face
+	// float faceSize = facePieceSize * BLOCK_SIZE; // Physical size of one face of the cube
+
+	int curFaceIndex = 0;
+	float curZ = 0;
+	float curY = 0;
+	float curX = 0;
+
+	for (int i = 0; i < facePieceSize; i++) {
+		for (int j = 0; j < facePieceSize * 6; j++) {
+			curFaceIndex = j / facePieceSize; //
+
+			switch (curFaceIndex) {
+			case 0: //
+				curZ = i;
+				curY = 0;
+				curX = j % facePieceSize;
+
+				break;
+			case 1:
+				curZ = i;
+				curY = j % facePieceSize;
+				curX = facePieceSize - 1;
+
+				// curX += 1;
+
+				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-90.0f), glm::vec3(0, 0, 1));
+				break;
+			case 2:
+				curZ = i;
+				curY = facePieceSize - 1;
+				curX = facePieceSize - (j % facePieceSize) - 1;
+
+				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-180.0f), glm::vec3(0, 0, 1));
+				break;
+			case 3:
+				curZ = i;
+				curY = facePieceSize - (j % facePieceSize) - 1;
+				curX = 0;
+
+				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-270.0f), glm::vec3(0, 0, 1));
+				break;
+			case 4: // top
+				curZ = 0;
+				curY = facePieceSize - i - 1;
+				curX = j % facePieceSize;
+
+
+				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-90.0f), glm::vec3(1, 0, 0));
+				break;
+			case 5: // bottom
+				curZ = facePieceSize - 1;
+				curY = i;
+				curX = j % facePieceSize;
+
+				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(90.0f), glm::vec3(1, 0, 0));
+				break;
+			}
+			// curZ = 0;
+			curZ *= BLOCK_OFFSET;
+			curY *= -BLOCK_OFFSET;
+			curX *= BLOCK_OFFSET;
+
+			grid2Transform[i + startY][j + startX]->SetScale(glm::vec3(BLOCK_SIZE));
+			grid2Transform[i + startY][j + startX]->SetTranslation(glm::vec3(curX, curY, curZ));
+		}
 	}
 }
 

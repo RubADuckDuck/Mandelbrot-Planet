@@ -86,7 +86,7 @@ public:
 
 	MovementManager movementManager;  
 
-    Transform* coord2Transform[GRID_SIZE][GRID_SIZE]; // 2d coordinate to transfrom
+    // Transform* coord2Transform[GRID_SIZE][GRID_SIZE]; // 2d coordinate to transfrom // todo: move this to GridManger. 
 	// every gm on (y,x) is transformed by coord2Transform[y, x]
 
     GroundType groundGrid[GRID_SIZE][GRID_SIZE];
@@ -129,9 +129,16 @@ public:
 
 	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType itemType);
 
+	void UpdateIntoCube(int startY, int startX, int size);
+
 	void UpdateIntoCube();
 
 	void Update() override;
+
+	void InitTransformationOfTerrainObjects();
+	void SetTransformOfBlockOfTerrainAt(int y, int x);
+	void SetTransformOfDroppedItemAt(int y, int x);
+	void SetTransformOfFactoryComponentAt(int y, int x);
 
     void DrawGameObject(CameraObject& cameraObj) override; 
 

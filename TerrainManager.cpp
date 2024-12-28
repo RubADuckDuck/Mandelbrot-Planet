@@ -11,15 +11,11 @@ TerrainManager::TerrainManager()
 	itemLoader("E:/repos/[DuckFishing]/model", itemType2ItemName),
 	factoryComponentLoader("E:/repos/[DuckFishing]/model", factoryType2FactoryName) {
 
-	for (int i = 0; i < GRID_SIZE; i++) {
-		for (int j = 0; j < GRID_SIZE; j++) {
-			coord2Transform[i][j] = new Transform();
-		}
-	}
-
 	// Randomly initialize the ground grid
 	RandomizeGroundGrid();
 	movementManager = MovementManager();
+
+	this->InitTransformationOfTerrainObjects();
 }
 
 void TerrainManager::onEvent(InteractionInfo* interactionInfo) {
@@ -322,6 +318,7 @@ void TerrainManager::DropItemAt(int yIndex, int xIndex, Item* item) {
 	newDroppedItem->SetItem(item);
 
 	itemGrid[yIndex][xIndex] = newDroppedItem;
+	this->SetTransformOfDroppedItemAt(yIndex, xIndex);
 }
 
 void TerrainManager::CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType itemType) {
@@ -336,108 +333,377 @@ void TerrainManager::CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType 
 	newItem->SetTexture(ptrTexture); 
 	newItem->SetTransform(defaultTransform);
 
-	DroppedItemObject* newDroppedItem = new DroppedItemObject();
+	this->DropItemAt(yIndex, xIndex, newItem);
+
+	/*DroppedItemObject* newDroppedItem = new DroppedItemObject();
 
 	newDroppedItem->SetCoordinates(yIndex, xIndex);
 	newDroppedItem->SetItem(newItem);
 
-	itemGrid[yIndex][xIndex] = newDroppedItem;
+	itemGrid[yIndex][xIndex] = newDroppedItem;*/
 }
+//
+//void TerrainManager::UpdateIntoCube(int startY, int startX, int size) { // todo: updating every transform of each ground is computationally expensive // this will be only ran on initialization
+//	Transform* curTransform;
+//
+//	// ground is manually drawn
+//	DroppedItemObject* curDroppedItem;
+//	FactoryComponentObject* curFactoryComponent;
+//
+//	int facePieceSize = size; // Number of pieces per face
+//	// float faceSize = facePieceSize * BLOCK_SIZE; // Physical size of one face of the cube
+//
+//	int curFaceIndex = 0;
+//	float curZ = 0;
+//	float curY = 0;
+//	float curX = 0;
+//	
+//	for (int i = 0; i < facePieceSize; i++) {
+//		for (int j = 0; j < facePieceSize * 6; j++) {
+//			curFaceIndex = j / facePieceSize; //
+//
+//			switch (curFaceIndex) {
+//			case 0: //
+//				curZ = i;
+//				curY = 0;
+//				curX = j % facePieceSize;
+//
+//				break;
+//			case 1:
+//				curZ = i;
+//				curY = j % facePieceSize;
+//				curX = facePieceSize - 1;
+//
+//				// curX += 1;
+//
+//				coord2Transform[i + startY][j + startX]->SetRotation(glm::radians(-90.0f), glm::vec3(0, 0, 1));
+//				break;
+//			case 2:
+//				curZ = i;
+//				curY = facePieceSize - 1;
+//				curX = facePieceSize - (j % facePieceSize) - 1;
+//
+//				coord2Transform[i + startY][j + startX]->SetRotation(glm::radians(-180.0f), glm::vec3(0, 0, 1));
+//				break;
+//			case 3:
+//				curZ = i;
+//				curY = facePieceSize - (j % facePieceSize) - 1;
+//				curX = 0;
+//
+//				coord2Transform[i + startY][j + startX]->SetRotation(glm::radians(-270.0f), glm::vec3(0, 0, 1));
+//				break;
+//			case 4: // top
+//				curZ = 0;
+//				curY = facePieceSize - i - 1; 
+//				curX = j % facePieceSize;
+//
+//
+//				coord2Transform[i + startY][j + startX]->SetRotation(glm::radians(-90.0f), glm::vec3(1, 0, 0));
+//				break;
+//			case 5: // bottom
+//				curZ = facePieceSize - 1;
+//				curY = i;
+//				curX = j % facePieceSize;
+//
+//				coord2Transform[i + startY][j + startX]->SetRotation(glm::radians(90.0f), glm::vec3(1, 0, 0));
+//				break;
+//			}
+//			// curZ = 0;
+//			curZ *= BLOCK_OFFSET;
+//			curY *= -BLOCK_OFFSET;
+//			curX *= BLOCK_OFFSET;
+//
+//			coord2Transform[i + startY][j + startX]->SetScale(glm::vec3(BLOCK_SIZE));
+//			coord2Transform[i + startY][j + startX]->SetTranslation(glm::vec3(curX, curY, curZ));
+//
+//			curTransform = coord2Transform[i + startY][j + startX];
+//			curDroppedItem = itemGrid[i + startY][j + startX];
+//			curFactoryComponent = factoryGrid[i + startY][j + startX];
+//
+//			if (curDroppedItem) {
+//				curDroppedItem->SetTransform(curTransform);
+//			}
+//			if (curFactoryComponent) {
+//				curFactoryComponent->SetTransform(curTransform);
+//			}
+//		}
+//	}
+//
+//	PlayableObject* curPlayer;
+//	Transform* curPlayersTransform;
+//
+//	// Update player position 
+//	for (int i = 0; i < players.size(); i++) {
+//		curPlayer = players[i];
+//		int yIndex = curPlayer->yCoord;
+//		int xIndex = curPlayer->xCoord;
+//
+//		curPlayersTransform = new Transform(*coord2Transform[yIndex][xIndex]);
+//
+//		// Rotate the transform based on the player's facing direction
+//		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
+//		float rotationAngle = 0.0f;
+//
+//		switch (curPlayer->direction) {
+//		case Direction::UP:
+//			rotationAngle = glm::radians(180.0f); // No rotation needed
+//			break;
+//		case Direction::DOWN:
+//			rotationAngle = glm::radians(0.0f); // Rotate 180 degrees
+//			break;
+//		case Direction::LEFT:
+//			rotationAngle = glm::radians(-90.0f); // Rotate 90 degrees counterclockwise
+//			break;
+//		case Direction::RIGHT:
+//			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
+//			break;
+//		}
+//		curPlayersTransform->AddRotationRight(rotationAngle, rotationAxis);
+//
+//		curPlayer->SetTransform(curPlayersTransform);
+//
+//		if (curPlayer->heldItem) {
+//			curPlayer->heldItem->SetTransform(curPlayersTransform);
+//		}
+//	}
+//}
 
-void TerrainManager::UpdateIntoCube() {
-	Transform* curTransform;
+//void TerrainManager::UpdateIntoCube() { // todo: updating every transform of each ground is computationally expensive // this will be only ran on initialization
+//	Transform* curTransform;
+//
+//	// ground is manually drawn
+//	DroppedItemObject* curDroppedItem;
+//	FactoryComponentObject* curFactoryComponent;
+//
+//	int facePieceSize = 4; // Number of pieces per face
+//	float faceSize = facePieceSize * BLOCK_SIZE; // Physical size of one face of the cube
+//
+//	int curFaceIndex = 0; 
+//	float curZ = 0; 
+//	float curY = 0; 
+//	float curX = 0;  
+//
+//	for (int i = 0; i < facePieceSize; i++) {
+//		for (int j = 0; j < facePieceSize * 6; j++) {
+//			curFaceIndex = j / facePieceSize;  // dive by face size
+//
+//			switch (curFaceIndex) {
+//			case 0: //
+//				curZ = i;
+//				curY = 0;
+//				curX = j % facePieceSize;
+//
+//				curY -= 1; 
+//				break;
+//			case 1:
+//				curZ = i;
+//				curY = j % facePieceSize;
+//				curX = facePieceSize - 1; 
+//
+//				curX += 1; 
+//				
+//				coord2Transform[i][j]->SetRotation(glm::radians(- 90.0f), glm::vec3(0, 0, 1));
+//				break;
+//			case 2:
+//				curZ = i;
+//				curY = facePieceSize - 1;
+//				curX = facePieceSize - (j % facePieceSize) - 1;
+//
+//				curY += 1;
+//
+//				coord2Transform[i][j]->SetRotation(glm::radians(-180.0f), glm::vec3(0, 0, 1));
+//				break;
+//			case 3:
+//				curZ = i;
+//				curY = facePieceSize - (j % facePieceSize) - 1;
+//				curX = 0;
+//
+//				curX -= 1;
+//
+//				coord2Transform[i][j]->SetRotation(glm::radians(-270.0f), glm::vec3(0, 0, 1));
+//				break;
+//			case 4: // top
+//				curZ = -1;
+//				curY = facePieceSize - i;
+//				curX = j % facePieceSize;
+//
+//				curY -= 1;
+//
+//				coord2Transform[i][j]->SetRotation(glm::radians(- 90.0f), glm::vec3(1, 0, 0));
+//				break;
+//			case 5: // bottom
+//				curZ = facePieceSize;
+//				curY = +1 + i;
+//				curX = j % facePieceSize;
+//
+//				curY -= 1;
+//
+//				coord2Transform[i][j]->SetRotation(glm::radians(90.0f), glm::vec3(1, 0, 0));
+//				break;
+//				break;
+//			}
+//			// curZ = 0;
+//			curZ *= BLOCK_OFFSET;
+//			curY *= - BLOCK_OFFSET;
+//			curX *= BLOCK_OFFSET;
+//
+//			coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+//			coord2Transform[i][j]->SetTranslation(glm::vec3(curX, curY, curZ));
+//
+//			curTransform = coord2Transform[i][j];
+//			curDroppedItem = itemGrid[i][j];
+//			curFactoryComponent = factoryGrid[i][j];
+//
+//			if (curDroppedItem) {
+//				curDroppedItem->SetTransform(curTransform);
+//			}
+//			if (curFactoryComponent) {
+//				curFactoryComponent->SetTransform(curTransform);
+//			}
+//		}
+//	}
+//
+//	PlayableObject* curPlayer;
+//	Transform* curPlayersTransform; 
+//
+//	// Update player position 
+//	for (int i = 0; i < players.size(); i++) {
+//		curPlayer = players[i];
+//		int yIndex = curPlayer->yCoord;
+//		int xIndex = curPlayer->xCoord;
+//		
+//		curPlayersTransform = new Transform(*coord2Transform[yIndex][xIndex]);
+//
+//		// Rotate the transform based on the player's facing direction
+//		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
+//		float rotationAngle = 0.0f;
+//
+//		switch (curPlayer->direction) {
+//		case Direction::UP:
+//			rotationAngle = glm::radians(180.0f); // No rotation needed
+//			break;
+//		case Direction::DOWN:
+//			rotationAngle = glm::radians(0.0f); // Rotate 180 degrees
+//			break;
+//		case Direction::LEFT:
+//			rotationAngle = glm::radians(-90.0f); // Rotate 90 degrees counterclockwise
+//			break;
+//		case Direction::RIGHT:
+//			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
+//			break;
+//		}
+//		curPlayersTransform->AddRotationRight(rotationAngle, rotationAxis);
+//
+//		curPlayer->SetTransform(curPlayersTransform);
+//
+//		if (curPlayer->heldItem) {
+//			curPlayer->heldItem->SetTransform(curPlayersTransform);
+//		}
+//	}
+//}
 
-	// ground is manually drawn
-	DroppedItemObject* curDroppedItem;
-	FactoryComponentObject* curFactoryComponent;
+void TerrainManager::Update() {
+	// Transform* curTransform;
+	
+	//// ground is manually drawn
+	//DroppedItemObject* curDroppedItem; 
+	//FactoryComponentObject* curFactoryComponent;
 
-	int facePieceSize = 4; // Number of pieces per face
-	float faceSize = facePieceSize * BLOCK_SIZE; // Physical size of one face of the cube
+	//float radius1 = 1; 
+	//float degreePerStep1 = 360 / GRID_SIZE; 
 
-	int curFaceIndex = 0; 
-	float curZ = 0; 
-	float curY = 0; 
-	float curX = 0;  
+	//float curDegree1 = 0; 
+	//float curRadian1 = 0;
 
-	for (int i = 0; i < facePieceSize; i++) {
-		for (int j = 0; j < facePieceSize * 6; j++) {
-			curFaceIndex = j / 4;  
+	//float radius2 = 4; 
+	//float degreePerStep2 = 360 / GRID_SIZE;
 
-			switch (curFaceIndex) {
-			case 0: //
-				curZ = i;
-				curY = 0;
-				curX = j % 4;
+	//float curDegree2 = 0; 
+	//float curRadian2 = 0; 
 
-				curY -= 1; 
-				break;
-			case 1:
-				curZ = i;
-				curY = j % 4;
-				curX = facePieceSize - 1; 
+	//bool normalMode = true;
+	//bool torus = false;
+	//bool cube = true; 
 
-				curX += 1; 
-				
-				coord2Transform[i][j]->SetRotation(glm::radians(- 90.0f), glm::vec3(0, 0, 1));
-				break;
-			case 2:
-				curZ = i;
-				curY = facePieceSize - 1;
-				curX = facePieceSize - (j % 4) - 1;
+	//if (cube) {
+	//	UpdateIntoCube(0, 0, 3); 
 
-				curY += 1;
+	//	return;
+	//}
+	//for (int i = 0; i < GRID_SIZE; i++) {
+	//	curDegree1 += degreePerStep1; 
+	//	curRadian1 = glm::radians(curDegree1);
+	//	for (int j = 0; j < GRID_SIZE; j++) {
+	//		curDegree2 -= degreePerStep2; 
+	//		curRadian2 = glm::radians(curDegree2);
+	//		if (normalMode) {
+	//			// Set the transform positions for each block
+	//			float yCoord = i * BLOCK_OFFSET;
+	//			float xCoord = j * BLOCK_OFFSET;
 
-				coord2Transform[i][j]->SetRotation(glm::radians(-180.0f), glm::vec3(0, 0, 1));
-				break;
-			case 3:
-				curZ = i;
-				curY = facePieceSize - (j % 4) - 1;
-				curX = 0;
+	//			coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+	//			coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, 0.0f, yCoord));
 
-				curX -= 1;
+	//			curTransform = coord2Transform[i][j];
+	//			curDroppedItem = itemGrid[i][j];
+	//			curFactoryComponent = factoryGrid[i][j];
 
-				coord2Transform[i][j]->SetRotation(glm::radians(-270.0f), glm::vec3(0, 0, 1));
-				break;
-			case 4: // top
-				curZ = -1;
-				curY = facePieceSize - i;
-				curX = j % 4;
+	//			if (curDroppedItem) {
+	//				curDroppedItem->SetTransform(curTransform);
+	//			}
+	//			if (curFactoryComponent) {
+	//				curFactoryComponent->SetTransform(curTransform);
+	//			}
+	//		}
+	//		else if(!torus) {
+	//			// Set the transform positions for each block
+	//			
+	//			float zCoord = radius1 * cos(curRadian1);
+	//			float yCoord = radius1 * sin(curRadian1);
+	//			float xCoord = j * BLOCK_OFFSET;
 
-				curY -= 1;
 
-				coord2Transform[i][j]->SetRotation(glm::radians(- 90.0f), glm::vec3(1, 0, 0));
-				break;
-			case 5: // bottom
-				curZ = 4;
-				curY = +1 + i;
-				curX = j % 4;
+	//			coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+	//			coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, zCoord, yCoord));
+	//			coord2Transform[i][j]->SetRotation(glm::radians(curDegree1), glm::vec3(1, 0, 0));
 
-				curY -= 1;
+	//			curTransform = coord2Transform[i][j];
+	//			curDroppedItem = itemGrid[i][j];
+	//			curFactoryComponent = factoryGrid[i][j];
 
-				coord2Transform[i][j]->SetRotation(glm::radians(90.0f), glm::vec3(1, 0, 0));
-				break;
-				break;
-			}
-			// curZ = 0;
-			curZ *= BLOCK_OFFSET;
-			curY *= - BLOCK_OFFSET;
-			curX *= BLOCK_OFFSET;
+	//			if (curDroppedItem) {
+	//				curDroppedItem->SetTransform(curTransform);
+	//			}
+	//			if (curFactoryComponent) {
+	//				curFactoryComponent->SetTransform(curTransform);
+	//			}
+	//		}
+	//		else {
+	//			// Set the transform positions for each block
 
-			coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
-			coord2Transform[i][j]->SetTranslation(glm::vec3(curX, curY, curZ));
+	//			float zCoord = radius1 * cos(curRadian1); // leave the z 
+	//			float yCoord = sin(curRadian2) * (radius2 + radius1 * sin(curRadian1));
+	//			float xCoord = cos(curRadian2) * (radius2 + radius1 * sin(curRadian1));
 
-			curTransform = coord2Transform[i][j];
-			curDroppedItem = itemGrid[i][j];
-			curFactoryComponent = factoryGrid[i][j];
 
-			if (curDroppedItem) {
-				curDroppedItem->SetTransform(curTransform);
-			}
-			if (curFactoryComponent) {
-				curFactoryComponent->SetTransform(curTransform);
-			}
-		}
-	}
+	//			coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
+	//			coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, zCoord, yCoord));
+	//			coord2Transform[i][j]->SetRotation(glm::radians( - curDegree1), glm::vec3(0, 0, 1));
+	//			coord2Transform[i][j]->AddRotation(glm::radians( - curDegree2), glm::vec3(0, 1, 0));
+
+	//			curTransform = coord2Transform[i][j];
+	//			curDroppedItem = itemGrid[i][j];
+	//			curFactoryComponent = factoryGrid[i][j];
+
+	//			if (curDroppedItem) {
+	//				curDroppedItem->SetTransform(curTransform);
+	//			}
+	//			if (curFactoryComponent) {
+	//				curFactoryComponent->SetTransform(curTransform);
+	//			}
+	//		}
+	//	}
+	//} 
 
 	PlayableObject* curPlayer;
 	Transform* curPlayersTransform; 
@@ -448,7 +714,7 @@ void TerrainManager::UpdateIntoCube() {
 		int yIndex = curPlayer->yCoord;
 		int xIndex = curPlayer->xCoord;
 		
-		curPlayersTransform = new Transform(*coord2Transform[yIndex][xIndex]);
+		curPlayersTransform = new Transform(*(this->movementManager.grid2Transform[yIndex][xIndex]));
 
 		// Rotate the transform based on the player's facing direction
 		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
@@ -478,148 +744,39 @@ void TerrainManager::UpdateIntoCube() {
 	}
 }
 
-void TerrainManager::Update() {
-	Transform* curTransform;
-	
-	// ground is manually drawn
-	DroppedItemObject* curDroppedItem; 
-	FactoryComponentObject* curFactoryComponent;
-
-	float radius1 = 1; 
-	float degreePerStep1 = 360 / GRID_SIZE; 
-
-	float curDegree1 = 0; 
-	float curRadian1 = 0;
-
-	float radius2 = 4; 
-	float degreePerStep2 = 360 / GRID_SIZE;
-
-	float curDegree2 = 0; 
-	float curRadian2 = 0; 
-
-	bool normalMode = true;
-	bool torus = false;
-	bool cube = true; 
-
-	if (cube) {
-		UpdateIntoCube(); 
-
-		return;
-	}
+void TerrainManager::InitTransformationOfTerrainObjects() {
 	for (int i = 0; i < GRID_SIZE; i++) {
-		curDegree1 += degreePerStep1; 
-		curRadian1 = glm::radians(curDegree1);
 		for (int j = 0; j < GRID_SIZE; j++) {
-			curDegree2 -= degreePerStep2; 
-			curRadian2 = glm::radians(curDegree2);
-			if (normalMode) {
-				// Set the transform positions for each block
-				float yCoord = i * BLOCK_OFFSET;
-				float xCoord = j * BLOCK_OFFSET;
-
-				coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
-				coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, 0.0f, yCoord));
-
-				curTransform = coord2Transform[i][j];
-				curDroppedItem = itemGrid[i][j];
-				curFactoryComponent = factoryGrid[i][j];
-
-				if (curDroppedItem) {
-					curDroppedItem->SetTransform(curTransform);
-				}
-				if (curFactoryComponent) {
-					curFactoryComponent->SetTransform(curTransform);
-				}
-			}
-			else if(!torus) {
-				// Set the transform positions for each block
-				
-				float zCoord = radius1 * cos(curRadian1);
-				float yCoord = radius1 * sin(curRadian1);
-				float xCoord = j * BLOCK_OFFSET;
-
-
-				coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
-				coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, zCoord, yCoord));
-				coord2Transform[i][j]->SetRotation(glm::radians(curDegree1), glm::vec3(1, 0, 0));
-
-				curTransform = coord2Transform[i][j];
-				curDroppedItem = itemGrid[i][j];
-				curFactoryComponent = factoryGrid[i][j];
-
-				if (curDroppedItem) {
-					curDroppedItem->SetTransform(curTransform);
-				}
-				if (curFactoryComponent) {
-					curFactoryComponent->SetTransform(curTransform);
-				}
-			}
-			else {
-				// Set the transform positions for each block
-
-				float zCoord = radius1 * cos(curRadian1); // leave the z 
-				float yCoord = sin(curRadian2) * (radius2 + radius1 * sin(curRadian1));
-				float xCoord = cos(curRadian2) * (radius2 + radius1 * sin(curRadian1));
-
-
-				coord2Transform[i][j]->SetScale(glm::vec3(BLOCK_SIZE));
-				coord2Transform[i][j]->SetTranslation(glm::vec3(xCoord, zCoord, yCoord));
-				coord2Transform[i][j]->SetRotation(glm::radians( - curDegree1), glm::vec3(0, 0, 1));
-				coord2Transform[i][j]->AddRotation(glm::radians( - curDegree2), glm::vec3(0, 1, 0));
-
-				curTransform = coord2Transform[i][j];
-				curDroppedItem = itemGrid[i][j];
-				curFactoryComponent = factoryGrid[i][j];
-
-				if (curDroppedItem) {
-					curDroppedItem->SetTransform(curTransform);
-				}
-				if (curFactoryComponent) {
-					curFactoryComponent->SetTransform(curTransform);
-				}
-			}
-		}
-	} 
-
-	PlayableObject* curPlayer;
-
-	// Update player position 
-	for (int i = 0; i < players.size(); i++) {
-		curPlayer = players[i]; 
-		int yIndex = curPlayer->yCoord; 
-		int xIndex = curPlayer->xCoord; 
-
-		curTransform = coord2Transform[yIndex][xIndex]; 
-
-		// Rotate the transform based on the player's facing direction
-		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
-		float rotationAngle = 0.0f;
-
-		switch (curPlayer->direction) {
-		case Direction::UP:
-			rotationAngle = glm::radians(180.0f); // No rotation needed
-			break;
-		case Direction::DOWN:
-			rotationAngle = glm::radians(0.0f); // Rotate 180 degrees
-			break;
-		case Direction::LEFT:
-			rotationAngle = glm::radians(-90.0f); // Rotate 90 degrees counterclockwise
-			break;
-		case Direction::RIGHT:
-			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
-			break;
-		}
-		curTransform->SetRotation(rotationAngle, rotationAxis);
-
-		curPlayer->SetTransform(curTransform);
-		
-		if (curPlayer->heldItem) {
-			curPlayer->heldItem->SetTransform(curTransform);
+			SetTransformOfBlockOfTerrainAt(i, j);
+			SetTransformOfDroppedItemAt(i, j);
+			SetTransformOfFactoryComponentAt(i, j);
 		}
 	}
 }
 
+void TerrainManager::SetTransformOfBlockOfTerrainAt(int y, int x) {
+	// the terrain is not an object. I think we don't have to.
+}
+void TerrainManager::SetTransformOfDroppedItemAt(int y, int x) {
+	DroppedItemObject* currItem = itemGrid[y][x];
+	if (currItem) {
+		Transform* curTransform = movementManager.grid2Transform[y][x];
+
+		currItem->SetTransform(curTransform);
+	}
+}
+void TerrainManager::SetTransformOfFactoryComponentAt(int y, int x) {
+	FactoryComponentObject* currFactory = factoryGrid[y][x];
+	if (currFactory) {
+		Transform* curTransform = movementManager.grid2Transform[y][x];
+
+		currFactory->SetTransform(ptrTransform); 
+	}
+}
+
 void TerrainManager::DrawGameObject(CameraObject& cameraObj) {
+	// too time consumming?  
+	// wtf is this
 	for (int i = 0; i < GRID_SIZE; i++) {
 		for (int j = 0; j < GRID_SIZE; j++) {
 			DrawBlockOfTerrainAt(i, j, cameraObj);
@@ -639,24 +796,30 @@ void TerrainManager::DrawPlayers(CameraObject& cameraObj) {
 
 void TerrainManager::DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& cameraObj) {
 	// Retrieve transform, ground type, mesh, and texture
-	Transform* currTransform = coord2Transform[yIndex][xIndex];
-	glm::mat4 transformMat = currTransform->GetTransformMatrix();
-
 	GroundType currGroundType = groundGrid[yIndex][xIndex];
-	GeneralMesh* currMesh = groundLoader.type2Mesh[currGroundType];
-	Texture* currTexture = groundLoader.type2Texture[currGroundType];
 
-	// Ensure mesh and texture are valid before rendering
-	if (currMesh && currTexture) { // TerrainManager directly renders
-		currMesh->Render(cameraObj, transformMat, currTexture);
+	if (currGroundType != GroundType::LAST) {
+		// retreive transform from the movement Manager
+		Transform* currTransform = this->movementManager.grid2Transform[yIndex][xIndex];
+		glm::mat4 transformMat = currTransform->GetTransformMatrix();
+
+		GeneralMesh* currMesh = groundLoader.type2Mesh[currGroundType];
+		Texture* currTexture = groundLoader.type2Texture[currGroundType];
+
+		// Ensure mesh and texture are valid before rendering
+		if (currMesh && currTexture) { // TerrainManager directly renders
+			// manually render
+			currMesh->Render(cameraObj, transformMat, currTexture);
+		}
+	}
+	else {
+		// no need to draw
 	}
 }
 
 void TerrainManager::DrawDroppedItemAt(int yIndex, int xIndex, CameraObject& cameraObj) {
 	DroppedItemObject* currItem = itemGrid[yIndex][xIndex];
 	if (currItem) {
-		Transform* currTransform = coord2Transform[yIndex][xIndex];
-		glm::mat4 transformMat = currTransform->GetTransformMatrix();
 		currItem->DrawGameObject(cameraObj); 
 	}
 }
@@ -664,8 +827,6 @@ void TerrainManager::DrawDroppedItemAt(int yIndex, int xIndex, CameraObject& cam
 void TerrainManager::DrawFactoryComponentAt(int yIndex, int xIndex, CameraObject& cameraObj) {
 	FactoryComponentObject* currFactory = factoryGrid[yIndex][xIndex];
 	if (currFactory) {
-		Transform* currTransform = coord2Transform[yIndex][xIndex];
-		glm::mat4 transformMat = currTransform->GetTransformMatrix();
 		currFactory->DrawGameObject(cameraObj);
 	}
 }

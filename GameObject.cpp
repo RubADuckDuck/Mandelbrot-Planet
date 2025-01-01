@@ -70,21 +70,71 @@ GameObject::~GameObject() {
 	std::cout << "GameObject Destructor" << std::endl;
 }
 
+void GameObject::AddChild(GameObject* child) {
+	childrenGameObjects.push_back(child);  
+} 
+
+void GameObject::RemoveChild(GameObject* child) {
+	auto it = std::remove(childrenGameObjects.begin(), childrenGameObjects.end(), child);
+	if (it != childrenGameObjects.end()) {
+		childrenGameObjects.erase(it, childrenGameObjects.end());
+	}
+}
+
+void GameObject::SetParent(GameObject* parent) {
+	if (parentGameObject) {
+		// if parent gameobject exists  
+		LOG(LOG_ERROR, "The game object which you are setting the parent already had an existing parent"); 
+
+		parentGameObject->RemoveChild(this); // 'this' is not a child of the previous parent anymore 
+	} 
+
+	// new parent
+	parentGameObject = parent;
+}
+
+void GameObject::SetTransformMatrixBeforeDraw() {
+	// traverse through tree and set Transform matrices
+	glm::mat4 curNodeTransform = ptrNodeTransform->GetTransformMatrix();
+
+	if (parentGameObject) {
+		glm::mat4* parentModelMat = &parentGameObject->modelTransformMat;
+
+		modelTransformMat = (*parentModelMat) * curNodeTransform;
+	}
+	else {
+		modelTransformMat = curNodeTransform;
+	}
+
+	for (int i = 0; i < childrenGameObjects.size(); i++) {
+		childrenGameObjects[i]->SetTransformMatrixBeforeDraw();
+	}
+}
+
 
 void GameObject::SetMesh(GeneralMesh* ptrModel) { this->ptrModel = ptrModel; }
 void GameObject::SetTexture(Texture* ptrTexture) { this->ptrTexture = ptrTexture; }
 //void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
-void GameObject::SetTransform(Transform* ptrTransform) { this->ptrTransform = ptrTransform; }
+void GameObject::SetTransform(Transform* ptrTransform) {
+	this->ptrNodeTransform = ptrTransform; 
+}
 
-void GameObject::Update() {};
-glm::mat4 GameObject::GetModelMatrixFromTransform() {
-	return ptrTransform->GetTransformMatrix();
+
+
+void GameObject::Update() {
+	this->SetTransformMatrixBeforeDraw();
+
+	for (int i = 0; i < childrenGameObjects.size(); i++) {
+		childrenGameObjects[i]->Update();
+	}
+};
+
+glm::mat4 GameObject::GetModelMatrixFromTransform() { // depreciated?
+	return ptrNodeTransform->GetTransformMatrix();
 }
 void GameObject::DrawGameObject(CameraObject& cameraObj) {
-	glm::mat4 transformMat = GetModelMatrixFromTransform();
-
 	// draw mesh
-	ptrModel->Render(cameraObj, transformMat, ptrTexture);
+	ptrModel->Render(cameraObj, modelTransformMat, ptrTexture);
 }
 void GameObject::onEvent(const std::string& message) {};
 void GameObject::onEvent(InteractionInfo* interactionInfo) {
@@ -104,7 +154,7 @@ RotatingGameObject::~RotatingGameObject() {
 }
 
 void RotatingGameObject::Update() {
-	ptrTransform->SetRotation(radian, axis);
+	ptrNodeTransform->SetRotation(radian, axis);
 	radian = radian + 0.1;
 }
 
@@ -296,10 +346,10 @@ glm::vec3& CameraObject::GetGlobalCameraPosition() {
 	return temp;
 };
 
-void CameraObject::AddTarget(GameObject* targetGameObj) {
-	if (targetGameObj && targetGameObj->ptrTransform) {
+void CameraObject::AddTarget(GameObject* targetGameObj) { // todo: ptr Transforms are not used
+	if (targetGameObj && targetGameObj->modelTransformMat!=glm::mat4(0.0f)) {
 		targetGameObjects.push_back(targetGameObj);
-		std::cout << "Added target object at: " << targetGameObj->ptrTransform->GetTranslation() << std::endl;
+		std::cout << "Added target object at: " << targetGameObj->modelTransformMat << std::endl;
 	}
 	else {
 		std::cerr << "Invalid target object or missing transform!" << std::endl;
@@ -317,9 +367,10 @@ glm::vec3 rotateVector(const glm::vec3& v, float theta) {
 	return glm::vec3(rotatedVector);
 }
 
-void CameraObject::Update() {
-	
-	{
+void CameraObject::Update() { // todo: ptrTransforms are not used anymore
+	bool doUpdate = false; 
+
+	if (doUpdate) {
 		glm::vec3 prevPosition = position; 
 		glm::vec3 prevTarget = target; 
 		glm::vec3 prevUp = up; 
@@ -335,8 +386,8 @@ void CameraObject::Update() {
 
 		// Calculate the average translation of target objects
 		for (const auto& targetGameObj : targetGameObjects) {
-			if (targetGameObj && targetGameObj->ptrTransform) {
-				totalTransform += targetGameObj->ptrTransform->GetTransformMatrix();
+			if (targetGameObj && targetGameObj->modelTransformMat != glm::mat4(0.0f)) {
+				totalTransform += targetGameObj->modelTransformMat;
 			}
 		}
 

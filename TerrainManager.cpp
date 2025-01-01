@@ -714,6 +714,7 @@ void TerrainManager::Update() {
 		int yIndex = curPlayer->yCoord;
 		int xIndex = curPlayer->xCoord;
 		
+		// make copy of transformation
 		curPlayersTransform = new Transform(*(this->movementManager.grid2Transform[yIndex][xIndex]));
 
 		// Rotate the transform based on the player's facing direction
@@ -734,6 +735,8 @@ void TerrainManager::Update() {
 			rotationAngle = glm::radians(90.0f); // Rotate 90 degrees clockwise
 			break;
 		}
+		// since rotation of player has to be applied before the other transforms happen, 
+		// we apply the right action
 		curPlayersTransform->AddRotationRight(rotationAngle, rotationAxis);
 
 		curPlayer->SetTransform(curPlayersTransform);
@@ -770,7 +773,7 @@ void TerrainManager::SetTransformOfFactoryComponentAt(int y, int x) {
 	if (currFactory) {
 		Transform* curTransform = movementManager.grid2Transform[y][x];
 
-		currFactory->SetTransform(ptrTransform); 
+		currFactory->SetTransform(curTransform); 
 	}
 }
 

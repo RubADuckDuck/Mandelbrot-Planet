@@ -36,7 +36,7 @@ void DroppedItemObject::Interact(Item* item) {
 }
 
 void DroppedItemObject::SetTransform(Transform* transform) {
-	ptrTransform = transform;
+	ptrNodeTransform = transform;
 	item->SetTransform(transform);
 }
 
@@ -121,7 +121,7 @@ void FactoryComponentObject::DiscardHeldItem() {
 }
 
 void FactoryComponentObject::SetTransform(Transform* transform) {
-	ptrTransform = transform;
+	ptrNodeTransform = transform;
     if (heldItem) {
         heldItem->SetTransform(transform);
     }

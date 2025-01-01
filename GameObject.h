@@ -31,14 +31,25 @@ using Publisher = std::function<void(const std::string&)>; // using 'Alias' = st
 
 class GameObject {
 public: 
-	GeneralMesh* ptrModel;
-	Texture* ptrTexture;  
+	GameObject* parentGameObject; 
+	std::vector<GameObject*> childrenGameObjects;
+
+	Transform* ptrNodeTransform;
+	glm::mat4 modelTransformMat;
+	  
+	GeneralMesh* ptrModel; 
+	Texture* ptrTexture;   
 	//Animation* ptrAnimation;  
-	Transform* ptrTransform;  
+
     
 	ItemListener itemListener;
 
 	virtual ~GameObject();
+
+	void RemoveChild(GameObject* child); 
+	void AddChild(GameObject* child); 
+	void SetParent(GameObject* parent); 
+	void SetTransformMatrixBeforeDraw();
 
 	void SetMesh(GeneralMesh* ptrModel);
 	void SetTexture(Texture* ptrTexture);

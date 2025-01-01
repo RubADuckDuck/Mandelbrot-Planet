@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "GlobalMappings.h"
 #include "GridManager.h" 
+#include "Planet.h"
 
 template <typename T> class Type2MeshAndTexture {
 public:
@@ -99,6 +100,11 @@ public:
 
 	std::vector<PlayableObject*> players;
 
+	Planet basePlanet; 
+	std::vector<Planet*> planets; 
+
+	
+
     TerrainManager();
 
 	void SetGameEngine(GameEngine* ge) {
@@ -140,14 +146,12 @@ public:
 	void SetTransformOfDroppedItemAt(int y, int x);
 	void SetTransformOfFactoryComponentAt(int y, int x);
 
+
+	// terrain Manager no longer will draw below
     void DrawGameObject(CameraObject& cameraObj) override; 
-
 	void DrawPlayers(CameraObject& cameraObj);
-
     void DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& cameraObj); 
-
 	void DrawDroppedItemAt(int yIndex, int xIndex, CameraObject& cameraObj);
-
 	void DrawFactoryComponentAt(int yIndex, int xIndex, CameraObject& cameraObj);
 
     // Function to randomly initialize the groundGrid

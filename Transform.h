@@ -9,7 +9,7 @@ public:
     Transform();
     Transform(const Transform& other);
 
-    glm::mat4 GetTransformMatrix() const;
+    glm::mat4 GetTransformMatrix();
 
     void SetTranslation(const glm::vec3& t);
     void SetRotation(float radians, const glm::vec3& axis);
@@ -28,4 +28,8 @@ private:
     glm::vec3 translation;
     glm::quat rotation;
     glm::vec3 scale;
+
+    bool dirty_flag = true; 
+
+    glm::mat4 transformMatrix;
 };

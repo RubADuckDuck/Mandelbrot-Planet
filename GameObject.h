@@ -48,29 +48,36 @@ public:
 
 	virtual ~GameObject();
 
+	// client & server
 	void RemoveChild(GameObject* child); 
 	void AddChild(GameObject* child); 
 	void SetParent(GameObject* parent); 
-	void SetTransformMatrixBeforeDraw();
 
+	// client & server 
 	virtual uint8_t GetTypeID() = 0;
 
+	// client::init
 	void SetMesh(GeneralMesh* ptrModel);
 	void SetTexture(Texture* ptrTexture);
 	//void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
 	virtual void SetTransform(Transform* ptrTransform);
 
+	// client::routine 
+	void SetTransformMatrixBeforeDraw();
+	virtual void DrawGameObject(CameraObject& cameraObj);
+
+	// server 
 	virtual void Update();
-	virtual glm::mat4 GetModelMatrixFromTransform();
-	virtual void DrawGameObject(CameraObject& cameraObj); 
-    virtual void onEvent(const std::string& message);
+	virtual void onEvent(const std::string& message);
 	virtual void onEvent(InteractionInfo* interactionInfo);
 
+	// server 
 	void PublishItem(InteractionInfo* interactionInfo) {
 		 EventDispatcher& dispatcher = EventDispatcher::GetInstance(); 
 		 dispatcher.Publish(interactionInfo); // item is published!
 	}
 
+	// server 
 	void SubscribeItemListener() {
 		itemListener = [this](InteractionInfo* interactionInfo) {
 			LOG(LOG_INFO, "ItemListenerTriggered::Typeid of gameObj on which event is triggered: " + std::string(typeid(*this).name()));
@@ -99,13 +106,16 @@ public:
 class PlayableObject : public GameObjectOnGrid {
 public:
 	Item* heldItem; 
-
+	
+	// server & client
 	uint8_t GetTypeID() override;
 
-    void onEvent(const std::string& message) override; 
-	void TakeAction(Direction direction); 
-
+	// client
 	void DrawGameObject(CameraObject& cameraObj) override;
+
+	// server 
+	void onEvent(const std::string& message) override;
+	void TakeAction(Direction direction);
 	void DropItem(); 
 	void RequestWalk(); 
 	void Walk(); 

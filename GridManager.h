@@ -38,8 +38,8 @@ public:
 	/*
 		This could be thought of as a map f: Direction x Direction -> Direction
 		Mathematically, a parallel tranport is a way of pushing tangent vectors on a manifold.
-		First argument corresponds to what TangentVector we are pushing.
-		Second argument corresponds to in what direction we are pushing the first argument in terms of the TangentVector.
+		First argument corresponds to 'what TangentVector we are pushing'.
+		Second argument corresponds to 'in what direction we are pushing the first argument'.
 		Third the result corresponds to how the first argument changes as it is pushed in the direction of the second argument.
 
 		However, in our case, since the world is discrete and there are only four directions,
@@ -98,7 +98,7 @@ public:
 };
 
 
-
+// server & client
 class MovementManager {
 	/*
 		Our objects live on a Non Euclidean Space
@@ -111,14 +111,24 @@ class MovementManager {
 public:
 	std::vector<std::vector<Action2Coord2d*>> grid2Transporter;
 	std::vector<std::vector<ParallelTransporter*>> grid2ParallelTransporter;
-	std::vector<std::vector<Transform*>> grid2Transform; 
+	// std::vector<std::vector<Transform*>> grid2Transform; 
 
 	MovementManager();
 
 	void InitPlanarFigure(int startY, int startX, int size);
 	void InitTransporters(int startY, int startX, int size);  
-	void InitTransforms(int startY, int startX, int size); 
+	// void InitTransforms(int startY, int startX, int size); 
 
 	NavigationInfo Move(Coord2d position, Direction movingDirection, Direction facingDirection); 
+};
 
+// client 
+class GridTransformManager {
+	static const int GRID_SIZE = 24;
+	float BLOCK_SIZE = 0.5f;
+	float BLOCK_OFFSET = 1.0f;
+public:
+	std::vector<std::vector<Transform*>> grid2Transform; 
+
+	void InitTransforms(int startY, int startX, int size);
 };

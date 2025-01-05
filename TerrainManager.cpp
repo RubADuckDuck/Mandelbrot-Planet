@@ -715,7 +715,7 @@ void TerrainManager::Update() {
 		int xIndex = curPlayer->xCoord;
 		
 		// make copy of transformation
-		curPlayersTransform = new Transform(*(this->movementManager.grid2Transform[yIndex][xIndex]));
+		curPlayersTransform = new Transform(*(this->gridTransformManager.grid2Transform[yIndex][xIndex]));
 
 		// Rotate the transform based on the player's facing direction
 		glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f); // Assuming Y-axis for rotation
@@ -763,7 +763,7 @@ void TerrainManager::SetTransformOfBlockOfTerrainAt(int y, int x) {
 void TerrainManager::SetTransformOfDroppedItemAt(int y, int x) {
 	DroppedItemObject* currItem = itemGrid[y][x];
 	if (currItem) {
-		Transform* curTransform = movementManager.grid2Transform[y][x];
+		Transform* curTransform = gridTransformManager.grid2Transform[y][x];
 
 		currItem->SetTransform(curTransform);
 	}
@@ -771,7 +771,7 @@ void TerrainManager::SetTransformOfDroppedItemAt(int y, int x) {
 void TerrainManager::SetTransformOfFactoryComponentAt(int y, int x) {
 	FactoryComponentObject* currFactory = factoryGrid[y][x];
 	if (currFactory) {
-		Transform* curTransform = movementManager.grid2Transform[y][x];
+		Transform* curTransform = gridTransformManager.grid2Transform[y][x];
 
 		currFactory->SetTransform(curTransform); 
 	}
@@ -803,7 +803,7 @@ void TerrainManager::DrawBlockOfTerrainAt(int yIndex, int xIndex, CameraObject& 
 
 	if (currGroundType != GroundType::LAST) {
 		// retreive transform from the movement Manager
-		Transform* currTransform = this->movementManager.grid2Transform[yIndex][xIndex];
+		Transform* currTransform = this->gridTransformManager.grid2Transform[yIndex][xIndex];
 		glm::mat4 transformMat = currTransform->GetTransformMatrix();
 
 		GeneralMesh* currMesh = groundLoader.type2Mesh[currGroundType];

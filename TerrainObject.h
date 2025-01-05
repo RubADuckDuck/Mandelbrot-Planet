@@ -25,6 +25,8 @@ public:
 
     ~TerrainObject() {};
 
+
+    // server
 	bool& CheckCondition(Condition condition); 
 
     virtual void Interact(Item* item) = 0; // item designates the kind of interaction f: Item -> Interaction
@@ -38,12 +40,16 @@ class DroppedItemObject : public TerrainObject {
 public:
     Item* item; 
 
+    // server & client 
     uint8_t GetTypeID() override; 
 
+    // server
     void SetItem(Item* ptrItem);
 
     void Interact(Item* item) override;
 
+
+    // client todo: make this go away?
     void SetTransform(Transform* transform) override;
 
     void DrawGameObject(CameraObject& cameraObj);
@@ -72,8 +78,9 @@ public:
         return { y + initY, x + initX };
     }
 
+    // server & client
     FactoryComponentType componentType; 
-
+    // server
     FactoryManagerObject* ptrParentStructure; 
     Item* heldItem;
 
@@ -81,6 +88,8 @@ public:
 
     ~FactoryComponentObject();
 
+
+    // server 
     void Interact(Item* item) override;
 
     Item* GetHeldItem();
@@ -89,6 +98,8 @@ public:
 
     void DiscardHeldItem();
 
+
+    // client
     void SetTransform(Transform* transform) override;
 
     void DrawGameObject(CameraObject& cameraObj) override;
@@ -101,12 +112,15 @@ private:
 using Publisher = std::function<void(const std::string&)>; // using 'Alias' = std::function<'returnType'('argType')>
 
 
-class StructureObject : public GameObject {
+// Server only GameObject
+class StructureManagerObject : public GameObject {
 public:
     // to do: add more kinds of structure
 };
 
-class FactoryManagerObject : public StructureObject {
+
+// Server only GameObject
+class FactoryManagerObject : public StructureManagerObject {
 public:
     /*
         FactoryType Structures have input ports that receive certain kinds of resources and OutputPorts that throw the produced objects to a certain building.

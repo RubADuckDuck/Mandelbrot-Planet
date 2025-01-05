@@ -85,21 +85,31 @@ public:
 
 	GameEngine* gameEngine; 
 
-	MovementManager movementManager;  
+	// server (& client potentially)
+	MovementManager movementManager; 
+
+	GridTransformManager gridTransformManager; 
+
+
 
     // Transform* coord2Transform[GRID_SIZE][GRID_SIZE]; // 2d coordinate to transfrom // todo: move this to GridManger. 
 	// every gm on (y,x) is transformed by coord2Transform[y, x]
 
+	// for server (too memory consuming)
     GroundType groundGrid[GRID_SIZE][GRID_SIZE];
     DroppedItemObject* itemGrid[GRID_SIZE][GRID_SIZE];
     FactoryComponentObject* factoryGrid[GRID_SIZE][GRID_SIZE];
 
+	// client::init
     Type2MeshAndTexture<GroundType> groundLoader;
     Type2MeshAndTexture<ItemType> itemLoader;
     Type2MeshAndTexture<std::pair<FactoryType, FactoryComponentType>> factoryComponentLoader; // this could be a mistake. I could have been more general. 
 
+
+	// server & client
 	std::vector<PlayableObject*> players;
 
+	// client
 	Planet basePlanet; 
 	std::vector<Planet*> planets; 
 
@@ -111,6 +121,7 @@ public:
 		gameEngine = ge;
 	}
 
+	// server -------------------------------------------------------------
 	void onEvent(InteractionInfo* interactionInfo) override;
 
 	void HandleInteraction(InteractionInfo* interactionInfo);
@@ -135,17 +146,16 @@ public:
 
 	void CreateAndAddDroppedItemAt(int yIndex, int xIndex, ItemType itemType);
 
-	void UpdateIntoCube(int startY, int startX, int size);
 
-	void UpdateIntoCube();
 
-	void Update() override;
-
+	// client --------------------------------------------------------------------
 	void InitTransformationOfTerrainObjects();
 	void SetTransformOfBlockOfTerrainAt(int y, int x);
 	void SetTransformOfDroppedItemAt(int y, int x);
 	void SetTransformOfFactoryComponentAt(int y, int x);
 
+	// Not recommeded -----------------------------------------------------------
+	void Update() override;
 
 	// terrain Manager no longer will draw below
     void DrawGameObject(CameraObject& cameraObj) override; 
@@ -154,6 +164,7 @@ public:
 	void DrawDroppedItemAt(int yIndex, int xIndex, CameraObject& cameraObj);
 	void DrawFactoryComponentAt(int yIndex, int xIndex, CameraObject& cameraObj);
 
+	// Server
     // Function to randomly initialize the groundGrid
     void RandomizeGroundGrid();
 	void SmoothGroundGrid();

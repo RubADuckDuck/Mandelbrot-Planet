@@ -95,15 +95,15 @@ void GameObject::SetParent(GameObject* parent) {
 
 void GameObject::SetTransformMatrixBeforeDraw() {
 	// traverse through tree and set Transform matrices
-	glm::mat4 curNodeTransform = ptrNodeTransform->GetTransformMatrix();
+	glm::mat4 curNodeTransformMatrix = ptrNodeTransform->GetTransformMatrix();
 
 	if (parentGameObject) {
 		glm::mat4* parentModelMat = &parentGameObject->modelTransformMat;
 
-		modelTransformMat = (*parentModelMat) * curNodeTransform;
+		modelTransformMat = (*parentModelMat) * curNodeTransformMatrix;
 	}
 	else {
-		modelTransformMat = curNodeTransform;
+		modelTransformMat = curNodeTransformMatrix;
 	}
 
 	for (int i = 0; i < childrenGameObjects.size(); i++) {
@@ -129,13 +129,11 @@ void GameObject::Update() {
 	}
 };
 
-glm::mat4 GameObject::GetModelMatrixFromTransform() { // depreciated?
-	return ptrNodeTransform->GetTransformMatrix();
-}
 void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	// draw mesh
 	ptrModel->Render(cameraObj, modelTransformMat, ptrTexture);
 }
+
 void GameObject::onEvent(const std::string& message) {};
 void GameObject::onEvent(InteractionInfo* interactionInfo) {
 	GameObject* who = interactionInfo->who; 

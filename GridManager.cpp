@@ -87,7 +87,7 @@ MovementManager::MovementManager() {
 
 void MovementManager::InitPlanarFigure(int startY, int startX, int size) {
 	this->InitTransporters(startY, startX, size);
-	this->InitTransforms(startY, startX, size); 
+	// this->InitTransforms(startY, startX, size); 
 }
 
 void MovementManager::InitTransporters(int startY, int startX, int size) {
@@ -204,7 +204,7 @@ void MovementManager::InitTransporters(int startY, int startX, int size) {
 	}
 }
 
-void MovementManager::InitTransforms(int startY, int startX, int size) {
+void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 	Transform* curTransform;
 
 	int facePieceSize = size; // Number of pieces per face

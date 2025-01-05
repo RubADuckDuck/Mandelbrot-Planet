@@ -16,6 +16,10 @@ public:
     ItemType itemType = ItemType::INVALID;
 	ItemState itemState; 
 
+	uint8_t GetTypeID() {
+		return static_cast<uint8_t>(ObjectType::ITEM_OBJECT);
+	}
+
 	Item(ItemType itemType) : itemType(itemType), itemState(INVALID_STATE){}
 
 	// void DrawGameObject(CameraObject& cameraObj) override; // differentiate draw method based on ItemState

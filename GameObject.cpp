@@ -159,6 +159,13 @@ void RotatingGameObject::Update() {
 }
 
 // Playable ---------------------------
+uint8_t PlayableObject::GetTypeID() {
+	return static_cast<uint8_t>(ObjectType::PLAYABLE_OBJECT);
+}
+
+
+
+
 void PlayableObject::onEvent(const std::string& message) {
 	int curDirectionInt = 0; 
 
@@ -242,6 +249,38 @@ void PlayableObject::onEvent(const std::string& message) {
 	} 
 	if (xCoord < 0) {
 		xCoord = 0;
+	}
+}
+
+void PlayableObject::TakeAction(Direction direction) {
+	int curDirectionInt = 0;
+
+	switch (direction) {
+	case(Direction::RIGHT):
+		curDirectionInt += 3; // turn right
+		curDirectionInt += static_cast<int>(direction);
+		curDirectionInt = curDirectionInt % 4;
+		direction = static_cast<Direction>(curDirectionInt);
+		break;
+	case(Direction::UP):
+		RequestWalk();
+		break; 
+	case(Direction::LEFT):
+		curDirectionInt += 1; // turn right
+		curDirectionInt += static_cast<int>(direction);
+		curDirectionInt = curDirectionInt % 4;
+		direction = static_cast<Direction>(curDirectionInt);
+		break;
+	case(Direction::DOWN):
+		curDirectionInt += 2; // turn around
+		curDirectionInt += static_cast<int>(direction);
+		curDirectionInt = curDirectionInt % 4;
+		direction = static_cast<Direction>(curDirectionInt);
+		break;
+	case(Direction::IDLE):
+		LOG(LOG_INFO, "Publishing Item from Player");
+
+		DropItem(); 
 	}
 }
 

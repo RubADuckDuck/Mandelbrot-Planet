@@ -1,0 +1,12 @@
+#pragma once
+
+
+enum class ObjectType {
+	PLAYABLE_OBJECT, 
+	
+	ITEM_OBJECT,
+	DROPPED_ITEM_OBJECT, 
+
+	FACTORY_COMPONENT_OBJECT, 
+	FACTORY_MANGER_OBJECT 
+};

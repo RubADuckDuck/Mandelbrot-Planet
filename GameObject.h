@@ -16,6 +16,8 @@
 #include "InteractionInfo.h"
 #include "PlayerDirection.h"
 
+#include "ObjectType.h"
+
 //class Animation; 
 
 class Texture; 
@@ -39,7 +41,7 @@ public:
 	  
 	GeneralMesh* ptrModel; 
 	Texture* ptrTexture;   
-	//Animation* ptrAnimation;  
+	// Animation* ptrAnimation;  
 
     
 	ItemListener itemListener;
@@ -50,6 +52,8 @@ public:
 	void AddChild(GameObject* child); 
 	void SetParent(GameObject* parent); 
 	void SetTransformMatrixBeforeDraw();
+
+	virtual uint8_t GetTypeID() = 0;
 
 	void SetMesh(GeneralMesh* ptrModel);
 	void SetTexture(Texture* ptrTexture);
@@ -94,12 +98,16 @@ public:
 
 class PlayableObject : public GameObjectOnGrid {
 public:
-	Item* heldItem;
+	Item* heldItem; 
 
-    void onEvent(const std::string& message) override;
+	uint8_t GetTypeID() override;
+
+    void onEvent(const std::string& message) override; 
+	void TakeAction(Direction direction); 
+
 	void DrawGameObject(CameraObject& cameraObj) override;
-	void DropItem();
-	void RequestWalk();
+	void DropItem(); 
+	void RequestWalk(); 
 	void Walk(); 
 	void PickUpItem(Item* item); 
 }; 

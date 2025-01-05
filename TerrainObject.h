@@ -38,6 +38,8 @@ class DroppedItemObject : public TerrainObject {
 public:
     Item* item; 
 
+    uint8_t GetTypeID() override; 
+
     void SetItem(Item* ptrItem);
 
     void Interact(Item* item) override;
@@ -52,6 +54,8 @@ class FactoryComponentObject : public TerrainObject {
 public:
     int initY; int initX; // offset 
     int yLocalCoord; int xLocalCoord; // Global = Init + Local 
+
+    uint8_t GetTypeID() override;
 
     void SetLocalCoord(int y, int x) {
         yLocalCoord = y; 
@@ -99,9 +103,7 @@ using Publisher = std::function<void(const std::string&)>; // using 'Alias' = st
 
 class StructureObject : public GameObject {
 public:
-    Publisher publisher;
-
-    // virtual void TriggerInteraction(const std::string& msg) = 0;
+    // to do: add more kinds of structure
 };
 
 class FactoryManagerObject : public StructureObject {
@@ -111,6 +113,8 @@ public:
         InputPorts and Output ports are designated from a block that is part of the buildings shape.
 
     */
+
+    uint8_t GetTypeID() override;
 
     FactoryType factoryType;
 

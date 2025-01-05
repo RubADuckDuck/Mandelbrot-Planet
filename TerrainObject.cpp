@@ -26,6 +26,10 @@ void TerrainObject::PublishItemDrop(Item* item, int y, int x) {
 }
 
 // DroppedItemObject:: --------------------------
+uint8_t DroppedItemObject::GetTypeID() {
+    return static_cast<uint8_t>(ObjectType::DROPPED_ITEM_OBJECT);
+}
+
 void DroppedItemObject::SetItem(Item* ptrItem) {
 	this->item = ptrItem;
 }
@@ -46,6 +50,10 @@ void DroppedItemObject::DrawGameObject(CameraObject& cameraObj) {
 }
 
 // FactoryComponentObject-------------------------
+uint8_t FactoryComponentObject::GetTypeID() {
+    return static_cast<uint8_t>(ObjectType::FACTORY_COMPONENT_OBJECT);
+}
+
 FactoryComponentObject::FactoryComponentObject(FactoryComponentType componentType, FactoryManagerObject* factoryManager) 
 	: componentType(componentType), heldItem(nullptr), ptrParentStructure(factoryManager) { }
 
@@ -140,6 +148,9 @@ void FactoryComponentObject::ResetFactoryFromCrafting() {
 }
 
 // FactoryManagerObject --------------------------
+uint8_t FactoryManagerObject::GetTypeID() {
+    return static_cast<uint8_t>(ObjectType::FACTORY_MANGER_OBJECT);
+}
 
 // We'll use BFS for the region growth process.
 void FactoryManagerObject::RandomlyGenerateBuildingShape()

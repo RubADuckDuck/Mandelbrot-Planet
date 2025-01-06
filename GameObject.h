@@ -18,6 +18,8 @@
 
 #include "ObjectType.h"
 
+#include "../NetCustomCommon/NetworkMessage.h"
+
 //class Animation; 
 
 class Texture; 
@@ -54,7 +56,7 @@ public:
 	void SetParent(GameObject* parent); 
 
 	// client & server 
-	virtual uint8_t GetTypeID() = 0;
+	virtual uint8_t GetTypeID() { return 0; };
 
 	// client::init
 	void SetMesh(GeneralMesh* ptrModel);
@@ -68,6 +70,7 @@ public:
 
 	// server 
 	virtual void Update();
+	virtual void Update(float deltaTime); 
 	virtual void onEvent(const std::string& message);
 	virtual void onEvent(InteractionInfo* interactionInfo);
 
@@ -89,6 +92,31 @@ public:
 		dispatcher.Subscribe(&itemListener);
 		LOG(LOG_INFO, "Subscribing game object as Listener");
 	}
+
+	void SetID(uint32_t newID) {
+		if (hasID) {
+			LOG(LOG_WARNING, "This game object already has an ID. ID will not be altered");
+		}
+		else {
+			hasID = true;
+			this->objectID = newID; 
+		}
+		return;
+	} 
+
+	uint32_t GetID() {
+		if (!hasID) {
+			LOG(LOG_ERROR, "This object has never been given an ID"); 
+			return 0; 
+		}
+		else {
+			return this->objectID; 
+		}
+	}
+
+private: 
+	bool hasID = false;
+	uint32_t objectID = 0;  
 }; 
 
 class GameObjectOnGrid : public GameObject {
@@ -97,7 +125,18 @@ public:
 	Direction direction = Direction::UP;
 	int orientation = 0; 
 
-	void SetCoordinates(int y, int x) {
+	
+
+	void SetCoordinates(int y, int x) { 
+		// publish change to server 
+		// however to generate message, 
+		// I should know what the id is of this particular instance. 
+
+		// there are two choices 
+		// 1. Add ID variable to objects. We will have to make the implementations of sending messages explicit within each instance of gameobject class. 
+		// 2. 
+		
+
 		yCoord = y;
 		xCoord = x;
 	}

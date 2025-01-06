@@ -166,5 +166,5 @@ public:
 
     void GenerateItem();
 
-    void Update(float deltaTime);
+    void Update(float deltaTime) override;
 };

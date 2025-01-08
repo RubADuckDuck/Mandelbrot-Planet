@@ -75,20 +75,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\dev\SDL2\SDL2\lib\x64;C:\Program Files\Assimp\lib\x64;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\dev\SDL2\SDL2\lib\x64;C:\Program Files\Assimp\lib\x64;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Event.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalMappings.cpp" />
     <ClCompile Include="GridManager.cpp" />

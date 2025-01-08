@@ -76,7 +76,7 @@ public:
     // If you told me A, there is no reason for me to repeat it for you.
 
     // Grid Management 
-    void FoldGridIntoCubeAt(int startY, int startX, int size, bool fromNetwork);  
+    void FoldGridIntoCubeAt(int startY, int startX, int size, bool fromNetwork);
     void CreatePortalOnGridAt(int yCoord, int xCoord, bool fromNetwork);
 
     // Object Management
@@ -105,7 +105,7 @@ public:
 
     void BroadcastGameObjectParenting(uint32_t parentID, uint32_t objID); 
 
-    std::unique_ptr<INetworkMessage> CaptureGameState();  
+    std::unique_ptr<INetworkMessage> CaptureGameState();
 
 public: 
     // send from client 

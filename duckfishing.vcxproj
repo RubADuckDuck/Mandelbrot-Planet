@@ -59,28 +59,24 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\opengl_sdl_asio.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\opengl_sdl_asio.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\opengl_sdl_asio.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\opengl_sdl_asio.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\dev\SDL2\SDL2\lib\x64;C:\Program Files\Assimp\lib\x64;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\proj\[gameproj]\DontStarve\NetCustomCommon;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\proj\[gameproj]\DontStarve\DuckFishing\include\glad;E:\source\asio-1.30.2\include;E:\dev\glm-master;C:\Program Files\Assimp\include;E:\dev\SDL2\SDL2\include;C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include;$(IncludePath)</IncludePath>
     <LibraryPath>E:\dev\SDL2\SDL2\lib\x64;C:\Program Files\Assimp\lib\x64;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
@@ -202,6 +198,7 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemType.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="LOG.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MessageParser.h" />
     <ClInclude Include="Network\Command.h" />

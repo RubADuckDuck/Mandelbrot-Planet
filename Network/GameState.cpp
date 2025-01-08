@@ -2,6 +2,23 @@
 #include "../GameObject.h" 
 #include "NetworkMessage.h"
 
+
+// Grid Management 
+
+void GameState::FoldGridIntoCubeAt(int startY, int startX, int size, bool fromNetwork) {
+
+    if (gridTransformManager != nullptr) {
+        gridTransformManager->InitTransforms(startY, startX, size);
+    }
+    if (movementManager != nullptr) {
+        movementManager->InitPlanarFigure(startY, startX, size);
+    }
+}
+
+void GameState::CreatePortalOnGridAt(int yCoord, int xCoord, bool fromNetwork) {
+    // to do
+}
+
 void GameState::CreateAndRegisterGameObjectWithID(uint32_t id, uint8_t typeId, bool fromNetwork) {
     if (!fromNetwork) {
         // propagate update to server
@@ -72,7 +89,8 @@ bool GameState::IsValidGameObject(uint32_t id) const {
 
 // BroadCast from Server  
 void GameState::RegisterAndBroadcastNewGameObject(GameObject* newGameObject) {
-    uint32_t newID = GenerateNewGameObjectId();
+    uint32_t newID = GenerateNewGameObjectId(); 
+    uint8_t objTypeID = 0; 
 
     // turn raw pointer unique  
     std::unique_ptr<GameObject> pGameObject(newGameObject);
@@ -82,7 +100,7 @@ void GameState::RegisterAndBroadcastNewGameObject(GameObject* newGameObject) {
     // to do: add to objects by type. This is not currently possible. 
 
     // Create Message 
-    INetworkMessage* curMessage = new AddGameObjectMessage(0, newID);
+    INetworkMessage* curMessage = new AddGameObjectMessage(objTypeID, newID);
 
     // Broadcast message through server  
     server->broadcast_message(curMessage);
@@ -91,7 +109,7 @@ void GameState::RegisterAndBroadcastNewGameObject(GameObject* newGameObject) {
     delete curMessage;
 }
 
-inline void GameState::BroadcastGameObjectRemoval(uint32_t id) {
+void GameState::BroadcastGameObjectRemoval(uint32_t id) {
     INetworkMessage* curMessage = new RemoveGameObjectMessage(id);
 
     server->broadcast_message(curMessage);
@@ -99,7 +117,7 @@ inline void GameState::BroadcastGameObjectRemoval(uint32_t id) {
     delete curMessage;
 }
 
-inline void GameState::BroadcastGameObjectPosition(GameObject* gameObject) {
+void GameState::BroadcastGameObjectPosition(GameObject* gameObject) {
     if (auto gridObject = dynamic_cast<GameObjectOnGrid*>(gameObject)) {
         INetworkMessage* curMessage = new GameObjectPositionMessage(
             gridObject->yCoord,
@@ -116,7 +134,7 @@ inline void GameState::BroadcastGameObjectPosition(GameObject* gameObject) {
     }
 }
 
-inline void GameState::BroadcastGameObjectParenting(uint32_t parentID, uint32_t objID) {
+void GameState::BroadcastGameObjectParenting(uint32_t parentID, uint32_t objID) {
     INetworkMessage* curMessage = new GameObjectParentObjectMessage(parentID, objID);
 
     server->broadcast_message(curMessage);
@@ -124,9 +142,15 @@ inline void GameState::BroadcastGameObjectParenting(uint32_t parentID, uint32_t 
     delete curMessage;
 }
 
+std::unique_ptr<INetworkMessage> GameState::CaptureGameState() {
+
+    // to do : create a child class of INetworkMessages that has all the infromation of current state of the game. 
+    return std::move(std::unique_ptr<INetworkMessage>(new PlayerInputMessage()));
+}
+
 // send from client 
 
-inline void GameState::SendPlayerInput(Direction direction) {
+void GameState::SendPlayerInput(Direction direction) {
     uint32_t playerID = 0;
 
     INetworkMessage* curMessage = new PlayerInputMessage(

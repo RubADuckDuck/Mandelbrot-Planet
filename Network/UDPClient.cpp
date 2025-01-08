@@ -1,5 +1,6 @@
-#include "UDPClient.h"
 #include "NetworkMessage.h"
+#include "UDPClient.h"
+
 #include <limits> 
 #include <random>
 
@@ -174,9 +175,11 @@ void GameClient::send_authentication() {
         this->id_has_been_set = true;
     }
 
+    uint32_t version = 1; 
+
     // Create and send authentication message
     AuthRequestMessage auth_msg(
-        1,  // Protocol version
+        version,  // Protocol version
         client_id,
         udp_socket_.local_endpoint().port()
     );
@@ -223,6 +226,6 @@ void GameClient::send_message(INetworkMessage* msg) {
         });
 }
 
-inline std::unique_ptr<INetworkMessage> GameClient::Decode(std::vector<uint8_t> data) {
+std::unique_ptr<INetworkMessage> GameClient::Decode(std::vector<uint8_t> data) {
     return network_codec->Decode(data);
 }

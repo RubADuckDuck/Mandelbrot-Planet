@@ -6,19 +6,19 @@
 
 // Encode a message to bytes
 
-inline std::vector<uint8_t> NetworkCodec::Encode(const INetworkMessage* message) {
+std::vector<uint8_t> NetworkCodec::Encode(const INetworkMessage* message) {
     return message->Serialize();
 }
 
 // Decode bytes to a message
 
-inline std::unique_ptr<INetworkMessage> NetworkCodec::Decode(const std::vector<uint8_t>& data) {
+std::unique_ptr<INetworkMessage> NetworkCodec::Decode(const std::vector<uint8_t>& data) {
     return MessageFactory::CreateMessage(data);
 }
 
 // Helper method to handle incoming UDP/TCP messages
 
-inline void NetworkCodec::HandleNetworkMessage(const std::vector<uint8_t>& data, GameState& gameState) {
+void NetworkCodec::HandleNetworkMessage(const std::vector<uint8_t>& data, GameState& gameState) {
     try {
         std::unique_ptr<INetworkMessage> message = Decode(data);
         // Process message : Message -> Command
@@ -33,11 +33,12 @@ inline void NetworkCodec::HandleNetworkMessage(const std::vector<uint8_t>& data,
     }
 }
 
-inline GameMessageProcessor& GameMessageProcessor::GetInstance() {
-    // Singleton implementation details 
+GameMessageProcessor& GameMessageProcessor::GetInstance() {
+    static GameMessageProcessor instance;
+    return instance;
 }
 
-inline std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetworkMessage& message) {
+std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetworkMessage& message) {
     switch (message.GetType()) {
     case MessageType::PLAYER_INPUT: {
         const auto& ipt_msg = static_cast<const PlayerInputMessage&>(message);
@@ -75,19 +76,19 @@ inline std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const 
     }
 }
 
-inline void INetworkMessage::add_int(std::vector<uint8_t>& buffer, int val) {
+void INetworkMessage::add_int(std::vector<uint8_t>& buffer, int val) {
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&val);
     buffer.insert(buffer.end(), bytes, bytes + sizeof(int));
 }
 
-inline void INetworkMessage::add_float(std::vector<uint8_t>& buffer, float val) {
+void INetworkMessage::add_float(std::vector<uint8_t>& buffer, float val) {
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&val);
     buffer.insert(buffer.end(), bytes, bytes + sizeof(int));
 }
 
 // Constructor for creating new auth requests
 
-inline AuthRequestMessage::AuthRequestMessage(uint32_t version, const uint32_t& id, uint16_t udp_port, const std::string& token)
+AuthRequestMessage::AuthRequestMessage(uint32_t version, const uint32_t& id, uint16_t udp_port, const std::string& token)
     : protocol_version(version)
     , client_id(id)
     , client_udp_port(udp_port)
@@ -95,17 +96,17 @@ inline AuthRequestMessage::AuthRequestMessage(uint32_t version, const uint32_t& 
 
 // Default constructor initializes client_id array to zeros
 
-inline AuthRequestMessage::AuthRequestMessage()
+AuthRequestMessage::AuthRequestMessage()
     : protocol_version(0)
     , client_udp_port(0) {
     client_id = (0);
 }
 
-inline MessageType AuthRequestMessage::GetType() const {
+MessageType AuthRequestMessage::GetType() const {
     return MessageType::AUTHENTICATION;
 }
 
-inline size_t AuthRequestMessage::GetSize() const {
+size_t AuthRequestMessage::GetSize() const {
     // Now we have a fixed size for client_id instead of variable length
     return sizeof(uint8_t) +              // Message type
         sizeof(uint32_t) +             // Protocol version
@@ -115,7 +116,7 @@ inline size_t AuthRequestMessage::GetSize() const {
         auth_token.length();           // Auth token string
 }
 
-inline std::vector<uint8_t> AuthRequestMessage::Serialize() const {
+std::vector<uint8_t> AuthRequestMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
@@ -138,7 +139,7 @@ inline std::vector<uint8_t> AuthRequestMessage::Serialize() const {
     return buffer;
 }
 
-inline void AuthRequestMessage::Deserialize(const std::vector<uint8_t>& data) {
+void AuthRequestMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Auth request message too short");
     }
@@ -163,7 +164,7 @@ inline void AuthRequestMessage::Deserialize(const std::vector<uint8_t>& data) {
         data.begin() + offset + token_length);
 }
 
-inline UdpVerificationMessage::UdpVerificationMessage(const uint32_t& session, uint64_t code)
+UdpVerificationMessage::UdpVerificationMessage(const uint32_t& session, uint64_t code)
     : session_id(session)
     , verification_code(code)
     , timestamp(get_current_timestamp()) {}
@@ -171,7 +172,7 @@ inline UdpVerificationMessage::UdpVerificationMessage(const uint32_t& session, u
 
 // Default constructor for deserialization - Randomly init verification code and session_id
 
-inline UdpVerificationMessage::UdpVerificationMessage()
+UdpVerificationMessage::UdpVerificationMessage()
     : verification_code(0)
     , timestamp(0) {
     session_id = (0);
@@ -180,18 +181,18 @@ inline UdpVerificationMessage::UdpVerificationMessage()
     this->set_random_session_id();
 }
 
-inline MessageType UdpVerificationMessage::GetType() const {
+MessageType UdpVerificationMessage::GetType() const {
     return MessageType::UDP_VERIFICATION;
 }
 
-inline size_t UdpVerificationMessage::GetSize() const {
+size_t UdpVerificationMessage::GetSize() const {
     return sizeof(uint8_t) +                // Message type
         sizeof(uint32_t) +              // Fixed-length session ID
         sizeof(uint64_t) +               // Verification code
         sizeof(uint64_t);                // Timestamp
 }
 
-inline std::vector<uint8_t> UdpVerificationMessage::Serialize() const {
+std::vector<uint8_t> UdpVerificationMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
@@ -210,7 +211,7 @@ inline std::vector<uint8_t> UdpVerificationMessage::Serialize() const {
     return buffer;
 }
 
-inline void UdpVerificationMessage::Deserialize(const std::vector<uint8_t>& data) {
+void UdpVerificationMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Invalid message size");
     }
@@ -227,7 +228,7 @@ inline void UdpVerificationMessage::Deserialize(const std::vector<uint8_t>& data
     timestamp = extract_from_data<uint64_t>(data, offset);
 }
 
-inline void UdpVerificationMessage::set_random_session_id() {
+void UdpVerificationMessage::set_random_session_id() {
     // Generate a random uint32_t
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -235,21 +236,21 @@ inline void UdpVerificationMessage::set_random_session_id() {
     session_id = dis(gen);
 }
 
-inline PlayerInputMessage::PlayerInputMessage(Direction direction, uint32_t id)
+PlayerInputMessage::PlayerInputMessage(Direction direction, uint32_t id)
     : playerDirection(direction), playerID(id) {}
 
-inline PlayerInputMessage::PlayerInputMessage()
+PlayerInputMessage::PlayerInputMessage()
     : playerDirection(Direction::IDLE), playerID(0) {}
 
-inline MessageType PlayerInputMessage::GetType() const {
+MessageType PlayerInputMessage::GetType() const {
     return MessageType::PLAYER_INPUT;
 }
 
-inline size_t PlayerInputMessage::GetSize() const {
+size_t PlayerInputMessage::GetSize() const {
     return sizeof(MessageType) + sizeof(uint8_t) + sizeof(uint32_t);
 }
 
-inline std::vector<uint8_t> PlayerInputMessage::Serialize() const {
+std::vector<uint8_t> PlayerInputMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
@@ -265,7 +266,7 @@ inline std::vector<uint8_t> PlayerInputMessage::Serialize() const {
     return buffer;
 }
 
-inline void PlayerInputMessage::Deserialize(const std::vector<uint8_t>& data) {
+void PlayerInputMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Invalid message size");
     }
@@ -279,21 +280,21 @@ inline void PlayerInputMessage::Deserialize(const std::vector<uint8_t>& data) {
     playerID = extract_from_data<uint32_t>(data, offset);
 }
 
-inline AddGameObjectMessage::AddGameObjectMessage(uint8_t typeID, uint32_t objID)
+AddGameObjectMessage::AddGameObjectMessage(uint8_t typeID, uint32_t objID)
     : gameObjectTypeID(typeID), gameObjectID(objID) {}
 
-inline AddGameObjectMessage::AddGameObjectMessage()
+AddGameObjectMessage::AddGameObjectMessage()
     : gameObjectTypeID(0), gameObjectID(0) {}
 
-inline MessageType AddGameObjectMessage::GetType() const {
+MessageType AddGameObjectMessage::GetType() const {
     return MessageType::ADD_GAMEOBJECT;
 }
 
-inline size_t AddGameObjectMessage::GetSize() const {
+size_t AddGameObjectMessage::GetSize() const {
     return sizeof(MessageType) + sizeof(uint8_t) + sizeof(uint32_t);
 }
 
-inline std::vector<uint8_t> AddGameObjectMessage::Serialize() const {
+std::vector<uint8_t> AddGameObjectMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
@@ -309,7 +310,7 @@ inline std::vector<uint8_t> AddGameObjectMessage::Serialize() const {
     return buffer;
 }
 
-inline void AddGameObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+void AddGameObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Invalid message size");
     }
@@ -323,21 +324,21 @@ inline void AddGameObjectMessage::Deserialize(const std::vector<uint8_t>& data) 
     gameObjectID = extract_from_data<uint32_t>(data, offset);
 }
 
-inline RemoveGameObjectMessage::RemoveGameObjectMessage(uint32_t objID)
+RemoveGameObjectMessage::RemoveGameObjectMessage(uint32_t objID)
     : gameObjectID(objID) { }
 
-inline RemoveGameObjectMessage::RemoveGameObjectMessage()
+RemoveGameObjectMessage::RemoveGameObjectMessage()
     : gameObjectID(0) { }
 
-inline MessageType RemoveGameObjectMessage::GetType() const {
+MessageType RemoveGameObjectMessage::GetType() const {
     return MessageType::REMOVE_GAMEOBJECT;
 }
 
-inline size_t RemoveGameObjectMessage::GetSize() const {
+size_t RemoveGameObjectMessage::GetSize() const {
     return sizeof(MessageType) + sizeof(uint32_t);
 }
 
-inline std::vector<uint8_t> RemoveGameObjectMessage::Serialize() const {
+std::vector<uint8_t> RemoveGameObjectMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
@@ -350,7 +351,7 @@ inline std::vector<uint8_t> RemoveGameObjectMessage::Serialize() const {
     return buffer;
 }
 
-inline void RemoveGameObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+void RemoveGameObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Invalid message size");
     }
@@ -361,21 +362,21 @@ inline void RemoveGameObjectMessage::Deserialize(const std::vector<uint8_t>& dat
     gameObjectID = extract_from_data<uint32_t>(data, offset);
 }
 
-inline GameObjectPositionMessage::GameObjectPositionMessage(int y, int x, uint32_t id)
+GameObjectPositionMessage::GameObjectPositionMessage(int y, int x, uint32_t id)
     : y(y), x(x), gameObjectID(id) {}
 
-inline GameObjectPositionMessage::GameObjectPositionMessage()
+GameObjectPositionMessage::GameObjectPositionMessage()
     : y(0), x(0), gameObjectID(0) {}
 
-inline MessageType GameObjectPositionMessage::GetType() const {
+MessageType GameObjectPositionMessage::GetType() const {
     return MessageType::GAMEOBJECT_POSITION;
 }
 
-inline size_t GameObjectPositionMessage::GetSize() const {
+size_t GameObjectPositionMessage::GetSize() const {
     return sizeof(MessageType) + sizeof(int) * 2 + sizeof(uint32_t);
 }
 
-inline std::vector<uint8_t> GameObjectPositionMessage::Serialize() const {
+std::vector<uint8_t> GameObjectPositionMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
@@ -397,7 +398,7 @@ inline std::vector<uint8_t> GameObjectPositionMessage::Serialize() const {
     return buffer;
 }
 
-inline void GameObjectPositionMessage::Deserialize(const std::vector<uint8_t>& data) {
+void GameObjectPositionMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Invalid message size");
     }
@@ -420,21 +421,21 @@ inline void GameObjectPositionMessage::Deserialize(const std::vector<uint8_t>& d
     gameObjectID = extract_from_data<uint32_t>(data, offset);
 }
 
-inline GameObjectParentObjectMessage::GameObjectParentObjectMessage(uint32_t parentID, uint32_t objID)
+GameObjectParentObjectMessage::GameObjectParentObjectMessage(uint32_t parentID, uint32_t objID)
     : parentObjectID(parentID), gameObjectID(objID) {}
 
-inline GameObjectParentObjectMessage::GameObjectParentObjectMessage()
+GameObjectParentObjectMessage::GameObjectParentObjectMessage()
     : parentObjectID(0), gameObjectID(0) {}
 
-inline MessageType GameObjectParentObjectMessage::GetType() const {
+MessageType GameObjectParentObjectMessage::GetType() const {
     return MessageType::GAMEOBJECT_PARENT_OBJECT;
 }
 
-inline size_t GameObjectParentObjectMessage::GetSize() const {
+size_t GameObjectParentObjectMessage::GetSize() const {
     return sizeof(MessageType) + sizeof(uint32_t) * 2;
 }
 
-inline std::vector<uint8_t> GameObjectParentObjectMessage::Serialize() const {
+std::vector<uint8_t> GameObjectParentObjectMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
@@ -450,7 +451,7 @@ inline std::vector<uint8_t> GameObjectParentObjectMessage::Serialize() const {
     return buffer;
 }
 
-inline void GameObjectParentObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+void GameObjectParentObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Invalid message size");
     }
@@ -464,7 +465,7 @@ inline void GameObjectParentObjectMessage::Deserialize(const std::vector<uint8_t
     gameObjectID = extract_from_data<uint32_t>(data, offset);
 }
 
-inline std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std::vector<uint8_t>& data) {
+std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std::vector<uint8_t>& data) {
     if (data.empty()) {
         throw std::runtime_error("Empty message data");
     }
@@ -491,6 +492,9 @@ inline std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std:
     case MessageType::AUTHENTICATION:
         message = std::make_unique<AuthRequestMessage>();
         break;
+    case MessageType::UDP_VERIFICATION:
+        message = std::make_unique<UdpVerificationMessage>();  
+        break; 
 
         // add more 
 
@@ -500,4 +504,19 @@ inline std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std:
 
     message->Deserialize(data);
     return message;
+}
+
+// Get current timestamp in milliseconds since epoch
+uint64_t get_current_timestamp() {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+}
+
+// Generate a cryptographically secure random number for verification
+uint64_t generate_verification_code() {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<uint64_t> dis;
+    return dis(gen);
 }

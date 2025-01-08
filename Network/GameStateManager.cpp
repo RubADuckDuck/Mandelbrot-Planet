@@ -1,8 +1,8 @@
 #include "GameStateManager.h"
 #include "NetworkMessage.h"
-#include "../DuckFishing/Event.h"
+#include "../Event.h"
 
-//inline void GameStateManager::setupNetworking() {
+//void GameStateManager::setupNetworking() {
 //    // Create message processor
 //    auto processor = std::make_shared<GameMessageProcessor>();
 //

@@ -24,19 +24,10 @@ class GameMessageProcessor;
 
 
 // Get current timestamp in milliseconds since epoch
-inline uint64_t get_current_timestamp() {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch()
-    ).count();
-}
+uint64_t get_current_timestamp();
 
 // Generate a cryptographically secure random number for verification
-inline uint64_t generate_verification_code() {
-    std::random_device rd;
-    std::mt19937_64 gen(rd());
-    std::uniform_int_distribution<uint64_t> dis;
-    return dis(gen);
-}
+uint64_t generate_verification_code();
 
 // Message type identifiers
 enum class MessageType : uint8_t {
@@ -352,7 +343,6 @@ public:
 // Message -> Command
 class GameMessageProcessor : public IMessageProcessor {
 private:
-
 public:
     static GameMessageProcessor& GetInstance();
 

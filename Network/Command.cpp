@@ -1,10 +1,10 @@
 #include "Command.h"
 #include "GameState.h"
 
-inline PlayerInputCommand::PlayerInputCommand(Direction userInput, uint32_t playerID)
+PlayerInputCommand::PlayerInputCommand(Direction userInput, uint32_t playerID)
     : user_input(userInput), player_id(playerID) {}
 
-inline void PlayerInputCommand::Execute(GameState& gameState) {
+void PlayerInputCommand::Execute(GameState& gameState) {
     gameState.PlayerTakeAction(player_id, user_input, true);
 }
 

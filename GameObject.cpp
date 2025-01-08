@@ -129,6 +129,10 @@ void GameObject::Update() {
 	}
 };
 
+void GameObject::Update(float deltaTime) {
+	return; 
+}
+
 void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	// draw mesh
 	ptrModel->Render(cameraObj, modelTransformMat, ptrTexture);

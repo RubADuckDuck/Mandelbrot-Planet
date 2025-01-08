@@ -130,5 +130,7 @@ class GridTransformManager {
 public:
 	std::vector<std::vector<Transform*>> grid2Transform; 
 
+	GridTransformManager();
+
 	void InitTransforms(int startY, int startX, int size);
 };

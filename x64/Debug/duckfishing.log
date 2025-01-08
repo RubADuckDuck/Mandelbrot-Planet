@@ -1,47 +1,13 @@
-﻿  Animation.cpp
-  GameObject.cpp
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(158,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  GlobalMappings.cpp
-  GridManager.cpp
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(224,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(226,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(230,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(231,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(232,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(239,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(240,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(241,48): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(246,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(247,48): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(254,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(255,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(261,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(262,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(263,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\GridManager.cpp(208,13): warning C4101: 'curTransform': unreferenced local variable
+﻿  GameObject.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(160,18): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   GroundType.h
-  Item.cpp
-  LOG.cpp
-  main.cpp
-  Mesh.cpp
-E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(153,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(185,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(206,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-E:\proj\[gameproj]\DontStarve\DuckFishing\Mesh.cpp(253,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  MessageParser.cpp
-  ShaderProgramLoader.cpp
-  stb_image.h
   TerrainManager.cpp
-E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,15): warning C4099: 'Recipe': type name first seen using 'class' now seen using 'struct'
-E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,8): message : see declaration of 'Recipe'
-  TerrainObject.cpp
-E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,15): warning C4099: 'Recipe': type name first seen using 'class' now seen using 'struct'
-E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(30,8): message : see declaration of 'Recipe'
-  Texture.cpp
-  Transform.cpp
-  utils.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(34,15): warning C4099: 'Recipe': type name first seen using 'class' now seen using 'struct'
+E:\proj\[gameproj]\DontStarve\DuckFishing\Item.h(34,8): message : see declaration of 'Recipe'
   Generating Code...
-E:\proj\[gameproj]\DontStarve\DuckFishing\TerrainObject.cpp(344): warning C4172: returning address of local variable or temporary: currIngredients
-E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(346): warning C4172: returning address of local variable or temporary: temp
-  glad.c
+E:\proj\[gameproj]\DontStarve\DuckFishing\GameObject.cpp(387): warning C4172: returning address of local variable or temporary: temp
   duckfishing.vcxproj -> E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe

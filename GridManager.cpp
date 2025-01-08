@@ -64,7 +64,6 @@ Direction ParallelTransporter::CalculateDireciton(Direction facingWhere, Directi
 MovementManager::MovementManager() {
 	grid2Transporter.resize(GRID_SIZE, std::vector<Action2Coord2d*>(GRID_SIZE, nullptr));
 	grid2ParallelTransporter.resize(GRID_SIZE, std::vector<ParallelTransporter*>(GRID_SIZE, nullptr));
-	grid2Transform.resize(GRID_SIZE, std::vector<Transform*>(GRID_SIZE, nullptr)); 
 
 	for (int y = 0; y < GRID_SIZE; ++y) {
 		for (int x = 0; x < GRID_SIZE; ++x) {
@@ -78,7 +77,6 @@ MovementManager::MovementManager() {
 
 			// Initialize the ParallelTransporter for the current cell
 			grid2ParallelTransporter[y][x] = new ParallelTransporter(); 
-			grid2Transform[y][x] = new Transform();
 		}
 	}
 
@@ -202,6 +200,18 @@ void MovementManager::InitTransporters(int startY, int startX, int size) {
 		curAction2Coord = grid2Transporter[startY + i][startX + size * 4 - 1];
 		(*curAction2Coord)[Direction::RIGHT] = { startY + i, startX + 0 };
 	}
+}
+
+GridTransformManager::GridTransformManager() {
+	grid2Transform.resize(GRID_SIZE, std::vector<Transform*>(GRID_SIZE, nullptr));
+
+	for (int y = 0; y < GRID_SIZE; ++y) {
+		for (int x = 0; x < GRID_SIZE; ++x) {
+			grid2Transform[y][x] = new Transform();
+		}
+	}
+
+	this->InitTransforms(0, 0, 4);
 }
 
 void GridTransformManager::InitTransforms(int startY, int startX, int size) {

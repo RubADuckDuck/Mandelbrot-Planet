@@ -18,6 +18,7 @@
 
 #include "ObjectType.h"
 
+// This is critical.
 #include "../NetCustomCommon/NetworkMessage.h"
 
 //class Animation; 

@@ -91,7 +91,9 @@ void FactoryComponentObject::DropItem(Item* item) {
     };
 
     // Shuffle directions for randomness
-    std::random_shuffle(directions.begin(), directions.end());
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::shuffle(directions.begin(), directions.end(), gen);
 
     // Attempt to find one adjacent empty tile
     bool foundSpot = false;
@@ -206,7 +208,9 @@ void FactoryManagerObject::RandomlyGenerateBuildingShape()
         int c = cell.second;
 
         // Shuffle the directions for randomness
-        std::random_shuffle(directions.begin(), directions.end());
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::shuffle(directions.begin(), directions.end(), gen);
 
         // Try random neighbors
         for (size_t i = 0; i < directions.size(); i++) {

@@ -19,7 +19,7 @@
 #include "ObjectType.h"
 
 // This is critical.
-#include "../NetCustomCommon/NetworkMessage.h"
+// #include "../NetCustomCommon/NetworkMessage.h"
 
 //class Animation; 
 
@@ -72,7 +72,7 @@ public:
 	// server 
 	virtual void Update();
 	virtual void Update(float deltaTime); 
-	virtual void onEvent(const std::string& message);
+	virtual void onEvent(const std::vector<uint8_t> message);
 	virtual void onEvent(InteractionInfo* interactionInfo);
 
 	// server 
@@ -154,7 +154,7 @@ public:
 	void DrawGameObject(CameraObject& cameraObj) override;
 
 	// server 
-	void onEvent(const std::string& message) override;
+	void onEvent(const std::vector<uint8_t> message) override;
 	void TakeAction(Direction direction);
 	void DropItem(); 
 	void RequestWalk(); 

@@ -124,7 +124,7 @@ public:
 	
 	void ManuallySubscribe(GameObject* gameObj) {
 		// Store the lambda in a persistent container
-		listeners.emplace_back([gameObj](const std::string& message) {
+		listeners.emplace_back([gameObj](const std::vector<uint8_t> message) {
 			LOG(LOG_INFO, "Typeid of gameObj on which event is triggered: " + std::string(typeid(*gameObj).name()));
 			gameObj->onEvent(message);
 			});

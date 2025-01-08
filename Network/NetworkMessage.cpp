@@ -1,0 +1,503 @@
+#include "NetworkMessage.h"
+#include "../PlayerDirection.h"
+
+// Helper method to handle incoming UDP/TCP messages
+
+
+// Encode a message to bytes
+
+inline std::vector<uint8_t> NetworkCodec::Encode(const INetworkMessage* message) {
+    return message->Serialize();
+}
+
+// Decode bytes to a message
+
+inline std::unique_ptr<INetworkMessage> NetworkCodec::Decode(const std::vector<uint8_t>& data) {
+    return MessageFactory::CreateMessage(data);
+}
+
+// Helper method to handle incoming UDP/TCP messages
+
+inline void NetworkCodec::HandleNetworkMessage(const std::vector<uint8_t>& data, GameState& gameState) {
+    try {
+        std::unique_ptr<INetworkMessage> message = Decode(data);
+        // Process message : Message -> Command
+        std::unique_ptr<IGameCommand> command = GameMessageProcessor::GetInstance().ProcessMessage(*message);
+
+        // command: GameState -> GameState 
+        command->Execute(gameState);
+    }
+    catch (const std::exception& e) {
+        // Log error and handle gracefully
+        std::cerr << "Error processing message: " << e.what() << std::endl;
+    }
+}
+
+inline GameMessageProcessor& GameMessageProcessor::GetInstance() {
+    // Singleton implementation details 
+}
+
+inline std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetworkMessage& message) {
+    switch (message.GetType()) {
+    case MessageType::PLAYER_INPUT: {
+        const auto& ipt_msg = static_cast<const PlayerInputMessage&>(message);
+        return std::make_unique<PlayerInputCommand>(
+            ipt_msg.playerDirection, ipt_msg.playerID
+        );
+    }
+    case MessageType::ADD_GAMEOBJECT: {
+        const auto& add_msg = static_cast<const AddGameObjectMessage&>(message);
+        return std::make_unique<AddGameObjectCommand>(
+            add_msg.gameObjectTypeID, add_msg.gameObjectID
+        );
+    }
+    case MessageType::REMOVE_GAMEOBJECT: {
+        const auto& remove_msg = static_cast<const RemoveGameObjectMessage&>(message);
+        return std::make_unique<RemoveGameObjectCommand>(
+            remove_msg.gameObjectID
+        );
+    }
+    case MessageType::GAMEOBJECT_POSITION: {
+        const auto& pos_msg = static_cast<const GameObjectPositionMessage&>(message);
+        return std::make_unique<GameObjectPositionCommand>(
+            pos_msg.y, pos_msg.x, pos_msg.gameObjectID
+        );
+    }
+    case MessageType::GAMEOBJECT_PARENT_OBJECT: {
+        const auto& parent_msg = static_cast<const GameObjectParentObjectMessage&>(message);
+        return std::make_unique<GameObjectParentCommand>(
+            parent_msg.parentObjectID, parent_msg.gameObjectID
+        );
+    }
+                                              // Add cases for other message types
+    default:
+        throw std::runtime_error("Unknown message type");
+    }
+}
+
+inline void INetworkMessage::add_int(std::vector<uint8_t>& buffer, int val) {
+    const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&val);
+    buffer.insert(buffer.end(), bytes, bytes + sizeof(int));
+}
+
+inline void INetworkMessage::add_float(std::vector<uint8_t>& buffer, float val) {
+    const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&val);
+    buffer.insert(buffer.end(), bytes, bytes + sizeof(int));
+}
+
+// Constructor for creating new auth requests
+
+inline AuthRequestMessage::AuthRequestMessage(uint32_t version, const uint32_t& id, uint16_t udp_port, const std::string& token)
+    : protocol_version(version)
+    , client_id(id)
+    , client_udp_port(udp_port)
+    , auth_token(token) {}
+
+// Default constructor initializes client_id array to zeros
+
+inline AuthRequestMessage::AuthRequestMessage()
+    : protocol_version(0)
+    , client_udp_port(0) {
+    client_id = (0);
+}
+
+inline MessageType AuthRequestMessage::GetType() const {
+    return MessageType::AUTHENTICATION;
+}
+
+inline size_t AuthRequestMessage::GetSize() const {
+    // Now we have a fixed size for client_id instead of variable length
+    return sizeof(uint8_t) +              // Message type
+        sizeof(uint32_t) +             // Protocol version
+        sizeof(uint32_t) +             // Fixed-length client ID
+        sizeof(uint16_t) +             // UDP port
+        sizeof(uint32_t) +             // Auth token length
+        auth_token.length();           // Auth token string
+}
+
+inline std::vector<uint8_t> AuthRequestMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+
+    // Add protocol version
+    add_to_buffer<uint32_t>(buffer, protocol_version);
+
+    // Add client ID 
+    add_to_buffer<uint32_t>(buffer, client_id);
+
+    // Add UDP port
+    add_to_buffer<uint16_t>(buffer, client_udp_port);
+
+    // Add auth token (length + string)
+    add_to_buffer<uint32_t>(buffer, static_cast<uint32_t>(auth_token.length()));
+    buffer.insert(buffer.end(), auth_token.begin(), auth_token.end());
+
+    return buffer;
+}
+
+inline void AuthRequestMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Auth request message too short");
+    }
+
+    size_t offset = 1; // Skip message type byte
+
+    // Extract protocol version
+    protocol_version = extract_from_data<uint32_t>(data, offset);
+
+    // Extract client id
+    client_id = extract_from_data<uint32_t>(data, offset);
+
+    // Extract UDP port
+    client_udp_port = extract_from_data<uint16_t>(data, offset);
+
+    // Extract auth token
+    uint32_t token_length = extract_from_data<uint32_t>(data, offset);
+    if (offset + token_length > data.size()) {
+        throw std::runtime_error("Invalid auth token length");
+    }
+    auth_token = std::string(data.begin() + offset,
+        data.begin() + offset + token_length);
+}
+
+inline UdpVerificationMessage::UdpVerificationMessage(const uint32_t& session, uint64_t code)
+    : session_id(session)
+    , verification_code(code)
+    , timestamp(get_current_timestamp()) {}
+
+
+// Default constructor for deserialization - Randomly init verification code and session_id
+
+inline UdpVerificationMessage::UdpVerificationMessage()
+    : verification_code(0)
+    , timestamp(0) {
+    session_id = (0);
+
+    verification_code = generate_verification_code();
+    this->set_random_session_id();
+}
+
+inline MessageType UdpVerificationMessage::GetType() const {
+    return MessageType::UDP_VERIFICATION;
+}
+
+inline size_t UdpVerificationMessage::GetSize() const {
+    return sizeof(uint8_t) +                // Message type
+        sizeof(uint32_t) +              // Fixed-length session ID
+        sizeof(uint64_t) +               // Verification code
+        sizeof(uint64_t);                // Timestamp
+}
+
+inline std::vector<uint8_t> UdpVerificationMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+
+    // Add session ID directly - no length needed since it's fixed
+    add_to_buffer<uint32_t>(buffer, session_id);
+
+    // Add verification code
+    add_to_buffer<uint64_t>(buffer, verification_code);
+
+    // Add timestamp
+    add_to_buffer<uint64_t>(buffer, timestamp);
+
+    return buffer;
+}
+
+inline void UdpVerificationMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1; // Skip message type byte
+
+    // Extract session id 
+    session_id = extract_from_data<uint32_t>(data, offset);
+
+    // Extract verification code
+    verification_code = extract_from_data<uint64_t>(data, offset);
+
+    // Extract timestamp
+    timestamp = extract_from_data<uint64_t>(data, offset);
+}
+
+inline void UdpVerificationMessage::set_random_session_id() {
+    // Generate a random uint32_t
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint32_t> dis(0, UINT32_MAX);
+    session_id = dis(gen);
+}
+
+inline PlayerInputMessage::PlayerInputMessage(Direction direction, uint32_t id)
+    : playerDirection(direction), playerID(id) {}
+
+inline PlayerInputMessage::PlayerInputMessage()
+    : playerDirection(Direction::IDLE), playerID(0) {}
+
+inline MessageType PlayerInputMessage::GetType() const {
+    return MessageType::PLAYER_INPUT;
+}
+
+inline size_t PlayerInputMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(uint8_t) + sizeof(uint32_t);
+}
+
+inline std::vector<uint8_t> PlayerInputMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+
+    // add Player direction 
+    INetworkMessage::add_to_buffer<uint8_t>(buffer, static_cast<uint8_t>(playerDirection));
+
+    // add PlayerID
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, playerID);
+
+    return buffer;
+}
+
+inline void PlayerInputMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1; // Skip message type byte
+
+    // Extract Player Direction 
+    playerDirection = static_cast<Direction>(extract_from_data<uint8_t>(data, offset));
+
+    // Extract player ID
+    playerID = extract_from_data<uint32_t>(data, offset);
+}
+
+inline AddGameObjectMessage::AddGameObjectMessage(uint8_t typeID, uint32_t objID)
+    : gameObjectTypeID(typeID), gameObjectID(objID) {}
+
+inline AddGameObjectMessage::AddGameObjectMessage()
+    : gameObjectTypeID(0), gameObjectID(0) {}
+
+inline MessageType AddGameObjectMessage::GetType() const {
+    return MessageType::ADD_GAMEOBJECT;
+}
+
+inline size_t AddGameObjectMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(uint8_t) + sizeof(uint32_t);
+}
+
+inline std::vector<uint8_t> AddGameObjectMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+
+    // add GameObjectTypeID  
+    INetworkMessage::add_to_buffer<uint8_t>(buffer, gameObjectTypeID);
+
+    // add GameObjectID
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, gameObjectID);
+
+    return buffer;
+}
+
+inline void AddGameObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1; // Skip message type byte
+
+    // Extract Player Direction 
+    gameObjectTypeID = extract_from_data<uint8_t>(data, offset);
+
+    // Extract player ID
+    gameObjectID = extract_from_data<uint32_t>(data, offset);
+}
+
+inline RemoveGameObjectMessage::RemoveGameObjectMessage(uint32_t objID)
+    : gameObjectID(objID) { }
+
+inline RemoveGameObjectMessage::RemoveGameObjectMessage()
+    : gameObjectID(0) { }
+
+inline MessageType RemoveGameObjectMessage::GetType() const {
+    return MessageType::REMOVE_GAMEOBJECT;
+}
+
+inline size_t RemoveGameObjectMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(uint32_t);
+}
+
+inline std::vector<uint8_t> RemoveGameObjectMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+
+    // add GameObjectID
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, gameObjectID);
+
+    return buffer;
+}
+
+inline void RemoveGameObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1; // Skip message type byte
+
+    // Extract player ID
+    gameObjectID = extract_from_data<uint32_t>(data, offset);
+}
+
+inline GameObjectPositionMessage::GameObjectPositionMessage(int y, int x, uint32_t id)
+    : y(y), x(x), gameObjectID(id) {}
+
+inline GameObjectPositionMessage::GameObjectPositionMessage()
+    : y(0), x(0), gameObjectID(0) {}
+
+inline MessageType GameObjectPositionMessage::GetType() const {
+    return MessageType::GAMEOBJECT_POSITION;
+}
+
+inline size_t GameObjectPositionMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(int) * 2 + sizeof(uint32_t);
+}
+
+inline std::vector<uint8_t> GameObjectPositionMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+
+    //// Add position data
+    //auto addInt = [&buffer](int value) {
+    //    const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&value);
+    //    buffer.insert(buffer.end(), bytes, bytes + sizeof(int));
+    //};
+
+    INetworkMessage::add_int(buffer, y);
+    INetworkMessage::add_int(buffer, x);
+
+    // Add player ID
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, gameObjectID);
+
+    return buffer;
+}
+
+inline void GameObjectPositionMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1; // Skip message type byte
+
+    //// Extract position data
+    //auto readFloat = [&data, &offset]() {
+    //    float value;
+    //    std::memcpy(&value, data.data() + offset, sizeof(float));
+    //    offset += sizeof(int);
+    //    return value;
+    //};
+
+    // Extract player position 
+    y = extract_from_data<int>(data, offset);
+    x = extract_from_data<int>(data, offset);
+
+    // Extract player ID
+    gameObjectID = extract_from_data<uint32_t>(data, offset);
+}
+
+inline GameObjectParentObjectMessage::GameObjectParentObjectMessage(uint32_t parentID, uint32_t objID)
+    : parentObjectID(parentID), gameObjectID(objID) {}
+
+inline GameObjectParentObjectMessage::GameObjectParentObjectMessage()
+    : parentObjectID(0), gameObjectID(0) {}
+
+inline MessageType GameObjectParentObjectMessage::GetType() const {
+    return MessageType::GAMEOBJECT_PARENT_OBJECT;
+}
+
+inline size_t GameObjectParentObjectMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(uint32_t) * 2;
+}
+
+inline std::vector<uint8_t> GameObjectParentObjectMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+
+    // Add parentObjectID
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, parentObjectID);
+
+    // Add gameObjectID
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, gameObjectID);
+
+    return buffer;
+}
+
+inline void GameObjectParentObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1; // Skip message type byte
+
+    // Extract parentObjectID
+    parentObjectID = extract_from_data<uint32_t>(data, offset);
+
+    // Extract player ID
+    gameObjectID = extract_from_data<uint32_t>(data, offset);
+}
+
+inline std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std::vector<uint8_t>& data) {
+    if (data.empty()) {
+        throw std::runtime_error("Empty message data");
+    }
+
+    MessageType type = static_cast<MessageType>(data[0]);
+    std::unique_ptr<INetworkMessage> message;
+
+    switch (type) {
+    case MessageType::GAMEOBJECT_POSITION:
+        message = std::make_unique<GameObjectPositionMessage>();
+        break;
+    case MessageType::GAMEOBJECT_PARENT_OBJECT:
+        message = std::make_unique<GameObjectParentObjectMessage>();
+        break;
+    case MessageType::PLAYER_INPUT:
+        message = std::make_unique<PlayerInputMessage>();
+        break;
+    case MessageType::ADD_GAMEOBJECT:
+        message = std::make_unique<AddGameObjectMessage>();
+        break;
+    case MessageType::REMOVE_GAMEOBJECT:
+        message = std::make_unique<RemoveGameObjectMessage>();
+        break;
+    case MessageType::AUTHENTICATION:
+        message = std::make_unique<AuthRequestMessage>();
+        break;
+
+        // add more 
+
+    default:
+        throw std::runtime_error("Unknown message type");
+    }
+
+    message->Deserialize(data);
+    return message;
+}

@@ -1,6 +1,8 @@
 #include "TerrainObject.h"
 #include "Item.h"
 #include <queue>
+#include <algorithm>
+#include <random>
 
 // TerrainObject----------------------------------
 bool& TerrainObject::CheckCondition(Condition condition) {

@@ -173,6 +173,12 @@
     </ClCompile>
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MessageParser.cpp" />
+    <ClCompile Include="Network\Command.cpp" />
+    <ClCompile Include="Network\GameState.cpp" />
+    <ClCompile Include="Network\GameStateManager.cpp" />
+    <ClCompile Include="Network\NetworkMessage.cpp" />
+    <ClCompile Include="Network\UDPClient.cpp" />
+    <ClCompile Include="Network\UDPServer.cpp" />
     <ClCompile Include="ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="stb_image.h" />
@@ -198,6 +204,13 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MessageParser.h" />
+    <ClInclude Include="Network\Command.h" />
+    <ClInclude Include="Network\GameState.h" />
+    <ClInclude Include="Network\GameStateManager.h" />
+    <ClInclude Include="Network\NetworkConfig.h" />
+    <ClInclude Include="Network\NetworkMessage.h" />
+    <ClInclude Include="Network\UDPClient.h" />
+    <ClInclude Include="Network\UDPServer.h" />
     <ClInclude Include="ObjectType.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="PlayerDirection.h" />

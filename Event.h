@@ -1,4 +1,5 @@
 #pragma once
+
 #include <functional>
 #include <string> 
 #include <vector>
@@ -6,18 +7,24 @@
 #include <iostream>
 #include <unordered_map>
 #include <mutex>
-#include <map>
 #include "LOG.h"
 #include "InteractionInfo.h"
+#include <map>
 
 class Item;
 class GameObject;
 
 // below Code is defining a proxy named (left) for the (right), 
 // sort of like assigning variables but with classnames I guess  
-using Listener = std::function<void(const std::string&)>;
+using Listener = std::function<void(const std::vector<uint8_t>)>;
 using ItemListener = std::function<void(InteractionInfo*)>; // args are (who, what, where1, where2)
 
+
+enum class Tag {
+    UDP,
+    TCP,
+    USER_INPUT,
+};
 
 class EventDispatcher {
 public:
@@ -28,17 +35,17 @@ public:
 
     void Subscribe(ItemListener* ptrItemListener);
 
-    void Subscribe(const std::string& tag, Listener* ptrListener);
+    void Subscribe(const Tag tag, Listener* ptrListener);
 
-    void Publish(const std::string& message);
+    void Publish(const std::vector<uint8_t> message);
 
-    void Publish(const std::string& tag, const std::string& message);
+    void Publish(const Tag tag, const std::vector<uint8_t> message);
 
     void Publish(InteractionInfo* interactionInfo);
 
     void Unsubscribe(Listener* ptrListener);
 
-    void Unsubscribe(const std::string& tag, Listener* ptrListener);
+    void Unsubscribe(const Tag tag, Listener* ptrListener);
 
     void Unsubscribe(ItemListener* ptrItemListener);
 
@@ -51,10 +58,10 @@ private:
     EventDispatcher& operator=(const EventDispatcher&) = delete;
 
     std::vector<Listener*> listeners;
-    std::map<std::string, std::vector<Listener*>> tag2Listener;
+    std::map<Tag, std::vector<Listener*>> tag2Listener;
 
 
-    std::vector<ItemListener*> itemListeners; 
+    std::vector<ItemListener*> itemListeners;
     // std::map<std::string, std::vector<ItemListener*>> tag2ItemListeners; // itemListeners are by iteself specific
     std::mutex mutex;
 };
@@ -63,7 +70,7 @@ private:
 
 class InputHandler {
 public:
-    std::string tag = "keyInput"; 
+    Tag tag = Tag::USER_INPUT;
 
     InputHandler();
 
@@ -80,11 +87,11 @@ public:
 
     void Subscribe(Listener* ptrListener);
 
-    void Publish(const std::string& msg);
+    void Publish(const std::vector<uint8_t> msg);
 
 private:
     bool quit;
-    bool wPressed, aPressed, sPressed, dPressed, spacePressed; 
+    bool wPressed, aPressed, sPressed, dPressed, spacePressed;
 
 
 

@@ -3,26 +3,26 @@
 
 // Public method to get the singleton instance
 
-inline EventDispatcher& EventDispatcher::GetInstance() {
+EventDispatcher& EventDispatcher::GetInstance() {
     static EventDispatcher instance; // Guaranteed to be initialized only once
     return instance;
 }
 
-inline void EventDispatcher::Subscribe(Listener* ptrListener) {
+void EventDispatcher::Subscribe(Listener* ptrListener) {
     std::lock_guard<std::mutex> lock(mutex);
     if (std::find(listeners.begin(), listeners.end(), ptrListener) == listeners.end()) {
         listeners.push_back(ptrListener);
     }
 }
 
-inline void EventDispatcher::Subscribe(ItemListener* ptrItemListener) {
+void EventDispatcher::Subscribe(ItemListener* ptrItemListener) {
     std::lock_guard<std::mutex> lock(mutex);
     if (std::find(itemListeners.begin(), itemListeners.end(), ptrItemListener) == itemListeners.end()) {
         itemListeners.push_back(ptrItemListener);
     }
 }
 
-inline void EventDispatcher::Subscribe(const std::string& tag, Listener* ptrListener) {
+void EventDispatcher::Subscribe(const Tag tag, Listener* ptrListener) {
     std::lock_guard<std::mutex> lock(mutex);
     auto& tagListeners = tag2Listener[tag];
     if (std::find(tagListeners.begin(), tagListeners.end(), ptrListener) == tagListeners.end()) {
@@ -31,7 +31,7 @@ inline void EventDispatcher::Subscribe(const std::string& tag, Listener* ptrList
     // Subscribe(ptrListener); // Add to general listeners as well // currently blocked
 }
 
-inline void EventDispatcher::Publish(const std::string& message) {
+void EventDispatcher::Publish(const std::vector<uint8_t> message) {
     // std::cout << message << " triggered" << std::endl;
 
     // std::lock_guard<std::mutex> lock(mutex);
@@ -45,7 +45,7 @@ inline void EventDispatcher::Publish(const std::string& message) {
     }
 }
 
-inline void EventDispatcher::Publish(const std::string& tag, const std::string& message) {
+void EventDispatcher::Publish(const Tag tag, const std::vector<uint8_t> message) {
     // std::cout << tag << "::" << message << " triggered" << std::endl;
 
     // std::lock_guard<std::mutex> lock(mutex);
@@ -64,7 +64,7 @@ inline void EventDispatcher::Publish(const std::string& tag, const std::string& 
     }
 }
 
-inline void EventDispatcher::Publish(InteractionInfo* interactionInfo) {
+void EventDispatcher::Publish(InteractionInfo* interactionInfo) {
     // std::lock_guard<std::mutex> lock(mutex);
 
     for (const ItemListener* ptrItemListener : itemListeners) {
@@ -77,12 +77,12 @@ inline void EventDispatcher::Publish(InteractionInfo* interactionInfo) {
     }
 }
 
-inline void EventDispatcher::Unsubscribe(Listener* ptrListener) {
+void EventDispatcher::Unsubscribe(Listener* ptrListener) {
     std::lock_guard<std::mutex> lock(mutex);
     listeners.erase(std::remove(listeners.begin(), listeners.end(), ptrListener), listeners.end());
 }
 
-inline void EventDispatcher::Unsubscribe(const std::string& tag, Listener* ptrListener) {
+void EventDispatcher::Unsubscribe(const Tag tag, Listener* ptrListener) {
     std::lock_guard<std::mutex> lock(mutex);
     auto it = tag2Listener.find(tag);
     if (it != tag2Listener.end()) {
@@ -93,12 +93,12 @@ inline void EventDispatcher::Unsubscribe(const std::string& tag, Listener* ptrLi
     }
 }
 
-inline void EventDispatcher::Unsubscribe(ItemListener* ptrItemListener) {
+void EventDispatcher::Unsubscribe(ItemListener* ptrItemListener) {
     std::lock_guard<std::mutex> lock(mutex);
     itemListeners.erase(std::remove(itemListeners.begin(), itemListeners.end(), ptrItemListener), itemListeners.end());
 }
 
-inline InputHandler::InputHandler() : quit(false) {
+InputHandler::InputHandler() : quit(false) {
     wPressed = aPressed = sPressed = dPressed = spacePressed = false;
     quit = false;
 
@@ -113,11 +113,11 @@ inline InputHandler::InputHandler() : quit(false) {
     SDL_SetEventFilter(NULL, NULL); // Remove any custom event filter
 }
 
-inline InputHandler::~InputHandler() {
+InputHandler::~InputHandler() {
     SDL_Quit();
 }
 
-inline void InputHandler::pollEvents() { // this function will get called every update to check for input
+void InputHandler::pollEvents() { // this function will get called every update to check for input
     // Reset key states
     wPressed = aPressed = sPressed = dPressed = spacePressed = false;
     // LOG(LOG_INFO, "Polling events");
@@ -146,54 +146,56 @@ inline void InputHandler::pollEvents() { // this function will get called every 
     }
 }
 
-inline bool InputHandler::isQuit() const { return quit; }
+bool InputHandler::isQuit() const { return quit; }
 
-inline bool InputHandler::isWPressed() const { return wPressed; }
+bool InputHandler::isWPressed() const { return wPressed; }
 
-inline bool InputHandler::isAPressed() const { return aPressed; }
+bool InputHandler::isAPressed() const { return aPressed; }
 
-inline bool InputHandler::isSPressed() const { return sPressed; }
+bool InputHandler::isSPressed() const { return sPressed; }
 
-inline bool InputHandler::isDPressed() const { return dPressed; }
+bool InputHandler::isDPressed() const { return dPressed; }
 
-inline bool InputHandler::isSpacePressed() const { return spacePressed; }
+bool InputHandler::isSpacePressed() const { return spacePressed; }
 
-inline void InputHandler::Subscribe(Listener* ptrListener) {
+
+
+void InputHandler::Subscribe(Listener* ptrListener) {
     // Get the singleton instance
     EventDispatcher& dispatcher = EventDispatcher::GetInstance();
     dispatcher.Subscribe(this->tag, ptrListener);
 }
 
-inline void InputHandler::Publish(const std::string& msg) {
+void InputHandler::Publish(const std::vector<uint8_t> msg) {
     // Get the singleton instance
     EventDispatcher& dispatcher = EventDispatcher::GetInstance();
-    LOG(LOG_INFO, msg);
+
     dispatcher.Publish(this->tag, msg);
 }
 
-inline void InputHandler::handleKeyDown(SDL_Keycode key) {
+void InputHandler::handleKeyDown(SDL_Keycode key) {
     LOG(LOG_INFO, "Keypressed");
 
-    switch (key) {
-    case SDLK_w: wPressed = true; this->Publish("w_down"); break;
-    case SDLK_a: aPressed = true; this->Publish("a_down"); break;
-    case SDLK_s: sPressed = true; this->Publish("s_down"); break;
-    case SDLK_d: dPressed = true; this->Publish("d_down"); break;
-    case SDLK_SPACE: spacePressed = true; this->Publish("space_down"); break;
-    default: break;
-    }
+    //switch (key) {
+    //case SDLK_w: wPressed = true; this->Publish("w_down"); break;
+    //case SDLK_a: aPressed = true; this->Publish("a_down"); break;
+    //case SDLK_s: sPressed = true; this->Publish("s_down"); break;
+    //case SDLK_d: dPressed = true; this->Publish("d_down"); break;
+    //case SDLK_SPACE: spacePressed = true; this->Publish("space_down"); break;
+    //default: break;
+    //}
 }
 
-inline void InputHandler::handleKeyUp(SDL_Keycode key) {
+void InputHandler::handleKeyUp(SDL_Keycode key) {
     // Get the singleton instance
     EventDispatcher& dispatcher = EventDispatcher::GetInstance();
 
-    switch (key) {
-    case SDLK_w: wPressed = false; this->Publish("w_up"); break;
-    case SDLK_a: aPressed = false; this->Publish("a_up"); break;
-    case SDLK_s: sPressed = false; this->Publish("s_up"); break;
-    case SDLK_d: dPressed = false; this->Publish("d_up"); break;
-    case SDLK_SPACE: spacePressed = false; this->Publish("space_up"); break;
-    default: break;
-    }
+    //switch (key) {
+    //case SDLK_w: wPressed = false; this->Publish("w_up"); break;
+    //case SDLK_a: aPressed = false; this->Publish("a_up"); break;
+    //case SDLK_s: sPressed = false; this->Publish("s_up"); break;
+    //case SDLK_d: dPressed = false; this->Publish("d_up"); break;
+    //case SDLK_SPACE: spacePressed = false; this->Publish("space_up"); break;
+    //default: break;
+    //}
 }

@@ -138,7 +138,7 @@ void GameObject::DrawGameObject(CameraObject& cameraObj) {
 	ptrModel->Render(cameraObj, modelTransformMat, ptrTexture);
 }
 
-void GameObject::onEvent(const std::string& message) {};
+void GameObject::onEvent(const std::vector<uint8_t> message) {};
 void GameObject::onEvent(InteractionInfo* interactionInfo) {
 	GameObject* who = interactionInfo->who; 
 	Item* item = interactionInfo->item;
@@ -168,81 +168,83 @@ uint8_t PlayableObject::GetTypeID() {
 
 
 
-void PlayableObject::onEvent(const std::string& message) {
+void PlayableObject::onEvent(const std::vector<uint8_t> message) {
 	int curDirectionInt = 0; 
 
 	bool originalWalk = false; 
 
-	if (message == "s_up") {
-		if (originalWalk) {
-			direction = Direction::DOWN;
-			// yCoord = yCoord + 1;
+	// message type changed from string to vector<uint8_t>
+	// 
+	//if (message == "s_up") {
+	//	if (originalWalk) {
+	//		direction = Direction::DOWN;
+	//		// yCoord = yCoord + 1;
 
-			curDirectionInt = static_cast<int>(direction) + orientation;
-			curDirectionInt = curDirectionInt % 4;
-			direction = static_cast<Direction>(curDirectionInt);
-			RequestWalk();
-		}
-		else {
-			curDirectionInt += 2; // turn around
-			curDirectionInt += static_cast<int>(direction);
-			curDirectionInt = curDirectionInt % 4;
-			direction = static_cast<Direction>(curDirectionInt);
-		}
-	}
-	else if (message == "w_up") {
-		if (originalWalk) {
-			direction = Direction::UP;
-			// yCoord = yCoord - 1;
+	//		curDirectionInt = static_cast<int>(direction) + orientation;
+	//		curDirectionInt = curDirectionInt % 4;
+	//		direction = static_cast<Direction>(curDirectionInt);
+	//		RequestWalk();
+	//	}
+	//	else {
+	//		curDirectionInt += 2; // turn around
+	//		curDirectionInt += static_cast<int>(direction);
+	//		curDirectionInt = curDirectionInt % 4;
+	//		direction = static_cast<Direction>(curDirectionInt);
+	//	}
+	//}
+	//else if (message == "w_up") {
+	//	if (originalWalk) {
+	//		direction = Direction::UP;
+	//		// yCoord = yCoord - 1;
 
-			curDirectionInt = static_cast<int>(direction) + orientation;
-			curDirectionInt = curDirectionInt % 4;
-			direction = static_cast<Direction>(curDirectionInt);
-			RequestWalk();
-		}
-		else {
-			RequestWalk();
-		}
-	}
-	else if (message == "d_up") {
-		if (originalWalk) {
-			direction = Direction::RIGHT;
-			// xCoord = xCoord + 1;
+	//		curDirectionInt = static_cast<int>(direction) + orientation;
+	//		curDirectionInt = curDirectionInt % 4;
+	//		direction = static_cast<Direction>(curDirectionInt);
+	//		RequestWalk();
+	//	}
+	//	else {
+	//		RequestWalk();
+	//	}
+	//}
+	//else if (message == "d_up") {
+	//	if (originalWalk) {
+	//		direction = Direction::RIGHT;
+	//		// xCoord = xCoord + 1;
 
-			curDirectionInt = static_cast<int>(direction) + orientation;
-			curDirectionInt = curDirectionInt % 4;
-			direction = static_cast<Direction>(curDirectionInt);
-			RequestWalk();
-		}
-		else {
-			curDirectionInt += 3; // turn right
-			curDirectionInt += static_cast<int>(direction);
-			curDirectionInt = curDirectionInt % 4;
-			direction = static_cast<Direction>(curDirectionInt);
-		}
-	}
-	else if (message == "a_up") {
-		if (originalWalk) {
-			direction = Direction::LEFT;
-			// xCoord = xCoord - 1;
+	//		curDirectionInt = static_cast<int>(direction) + orientation;
+	//		curDirectionInt = curDirectionInt % 4;
+	//		direction = static_cast<Direction>(curDirectionInt);
+	//		RequestWalk();
+	//	}
+	//	else {
+	//		curDirectionInt += 3; // turn right
+	//		curDirectionInt += static_cast<int>(direction);
+	//		curDirectionInt = curDirectionInt % 4;
+	//		direction = static_cast<Direction>(curDirectionInt);
+	//	}
+	//}
+	//else if (message == "a_up") {
+	//	if (originalWalk) {
+	//		direction = Direction::LEFT;
+	//		// xCoord = xCoord - 1;
 
-			curDirectionInt = static_cast<int>(direction) + orientation;
-			curDirectionInt = curDirectionInt % 4;
-			direction = static_cast<Direction>(curDirectionInt);
-			RequestWalk();
-		}
-		else {
-			curDirectionInt += 1; // turn right
-			curDirectionInt += static_cast<int>(direction);
-			curDirectionInt = curDirectionInt % 4;
-			direction = static_cast<Direction>(curDirectionInt);
-		}
-	}
-	else if (message== "space_up") {
-		LOG(LOG_INFO, "Publishing Item from Player");
+	//		curDirectionInt = static_cast<int>(direction) + orientation;
+	//		curDirectionInt = curDirectionInt % 4;
+	//		direction = static_cast<Direction>(curDirectionInt);
+	//		RequestWalk();
+	//	}
+	//	else {
+	//		curDirectionInt += 1; // turn right
+	//		curDirectionInt += static_cast<int>(direction);
+	//		curDirectionInt = curDirectionInt % 4;
+	//		direction = static_cast<Direction>(curDirectionInt);
+	//	}
+	//}
+	//else if (message== "space_up") {
+	//	LOG(LOG_INFO, "Publishing Item from Player");
 
-		DropItem();
-	}
+	//	DropItem();
+	//}
 
 
 

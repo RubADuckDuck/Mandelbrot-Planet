@@ -3,9 +3,19 @@
 HostLobbyMode::HostLobbyMode(GameEngine* engine) : GameMode(engine) {}
 
 void HostLobbyMode::Enter() {
+    unsigned short tcp_port = 10429; 
+    unsigned short udp_port = 20429;
+
+
+    LOG(LOG_INFO, "HostLobbyMode::Initializing Gameserver");
     // Initialize the server when entering host mode
-    // server = std::make_unique<GameServer>();
-    // server->Start();  // Your server initialization
+    server = std::make_unique<GameServer>(*(gameEngine->GetIOContext())), tcp_port, udp_port);
+
+    LOG(LOG_INFO, "HostLobbyMode::Run IO Context on IO Thread"); 
+
+
+
+    io_context->run();
 }
 
 void HostLobbyMode::Update() {

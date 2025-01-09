@@ -3,11 +3,13 @@
 #include "GameMode.h"
 #include "Network/UDPServer.h"  // Your networking code
 #include "GameEngine.h"
+#include <asio.hpp>
 
 class HostLobbyMode : public GameMode {
 private:
     std::unique_ptr<GameServer> server;
     std::vector<std::string> connectedPlayers;  // List of connected players
+
 
 public:
     HostLobbyMode(GameEngine* engine);
@@ -19,4 +21,5 @@ public:
     void Draw() override;
 
     void Exit() override;
-};
+}; 
+

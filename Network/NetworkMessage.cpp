@@ -1,5 +1,6 @@
 #include "NetworkMessage.h"
 #include "../PlayerDirection.h"
+#include "../LOG.h"
 
 // Helper method to handle incoming UDP/TCP messages
 
@@ -18,7 +19,7 @@ std::unique_ptr<INetworkMessage> NetworkCodec::Decode(const std::vector<uint8_t>
 
 // Helper method to handle incoming UDP/TCP messages
 
-void NetworkCodec::HandleNetworkMessage(const std::vector<uint8_t>& data, GameState& gameState) {
+void NetworkCodec::HandleNetworkData(const std::vector<uint8_t>& data, GameState& gameState) {
     try {
         std::unique_ptr<INetworkMessage> message = Decode(data);
         // Process message : Message -> Command
@@ -31,7 +32,8 @@ void NetworkCodec::HandleNetworkMessage(const std::vector<uint8_t>& data, GameSt
         // Log error and handle gracefully
         std::cerr << "Error processing message: " << e.what() << std::endl;
     }
-}
+} 
+
 
 GameMessageProcessor& GameMessageProcessor::GetInstance() {
     static GameMessageProcessor instance;
@@ -40,6 +42,12 @@ GameMessageProcessor& GameMessageProcessor::GetInstance() {
 
 std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetworkMessage& message) {
     switch (message.GetType()) {
+    case MessageType::UDP_VERIFICATION: {
+        const auto& ipt_msg = static_cast<const UdpVerificationMessage&>(message);
+        return std::make_unique<UdpVerificationCommand>(
+            ipt_msg.session_id, ipt_msg.verification_code, ipt_msg.timestamp
+        );
+    }
     case MessageType::PLAYER_INPUT: {
         const auto& ipt_msg = static_cast<const PlayerInputMessage&>(message);
         return std::make_unique<PlayerInputCommand>(
@@ -70,6 +78,10 @@ std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetwor
             parent_msg.parentObjectID, parent_msg.gameObjectID
         );
     }
+    case MessageType::AUTHENTICATION:
+        LOG(LOG_WARNING, "Authenication message cannot be handled by a MessageProcessor."); 
+        return nullptr;
+                                              
                                               // Add cases for other message types
     default:
         throw std::runtime_error("Unknown message type");

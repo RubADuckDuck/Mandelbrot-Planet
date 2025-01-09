@@ -6,12 +6,45 @@
 #include "GameModeController.h"
 
 class GameEngine {
+public: 
+	std::string GetName() const; 
+
+	asio::io_context* GetIOContext();
+
+	std::thread& GetIOThread();
+
+	void RunIOContextOnIOThread() {
+		log(LOG_INFO, "Run IO context on IO thread");
+		io_thread = std::thread([this]() {
+			io_context->run();
+			}); 
+	} 
+
+	void StopIOThread() {
+		// Stop the event loop
+		log(LOG_INFO, "Stop IO context on IO thread");
+		io_context->stop();
+
+		// Wait for the thread to finish
+		if (io_thread.joinable()) {
+			io_thread.join();
+		}
+	}
+
+
 private: 
+	void log(LogLevel level, std::string text) {
+		LOG(level, GetName() + "::" + text); 
+	}
+
 	std::unique_ptr<SystemManager> systemManager;
 	std::unique_ptr<GameModeController> modeController;
 
-public: 
+	InputHandler inputHandler;
 
+	std::unique_ptr<asio::io_context> io_context;
+	std::thread io_thread;
+public: 
 
 	CameraObject camera;
 
@@ -21,7 +54,6 @@ public:
 	std::vector<Mesh*> reusableMeshes; 
 	std::vector<Texture*> resualbeTexutures; 
 
-	InputHandler inputHandler; 
 
 	GameEngine();
 
@@ -33,7 +65,10 @@ public:
 
 public:
 	InputHandler* GetInputHandler();
-	GameModeController* GetModeController();
+	GameModeController* GetModeController(); 
+	SDL_Window* GetWindow() {
+		return systemManager->GetWindow();
+	}
 
 public:
 

@@ -1,20 +1,43 @@
 #include "GameEngine.h"
 
+std::string GameEngine::GetName() const { return "GameEngine"; }
+
+asio::io_context* GameEngine::GetIOContext() {
+	return io_context.get();
+}
+
+std::thread& GameEngine::GetIOThread() {
+	return io_thread;
+}
+
 GameEngine::GameEngine() {
+	
+	
+	
 	camera = CameraObject();
 	inputHandler = InputHandler();
+
 }
 
 bool GameEngine::Initialize() {
+	LOG(LOG_INFO, GetName() + "::Initializing Application Configuration");
+	ApplicationConfig::Initialize(720, 480);  
+
 	// Initialize core systems
+	LOG(LOG_INFO, GetName() + "::Initializing System");
 	systemManager = std::make_unique<SystemManager>();
 	if (!systemManager->InitializeSDLAndOpenGL()) {
 		return false;
 	}
 
 	// Initialize game modes
+	LOG(LOG_INFO, GetName() + "::Initializing GameModes and GameModeController");
 	modeController = std::make_unique<GameModeController>(this);
 	modeController.get()->Initialize();
+
+	// LOG(LOG_INFO, GetName() + "::Initializing io_context");
+	log(LOG_INFO, "Initializing io_context"); 
+	io_context = std::make_unique<asio::io_context>();
 
 	return true;
 }
@@ -38,6 +61,8 @@ void GameEngine::Draw() {
 InputHandler* GameEngine::GetInputHandler() { return &inputHandler; }
 
 GameModeController* GameEngine::GetModeController() { return modeController.get(); }
+
+
 
 void GameEngine::CreateAndAddGameObject(const std::string& meshPath, std::string& texturePath, GLuint shaderProgram)
 {

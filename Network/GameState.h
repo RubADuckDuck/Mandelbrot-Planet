@@ -120,6 +120,8 @@ public:
     void UpdateGameState(float deltaTime);
 
     GameState() {
+        isWorking = false; 
+
         // movementManager = new MovementManager();  
         // gridTransformManager = new GridTransformManager();  
 
@@ -127,13 +129,36 @@ public:
         server = nullptr; 
     }
 
+    GameState(GameClient* client) 
+        : client(client), server(nullptr)
+    {
+        isWorking = true;
+        isServerSide = false;  
+    }
+
+    GameState(GameServer* server)
+        : client(nullptr), server(server)
+    {
+        isWorking = true; 
+        isServerSide = true;
+    }
+
+    void Initialize() {
+
+    }
+
 private: 
     // server (& client potentially)
     MovementManager* movementManager; 
 
     // Client 
-    GridTransformManager* gridTransformManager; 
+    GridTransformManager* gridTransformManager;
 
+
+public:  
+    // A bit messy but who cares 
+    bool isWorking = false;
+    bool isServerSide = false;  
     GameClient* client; 
     GameServer* server;  
 };

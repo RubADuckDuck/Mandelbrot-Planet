@@ -3,6 +3,7 @@
 #include <memory>
 #include "GameMode.h"
 
+
 class GameEngine;
 
 
@@ -10,7 +11,7 @@ class GameModeController {
 private:
     GameEngine* gameEngine;
     std::unordered_map<GameModeType, std::unique_ptr<GameMode>> modes;
-    GameMode* currentMode = nullptr;
+    GameMode* currentMode = nullptr; 
 
 public:
     GameModeController(GameEngine* engine);

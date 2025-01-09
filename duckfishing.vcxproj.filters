@@ -46,6 +46,12 @@
     <Filter Include="Source Files\System">
       <UniqueIdentifier>{9793de1b-5708-45ba-aaf6-7c754288fbb0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GameMode\PlayingMode">
+      <UniqueIdentifier>{7ec466af-c6c1-4fb5-9a82-111312468654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameMode\PlayingMode">
+      <UniqueIdentifier>{5328fbd7-8533-44e6-91e7-431f3374d1ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Item.cpp">
@@ -138,9 +144,6 @@
     <ClCompile Include="ApplicationConfig.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
-    <ClCompile Include="PlayingMode.cpp">
-      <Filter>Source Files\GameMode</Filter>
-    </ClCompile>
     <ClCompile Include="GameEngine.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
@@ -152,6 +155,18 @@
     </ClCompile>
     <ClCompile Include="ImageLoader.cpp">
       <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMode.cpp">
+      <Filter>Source Files\GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayingMode.cpp">
+      <Filter>Source Files\GameMode\PlayingMode</Filter>
+    </ClCompile>
+    <ClCompile Include="HostPlayingMode.cpp">
+      <Filter>Source Files\GameMode\PlayingMode</Filter>
+    </ClCompile>
+    <ClCompile Include="JoinPlayingMode.cpp">
+      <Filter>Source Files\GameMode\PlayingMode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -266,14 +281,20 @@
     <ClInclude Include="GameEngine.h">
       <Filter>Header Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="PlayingMode.h">
-      <Filter>Header Files\GameMode</Filter>
-    </ClInclude>
     <ClInclude Include="HostLobbyMode.h">
       <Filter>Header Files\GameMode</Filter>
     </ClInclude>
     <ClInclude Include="JoinLobbyMode.h">
       <Filter>Header Files\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="JoinPlayingMode.h">
+      <Filter>Header Files\GameMode\PlayingMode</Filter>
+    </ClInclude>
+    <ClInclude Include="HostPlayingMode.h">
+      <Filter>Header Files\GameMode\PlayingMode</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayingMode.h">
+      <Filter>Header Files\GameMode\PlayingMode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,4 +1,7 @@
 #pragma once
+#include <string> 
+#include "LOG.h"
+
 class ApplicationConfig {
 private:
     // Make constructor private to prevent direct instantiation
@@ -24,9 +27,13 @@ public:
     static int GetScreenHeight() { return screenHeight; }
 
     // Initialize with default values
-    static void Initialize(int width = 1280, int height = 960) {
+    static void Initialize(int width = 1280, int height = 720) {
         screenWidth = width;
         screenHeight = height;
+
+        std::string swsh = "  ScreenWidth: " + std::to_string(width) + "  ScreenHeight: " + std::to_string(height);
+
+        LOG(LOG_INFO, swsh); 
         quit = false;
     }
 };

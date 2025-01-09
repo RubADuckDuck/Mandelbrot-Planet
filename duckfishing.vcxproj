@@ -155,15 +155,18 @@
     <ClCompile Include="ApplicationConfig.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="GameMode.cpp" />
     <ClCompile Include="GameModeController.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalMappings.cpp" />
     <ClCompile Include="GridManager.cpp" />
     <ClCompile Include="GroundType.h" />
     <ClCompile Include="HostLobbyMode.cpp" />
+    <ClCompile Include="HostPlayingMode.cpp" />
     <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="JoinLobbyMode.cpp" />
+    <ClCompile Include="JoinPlayingMode.cpp" />
     <ClCompile Include="LOG.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -196,6 +199,7 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="ApplicationConfig.h" />
+    <ClInclude Include="JoinPlayingMode.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="FactoryType.h" />
     <ClInclude Include="GameEngine.h" />
@@ -207,6 +211,7 @@
     <ClInclude Include="GlobalMappings.h" />
     <ClInclude Include="GridManager.h" />
     <ClInclude Include="HostLobbyMode.h" />
+    <ClInclude Include="HostPlayingMode.h" />
     <ClInclude Include="InteractionInfo.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemType.h" />

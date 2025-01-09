@@ -36,6 +36,24 @@ public:
 //        gameState.UpdatePlayerPosition(player_id, x, y, z);
 //    }
 //};
+class UdpVerificationCommand : public IGameCommand {
+    uint32_t session_id;
+
+    // Keeping the 64-bit verification code
+    uint64_t verification_code;
+
+    // Keeping the 64-bit timestamp
+    uint64_t timestamp; 
+
+public: 
+    UdpVerificationCommand(
+        uint32_t session_id, 
+        uint64_t verification_code, 
+        uint64_t timestamp 
+    );
+
+    void Execute(GameState& gameState) override;
+};
 
 class PlayerInputCommand : public IGameCommand {
     Direction user_input; 

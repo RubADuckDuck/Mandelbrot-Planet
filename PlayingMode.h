@@ -2,13 +2,10 @@
 #pragma once
 #include "GameMode.h"
 
-class TerrainManager;
-
 class PlayingMode : public GameMode {
 private:
-    TerrainManager* terrainManager;
     // Track whether we're in a networked game
-    bool isNetworked;
+    bool isNetworked = false;
 
 public:
     PlayingMode(GameEngine* engine);
@@ -22,4 +19,5 @@ public:
     void Draw() override;
 
     void Exit() override;
-};
+}; 
+

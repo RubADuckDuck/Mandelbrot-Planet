@@ -2,15 +2,57 @@
 #include "NetworkMessage.h"
 #include "GameState.h"
 
+
+
 using pointer = std::shared_ptr<GameServer::TcpConnection>;
+
+void GameServer::InitGameState() {
+    LOG(LOG_INFO, "GameServer::Initializing Game State"); 
+    game_state = new GameState(this);
+}
+
+void GameServer::stop_accepting_connections() {
+    should_accept_new_connections = false;
+}
+
+
+// Register GameServer As listener to data type event messages 
+
+
+// Event Related 
+
+void GameServer::handle_events(const std::vector<uint8_t> data) {
+    // broadcast to other clients 
+    this->broadcast_data_through_udp(data); 
+
+    this->handle_data(data); 
+}
+
+void GameServer::register_to_dispatcher() {
+    Listener dataListener = [this](const std::vector<uint8_t> data) {
+        LOG(LOG_INFO, "GameServer::DataListener Triggered");
+        this->handle_events(data);
+    };
+
+    EventDispatcher& dispatcher = EventDispatcher::GetInstance();
+
+    dispatcher.Subscribe(&dataListener);
+    LOG(LOG_INFO, "GameServer::Subscribing GameServer as Listener");
+}
 
 GameServer::GameServer(asio::io_context& io_context, unsigned short tcp_port, unsigned short udp_port)
     : tcp_acceptor_(io_context, tcp::endpoint(tcp::v4(), tcp_port)),
     udp_socket_(io_context, udp::endpoint(udp::v4(), udp_port)),
-    io_context_(io_context) {
+    io_context_(io_context) 
+{
+    InitGameState();
 
-    start_tcp_accept();
-    start_udp_receive();
+    // register listener to dispatcher. 
+    register_to_dispatcher(); 
+
+    // Start Network
+    start_tcp_accept();  
+    start_udp_receive();  
 }
 
 // Broadcast a message to all connected clients
@@ -105,6 +147,7 @@ void GameServer::TcpConnection::do_write() {
         });
 }
 
+// tcp connection process #1 
 void GameServer::TcpConnection::start_connection_process() {
     // Handle new TCP connection
     auto client_info = std::make_shared<ClientInfo>();
@@ -117,6 +160,8 @@ void GameServer::TcpConnection::start_connection_process() {
     begin_authentication(client_info);
 }
 
+// tcp connection process #5
+// register client to server and start syncing gameState Information  
 std::shared_ptr<ClientInfo> GameServer::TcpConnection::handle_udp_establishment_and_get_client() {
     // Start to send Map info 
     client_info->state = ClientInfo::State::SYNCHRONIZING;
@@ -126,6 +171,8 @@ std::shared_ptr<ClientInfo> GameServer::TcpConnection::handle_udp_establishment_
     return client_info;
 }
 
+// tcp connection process #2
+// begin authentication process  
 void GameServer::TcpConnection::begin_authentication(std::shared_ptr<ClientInfo> client) {
     asio::async_read(
         this->socket_, asio::buffer(read_buffer_),
@@ -143,6 +190,7 @@ bool GameServer::TcpConnection::validate_auth_request(AuthRequestMessage* auth_m
     return true;
 }
 
+// tcp connection process #3 
 void GameServer::TcpConnection::handle_auth_request(std::shared_ptr<ClientInfo> client, const std::vector<uint8_t>& data, std::size_t length) {
     // Process authentication data
     std::unique_ptr<INetworkMessage> message = std::move(MessageFactory::CreateMessage(data));
@@ -156,10 +204,14 @@ void GameServer::TcpConnection::handle_auth_request(std::shared_ptr<ClientInfo> 
         }
     }
     else {
-        LOG(LOG_ERROR, "Client did not send a auth message. ");
+        LOG(LOG_INFO, "Client did not send a auth message. Retry connection"); 
+        // try again 
+        begin_authentication(client); 
     }
 }
 
+// tcp connection process #4 
+// Send UDP verification code 
 void GameServer::TcpConnection::begin_udp_establishment(std::shared_ptr<ClientInfo> client) {
     // Create verification message
     UdpVerificationMessage verify_msg = UdpVerificationMessage();
@@ -181,6 +233,8 @@ void GameServer::TcpConnection::send_udp_verification(std::shared_ptr<ClientInfo
     this->send_tcp_message(data);
 }
 
+// tcp connection process #6 
+// sync gameState
 void GameServer::TcpConnection::begin_state_sync(std::shared_ptr<ClientInfo> client)
 {
     std::unique_ptr<INetworkMessage> gameStateCaptureMsg = this->server->game_state->CaptureGameState();
@@ -207,11 +261,11 @@ void GameServer::TcpConnection::handle_read(std::size_t length) {
 
 // Static creation method that ensures proper shared_ptr management
 
-pointer GameServer::TcpConnection::create(asio::io_context& io_context, GameServer* ptrServer) {
-    return pointer(new TcpConnection(io_context, ptrServer));
-}
+pointer GameServer::TcpConnection::create(asio::io_context& io_context, GameServer* ptrServer) { 
+    return pointer(new TcpConnection(io_context, ptrServer)); 
+}  
 
-// The main send interface
+// The main send interface 
 
 void GameServer::TcpConnection::send_tcp_message(const std::vector<uint8_t>& data) {
     // We can safely use shared_from_this() here because the object
@@ -225,10 +279,16 @@ void GameServer::TcpConnection::send_tcp_message(const std::vector<uint8_t>& dat
         });
 }
 
-
+ 
 void GameServer::start_tcp_accept() {
+    if (!should_accept_new_connections) {
+        return;
+    }
+
     // creating new tcp connection
     auto new_connection = TcpConnection::create(io_context_, this); // creates a shared pointer
+
+    LOG(LOG_INFO, "Start TCP Accept");  
 
     tcp_acceptor_.async_accept(
         new_connection->socket(), // the socket made by the connection goes here.
@@ -246,6 +306,9 @@ void GameServer::start_tcp_accept() {
 }
 
 void GameServer::start_udp_receive() {
+
+    LOG(LOG_INFO, "Start UDP Receive");
+
     udp_socket_.async_receive_from(
         asio::buffer(udp_receive_buffer_), udp_remote_endpoint_,
         [this](std::error_code ec, std::size_t bytes_received) {
@@ -261,32 +324,35 @@ void GameServer::handle_udp_receive(std::size_t bytes_received) {
         udp_receive_buffer_.begin(),
         udp_receive_buffer_.begin() + bytes_received
     );
-    std::unique_ptr<INetworkMessage> receivedMessage = MessageFactory::CreateMessage(data);
 
-    if (auto verificationMsg = dynamic_cast<UdpVerificationMessage*>(receivedMessage.get())) {
-        // when the message is a udp_verification, search from the pending verifications
-        auto it = pendingVerification.find(verificationMsg->verification_code);
+    this->handle_data(data); 
+} 
 
-        if (it != pendingVerification.end()) {
-            std::shared_ptr<ClientInfo> newClient = it->second->handle_udp_establishment_and_get_client();
+void GameServer::handle_data(const std::vector<uint8_t> data) {
+    NetworkCodec::HandleNetworkData(data, *(this->game_state)); 
+}
 
-            // set udp endpoint of client 
-            newClient->udp_endpoint = udp_remote_endpoint_;
+void GameServer::verify_pending_udp_connection(uint64_t verification_code) 
+{
+    // when the message is a udp_verification, search from the pending verifications
+    auto it = pendingVerification.find(verification_code);
 
-            // register client  
-            register_client(newClient);
-        }
-        else {
-            // none valid verification code
-            return;
-        }
+    if (it != pendingVerification.end()) {
+        std::shared_ptr<ClientInfo> newClient = it->second->handle_udp_establishment_and_get_client();
+
+        // set udp endpoint of client 
+        newClient->udp_endpoint = udp_remote_endpoint_;
+
+        // register client  
+        register_client(newClient);
     }
-
-    // add logic for altering gameState
+    else {
+        // none valid verification code
+        return;
+    }
 }
 
 // broadcast data to all tcp clients 
-
 void GameServer::broadcast_data_through_tcp(const std::vector<uint8_t> data) {
     for (const auto& tcpConnection : tcp_clients_) {
         tcpConnection.get()->send_tcp_message(data);

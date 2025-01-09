@@ -1,5 +1,6 @@
 #include "Command.h"
 #include "GameState.h"
+#include "NetworkMessage.h"
 
 PlayerInputCommand::PlayerInputCommand(Direction userInput, uint32_t playerID)
     : user_input(userInput), player_id(playerID) {}
@@ -34,4 +35,21 @@ GameObjectParentCommand::GameObjectParentCommand(uint32_t parentObjectID, uint32
 
 void GameObjectParentCommand::Execute(GameState& gameState) {
     gameState.SetParent(gameobject_id, parent_object_id, true);
+}
+
+UdpVerificationCommand::UdpVerificationCommand(uint32_t session_id, uint64_t verification_code, uint64_t timestamp) : session_id(session_id), verification_code(verification_code), timestamp(timestamp) {}
+
+void UdpVerificationCommand::Execute(GameState& gameState) {
+    if (gameState.isServerSide) {
+        // verify code 
+        gameState.server->verify_pending_udp_connection(verification_code);
+    }
+    else {
+        // send back verification message through udp 
+        INetworkMessage* newMessage = new UdpVerificationMessage(session_id, verification_code);
+
+        gameState.client->send_message(newMessage);
+
+        delete newMessage;
+    }
 }

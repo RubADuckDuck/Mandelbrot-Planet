@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_map> 
+#include <string> 
 
 // Different modes our game can be in
 enum class GameModeType {
@@ -6,8 +8,12 @@ enum class GameModeType {
     PLAYING,
     SETTINGS,
     HOST_LOBBY,
-    JOIN_LOBBY
+    JOIN_LOBBY, 
+    HOST_PLAYING, 
+    CLIENT_PLAYING
 };
+
+extern std::unordered_map<GameModeType, std::string> mode2string;
 
 class GameEngine;
 
@@ -24,4 +30,5 @@ public:
     virtual void Update() = 0;  // Called each frame for logic updates
     virtual void Draw() = 0;    // Called each frame for rendering
     virtual void Exit() = 0;    // Called when leaving this mode
-};
+}; 
+

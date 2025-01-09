@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetCustomServer", "..\NetCu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetCustomClient", "..\NetCustomClient\NetCustomClient.vcxproj", "{20B52DCB-08A6-41BA-90AA-C7466E23A07B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetCustomCommon", "..\NetCustomCommon\NetCustomCommon.vcxproj", "{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestServer", "..\TestServer\TestServer.vcxproj", "{AF64F71E-8053-46BC-86C4-DBDD2B33CA79}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestClient", "..\TestClient\TestClient.vcxproj", "{755CEC9D-2660-47F8-8B44-C634D0A6B8ED}"
@@ -47,14 +45,6 @@ Global
 		{20B52DCB-08A6-41BA-90AA-C7466E23A07B}.Release|x64.Build.0 = Release|x64
 		{20B52DCB-08A6-41BA-90AA-C7466E23A07B}.Release|x86.ActiveCfg = Release|Win32
 		{20B52DCB-08A6-41BA-90AA-C7466E23A07B}.Release|x86.Build.0 = Release|Win32
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Debug|x64.ActiveCfg = Debug|x64
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Debug|x64.Build.0 = Debug|x64
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Debug|x86.ActiveCfg = Debug|Win32
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Debug|x86.Build.0 = Debug|Win32
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Release|x64.ActiveCfg = Release|x64
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Release|x64.Build.0 = Release|x64
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Release|x86.ActiveCfg = Release|Win32
-		{EF0C44EE-A9F9-429F-9D6C-4E6425499A0E}.Release|x86.Build.0 = Release|Win32
 		{AF64F71E-8053-46BC-86C4-DBDD2B33CA79}.Debug|x64.ActiveCfg = Debug|x64
 		{AF64F71E-8053-46BC-86C4-DBDD2B33CA79}.Debug|x64.Build.0 = Debug|x64
 		{AF64F71E-8053-46BC-86C4-DBDD2B33CA79}.Debug|x86.ActiveCfg = Debug|Win32

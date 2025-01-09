@@ -51,13 +51,26 @@ struct ClientInfo {
 };
 
 
-
-
 class GameServer {
 
 private: 
     NetworkCodec* network_codec;
-    GameState* game_state;
+    GameState* game_state; 
+
+    bool should_accept_new_connections = true;
+
+public:
+    void InitGameState();
+
+    void stop_accepting_connections();
+
+private: 
+    // Event Related 
+    void handle_events(const std::vector<uint8_t> data);
+
+    // Register GameServer As listener to data type event messages 
+    void register_to_dispatcher();
+
 public:
     GameServer(asio::io_context& io_context, unsigned short tcp_port, unsigned short udp_port);
 
@@ -139,7 +152,12 @@ public:
 
     void start_udp_receive();
 
+    // handle input 
     void handle_udp_receive(std::size_t bytes_received); 
+    void handle_data(const std::vector<uint8_t> data);
+
+    // verify udp connection 
+    void verify_pending_udp_connection(uint64_t verification_code);
 
     // broadcast data to all tcp clients 
     void broadcast_data_through_tcp(const std::vector<uint8_t> data);
@@ -147,7 +165,6 @@ public:
     // broadcast data to all existing clients 
     void broadcast_data_through_udp(const std::vector<uint8_t> data);
 
-    // send to specific client by client_id
     // send to specific client by client_id
     void send_data_to_specific_client_by_udp(
         uint32_t client_id,
@@ -165,22 +182,23 @@ public:
     // clients are registered after connections are established
     void register_client(std::shared_ptr<ClientInfo> newClient);
 
-    // TCP server components
+    // TCP server components  
     tcp::acceptor tcp_acceptor_;
     std::unordered_set<typename TcpConnection::pointer> tcp_clients_;
 
-    // UDP server components
+    // UDP server components   
     udp::socket udp_socket_;
     udp::endpoint udp_remote_endpoint_;
     std::array<uint8_t, 1024> udp_receive_buffer_;
 
-    // Shared components
+    // Shared components  
     asio::io_context& io_context_;
     std::mutex clients_mutex_; 
 
-    // clients
+    // Registered clients 
     std::unordered_map<uint32_t,std::shared_ptr<ClientInfo>> clients;
 
+    // TCP connections waiting for UDP Verification to arrive  
     // f: verification code -> Client's TCP Connection
     std::unordered_map<uint64_t, std::shared_ptr<TcpConnection>> pendingVerification;
 };

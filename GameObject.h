@@ -164,11 +164,11 @@ public:
 
 enum class MapLayerType {
     BIOME,        // Water, Grassland, volcano ...
-    STRUCTURE, // buildings, Primary Resources (one time use blocks)
-    DROPPEDITEM,  // Resources
-    PLAYER,
-    LAST
-};
+    STRUCTURE, // buildings, Primary Resources (one time use blocks) 
+    DROPPEDITEM,  // Resources 
+    PLAYER, 
+    LAST 
+}; 
 
 
 

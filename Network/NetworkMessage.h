@@ -1,18 +1,18 @@
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <memory>
-#include <variant>
-#include <string>
-#include <array>
-#include <stdexcept>
-#include <iostream> 
-#include <chrono>
-#include <random>
+#include <cstdint> 
+#include <vector> 
+#include <memory> 
+#include <variant> 
+#include <string> 
+#include <array> 
+#include <stdexcept> 
+#include <iostream>  
+#include <chrono> 
+#include <random> 
 
-#include "Command.h"
-#include "NetworkConfig.h"
+#include "Command.h"  
+#include "NetworkConfig.h" 
 
 
 // Forward declarations
@@ -328,7 +328,7 @@ public:
     static std::unique_ptr<INetworkMessage> Decode(const std::vector<uint8_t>& data);
 
     // Helper method to handle incoming UDP/TCP messages
-    static void HandleNetworkMessage(const std::vector<uint8_t>& data, GameState& gameState);
+    static void HandleNetworkData(const std::vector<uint8_t>& data, GameState& gameState);
 };
 
 

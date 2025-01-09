@@ -1,5 +1,10 @@
 #include "Texture.h"
 #include "LOG.h"
+#include "stb_image.h"
+
+void Texture::SetTextureIndex(GLuint textureIndex) { this->textureIndex = textureIndex; }
+
+GLuint Texture::GetTextureIndex() { return textureIndex; }
 
 void Texture::LoadandSetTextureIndexFromPath(const std::string& path, bool retry) {
 	GLuint resTextureIndex;

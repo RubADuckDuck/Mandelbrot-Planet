@@ -152,21 +152,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="ApplicationConfig.cpp" />
     <ClCompile Include="Event.cpp" />
+    <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="GameModeController.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalMappings.cpp" />
     <ClCompile Include="GridManager.cpp" />
     <ClCompile Include="GroundType.h" />
+    <ClCompile Include="HostLobbyMode.cpp" />
+    <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="JoinLobbyMode.cpp" />
     <ClCompile Include="LOG.cpp" />
     <ClCompile Include="main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main1.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="MainMenuMode.cpp" />
+    <ClCompile Include="main_game.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MessageParser.cpp" />
     <ClCompile Include="Network\Command.cpp" />
@@ -175,6 +183,7 @@
     <ClCompile Include="Network\NetworkMessage.cpp" />
     <ClCompile Include="Network\UDPClient.cpp" />
     <ClCompile Include="Network\UDPServer.cpp" />
+    <ClCompile Include="PlayingMode.cpp" />
     <ClCompile Include="ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="stb_image.h" />
@@ -186,19 +195,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="ApplicationConfig.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="FactoryType.h" />
     <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="GameMode.h" />
+    <ClInclude Include="GameModeController.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Gizmo.h" />
     <ClInclude Include="GlobalMappings.h" />
     <ClInclude Include="GridManager.h" />
+    <ClInclude Include="HostLobbyMode.h" />
     <ClInclude Include="InteractionInfo.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemType.h" />
+    <ClInclude Include="JoinLobbyMode.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LOG.h" />
+    <ClInclude Include="MainMenuMode.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MessageParser.h" />
     <ClInclude Include="Network\Command.h" />
@@ -211,7 +226,9 @@
     <ClInclude Include="ObjectType.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="PlayerDirection.h" />
+    <ClInclude Include="PlayingMode.h" />
     <ClInclude Include="ShaderProgramLoader.h" />
+    <ClInclude Include="SystemManager.h" />
     <ClInclude Include="TerrainManager.h" />
     <ClInclude Include="TerrainObject.h" />
     <ClInclude Include="Texture.h" />

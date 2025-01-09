@@ -28,53 +28,26 @@
     <Filter Include="Source Files\Network">
       <UniqueIdentifier>{109157ff-0856-4a9e-b4d5-11c86feaa93e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GameMode">
+      <UniqueIdentifier>{b1717b42-ace8-4164-9fd1-90ac5e22539f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\temp">
+      <UniqueIdentifier>{ecc0b519-8536-488e-835a-76dea7d257ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\temp">
+      <UniqueIdentifier>{9de4c970-d3c9-4c5d-b52c-da9f370f5447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameMode">
+      <UniqueIdentifier>{d8ba4fba-d22b-43e2-925e-4b50d72663d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{f4ae0948-a782-4735-bf88-24ede154a0b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{9793de1b-5708-45ba-aaf6-7c754288fbb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\glad.c">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderProgramLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LOG.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MessageParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalMappings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TerrainObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Item.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
@@ -83,12 +56,6 @@
     </ClCompile>
     <ClCompile Include="TerrainManager.cpp">
       <Filter>Source Files\GameObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="GridManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Event.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Network\Command.cpp">
       <Filter>Source Files\Network</Filter>
@@ -108,47 +75,86 @@
     <ClCompile Include="Network\UDPServer.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
+    <ClCompile Include="src\glad.c">
+      <Filter>Header Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.h">
+      <Filter>Header Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalMappings.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="GridManager.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="LOG.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="main1.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageParser.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgramLoader.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainObject.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeController.cpp">
+      <Filter>Source Files\GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenuMode.cpp">
+      <Filter>Source Files\GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="main_game.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationConfig.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayingMode.cpp">
+      <Filter>Source Files\GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEngine.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="HostLobbyMode.cpp">
+      <Filter>Source Files\GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="JoinLobbyMode.cpp">
+      <Filter>Source Files\GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageLoader.cpp">
+      <Filter>Source Files\temp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Event.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Gizmo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderProgramLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalMappings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
@@ -172,9 +178,6 @@
     </ClInclude>
     <ClInclude Include="PlayerDirection.h">
       <Filter>Header Files\GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="GridManager.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Planet.h">
       <Filter>Header Files\GameObjects</Filter>
@@ -203,8 +206,74 @@
     <ClInclude Include="Network\UDPServer.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
+    <ClInclude Include="GameMode.h">
+      <Filter>Header Files\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="GameModeController.h">
+      <Filter>Header Files\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenuMode.h">
+      <Filter>Header Files\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Gizmo.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalMappings.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="GridManager.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
     <ClInclude Include="LOG.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageParser.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgramLoader.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemManager.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationConfig.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEngine.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayingMode.h">
+      <Filter>Header Files\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="HostLobbyMode.h">
+      <Filter>Header Files\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="JoinLobbyMode.h">
+      <Filter>Header Files\GameMode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

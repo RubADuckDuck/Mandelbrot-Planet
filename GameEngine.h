@@ -2,9 +2,17 @@
 #include "Mesh.h" 
 #include "GameObject.h" 
 #include "Event.h"
+#include "SystemManager.h"
+#include "GameModeController.h"
 
 class GameEngine {
+private: 
+	std::unique_ptr<SystemManager> systemManager;
+	std::unique_ptr<GameModeController> modeController;
+
 public: 
+
+
 	CameraObject camera;
 
 	std::list<Listener> listeners;
@@ -15,76 +23,30 @@ public:
 
 	InputHandler inputHandler; 
 
-	GameEngine() {
-		camera = CameraObject(); 
-		inputHandler = InputHandler();
-	} 
+	GameEngine();
 
-	void Update() {
-		inputHandler.pollEvents(); 
+	bool Initialize();
 
-		camera.Update();
+	void Update();
+	 
+	void Draw();
 
-		GameObject* curGameObjPtr; 
+public:
+	InputHandler* GetInputHandler();
+	GameModeController* GetModeController();
 
-		for (int i = 0; i < gameObjects.size(); i++) {
-			curGameObjPtr = gameObjects[i]; 
-			curGameObjPtr->Update();
-		}
-	} 
-
-	void Draw() {
-		for (GameObject* ptrGameObj : gameObjects) {
-			ptrGameObj->DrawGameObject(camera);
-		}
-	}
+public:
 
 	void CreateAndAddGameObject( // I recommed not to use this. Shaders are no longer manually passed.
 		const std::string& meshPath, 
 		std::string& texturePath,
 		GLuint shaderProgram
-		) 
-	{  
-		GeneralMesh* curMesh = new StaticMesh();  
-		curMesh->LoadMesh(meshPath); 
-
-		Texture* curTexture = new Texture(); 
-		curTexture->LoadandSetTextureIndexFromPath(texturePath);  
-
-		Transform* defaultTransform = new Transform();  
-		defaultTransform->SetScale(glm::vec3(0.2f));
-		defaultTransform->SetTranslation(glm::vec3(0,1.0f,0));
-
-		GameObject* gameObject = new RotatingGameObject(); 
-		gameObject->SetMesh(curMesh); 
-		gameObject->SetTexture(curTexture); 
-		gameObject->SetTransform(defaultTransform); 
-
-		this->AddGameObjectToGameEngine(gameObject);
-	} 
+		);
 
 	void CreateAndAddGameObject(
 		const std::string& meshPath,
 		std::string& texturePath
-	)
-	{
-		GeneralMesh* curMesh = new StaticMesh();
-		curMesh->LoadMesh(meshPath);
-
-		Texture* curTexture = new Texture();
-		curTexture->LoadandSetTextureIndexFromPath(texturePath);
-
-		Transform* defaultTransform = new Transform();
-		defaultTransform->SetScale(glm::vec3(0.2f));
-		defaultTransform->SetTranslation(glm::vec3(0, 1.0f, 0));
-
-		GameObject* gameObject = new PlayableObject();
-		gameObject->SetMesh(curMesh);
-		gameObject->SetTexture(curTexture);
-		gameObject->SetTransform(defaultTransform);
-
-		this->AddGameObjectToGameEngine(gameObject);
-	}
+	);
 
 	void CreateAndAddGameObjectWithTransform( 
 		const std::string& meshPath, 
@@ -92,71 +54,11 @@ public:
 		const glm::vec3& translation = glm::vec3(0.0f), 
 		const glm::vec3& scale = glm::vec3(1.0f), 
 		const glm::vec3& rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f), 
-		float rotationAngleRadians = 0.0f) // Angle in radians 
-	{
-		// Load mesh
-		GeneralMesh* curMesh = new StaticMesh();
-		curMesh->LoadMesh(meshPath);
+		float rotationAngleRadians = 0.0f);
 
-		// Load texture
-		Texture* curTexture = new Texture();
-		curTexture->LoadandSetTextureIndexFromPath(texturePath);
-
-		// Create and set up transform
-		Transform* customTransform = new Transform();
-		customTransform->SetTranslation(translation);
-		customTransform->SetScale(scale);
-		customTransform->SetRotation(rotationAngleRadians, rotationAxis);
-
-		// Create the game object
-		GameObject* gameObject = new GameObject();
-		gameObject->SetMesh(curMesh);
-		gameObject->SetTexture(curTexture);
-		gameObject->SetTransform(customTransform);
-
-		// Add to game engine
-		this->AddGameObjectToGameEngine(gameObject);
-	}
-
-	void DirectlyAddGameObject(GameObject* newGameObject) {
-		AddGameObjectToGameEngine(newGameObject);
-	}
+	void DirectlyAddGameObject(GameObject* newGameObject);
 	
-	void ManuallySubscribe(GameObject* gameObj) {
-		// Store the lambda in a persistent container
-		listeners.emplace_back([gameObj](const std::vector<uint8_t> message) {
-			LOG(LOG_INFO, "Typeid of gameObj on which event is triggered: " + std::string(typeid(*gameObj).name()));
-			gameObj->onEvent(message);
-			});
-
-		// Pass a pointer to the stored lambda
-		inputHandler.Subscribe(&listeners.back());
-		LOG(LOG_INFO, "Subscribing game object as Listener");
-
-		// Check if the game object is an instance of PlayableObject
-		if (PlayableObject* playableObj = dynamic_cast<PlayableObject*>(gameObj)) {
-			camera.AddTarget(playableObj); // Add to target list
-			LOG(LOG_INFO, "Added PlayableObject to target list: " + std::string(typeid(*playableObj).name()));
-		}
-	}
+	void ManuallySubscribe(GameObject* gameObj);
 private: 
-	void AddGameObjectToGameEngine(GameObject* gameObj) {
-		//// Store the lambda in a persistent container
-		//listeners.emplace_back([gameObj](const std::string& message) {
-		//	LOG(LOG_INFO, "Typeid of gameObj on which event is triggered: " + std::string(typeid(*gameObj).name()));
-		//	gameObj->onEvent(message);
-		//	});
-
-		//// Pass a pointer to the stored lambda
-		//inputHandler.Subscribe(&listeners.back());
-
-		//LOG(LOG_INFO, "Subscribing game object as Listener"); 
-
-		gameObjects.push_back(gameObj); 
-
-		// Check if the game object is an instance of PlayableObject
-		if (PlayableObject* playableObj = dynamic_cast<PlayableObject*>(gameObj)) {
-			ManuallySubscribe(playableObj);
-		}
-	}
+	void AddGameObjectToGameEngine(GameObject* gameObj);
 };

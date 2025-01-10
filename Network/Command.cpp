@@ -1,12 +1,14 @@
 #include "Command.h"
 #include "GameState.h"
 #include "NetworkMessage.h"
+#include "../LOG.h" 
 
 PlayerInputCommand::PlayerInputCommand(Direction userInput, uint32_t playerID)
     : user_input(userInput), player_id(playerID) {}
 
 void PlayerInputCommand::Execute(GameState& gameState) {
-    gameState.PlayerTakeAction(player_id, user_input, true);
+    LOG(LOG_INFO, "PlayerInput \n  Player id: " + std::to_string(player_id) + "\n  User Input: " + direction2String[user_input]);
+    // gameState.PlayerTakeAction(player_id, user_input, true);
 }
 
 AddGameObjectCommand::AddGameObjectCommand(uint8_t gameObjectTypeID, uint32_t gameObjectID)

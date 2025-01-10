@@ -186,6 +186,7 @@
     <ClCompile Include="Network\NetworkMessage.cpp" />
     <ClCompile Include="Network\UDPClient.cpp" />
     <ClCompile Include="Network\UDPServer.cpp" />
+    <ClCompile Include="PlayerDirection.cpp" />
     <ClCompile Include="PlayingMode.cpp" />
     <ClCompile Include="ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />

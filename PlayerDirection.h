@@ -1,4 +1,6 @@
 #pragma once
+#include <map> 
+#include <string>
 
 enum class Direction { 
 	RIGHT = 0, 
@@ -7,4 +9,6 @@ enum class Direction {
 	DOWN = 3, 
 	IDLE = 4
 };
+
+extern std::map<Direction, std::string> direction2String;
 

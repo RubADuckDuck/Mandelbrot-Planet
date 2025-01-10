@@ -168,6 +168,9 @@
     <ClCompile Include="JoinPlayingMode.cpp">
       <Filter>Source Files\GameMode\PlayingMode</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerDirection.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameObject.h">

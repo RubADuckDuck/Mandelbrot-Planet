@@ -25,6 +25,7 @@ E:\proj\[gameproj]\DontStarve\DuckFishing\Network\GameStateManager.cpp;E:\proj\[
 E:\proj\[gameproj]\DontStarve\DuckFishing\Network\NetworkMessage.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\NetworkMessage.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\Network\UDPClient.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\UDPClient.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\Network\UDPServer.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\UDPServer.obj
+E:\proj\[gameproj]\DontStarve\DuckFishing\PlayerDirection.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\PlayerDirection.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\PlayingMode.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\PlayingMode.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\ShaderProgramLoader.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\ShaderProgramLoader.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\src\glad.c;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\glad.obj

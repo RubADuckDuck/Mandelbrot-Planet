@@ -226,7 +226,11 @@ void GameClient::handle_events(std::vector<uint8_t> data)
     switch (mt) {
     case MessageType::PLAYER_INPUT: 
         log(LOG_INFO, "Player Input event Triggered, Sending to Sever"); 
-        this->send_message(curMessage.get(), true);
+        auto pi_msg = dynamic_cast<PlayerInputMessage*>(curMessage.get()); 
+
+        pi_msg->playerID = client_id; 
+
+        this->send_message(pi_msg, true);
     }
 
     

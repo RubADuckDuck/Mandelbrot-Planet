@@ -13,23 +13,9 @@ public:
 
 	std::thread& GetIOThread();
 
-	void RunIOContextOnIOThread() {
-		log(LOG_INFO, "Run IO context on IO thread");
-		io_thread = std::thread([this]() {
-			io_context->run();
-			}); 
-	} 
+	void RunIOContextOnIOThread();
 
-	void StopIOThread() {
-		// Stop the event loop
-		log(LOG_INFO, "Stop IO context on IO thread");
-		io_context->stop();
-
-		// Wait for the thread to finish
-		if (io_thread.joinable()) {
-			io_thread.join();
-		}
-	}
+	void StopIOThread();
 
 
 private: 
@@ -56,6 +42,8 @@ public:
 
 
 	GameEngine();
+
+	~GameEngine();
 
 	bool Initialize();
 

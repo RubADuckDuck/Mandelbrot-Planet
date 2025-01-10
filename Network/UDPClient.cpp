@@ -6,6 +6,12 @@
 
 using pointer = std::shared_ptr<TcpConnection>;
 
+std::string TcpConnection::GetName() const { return "TcpConnection"; }
+
+void TcpConnection::log(LogLevel level, std::string text) {
+    LOG(level, GetName() + "::" + text);
+}
+
 pointer TcpConnection::create(asio::io_context& io_context, GameClient* client) {
     return pointer(new TcpConnection(io_context, client));
 }
@@ -114,6 +120,8 @@ void TcpConnection::do_write() {
 }
 
 void TcpConnection::handle_message(std::size_t length) {
+    log(LOG_INFO, "Handling Received Message");
+
     // Create a vector from the received data
     std::vector<uint8_t> data(read_buffer_.begin(),
         read_buffer_.begin() + length);
@@ -122,39 +130,50 @@ void TcpConnection::handle_message(std::size_t length) {
     std::unique_ptr<INetworkMessage> message =
         client->Decode(data);
 
-    // Handle different message types
+    // Handle different message types 
 
-
-    if (auto verify_msg =
-        dynamic_cast<UdpVerificationMessage*>(message.get())) {
-        // on receiving verification message
+    switch (message->GetType()) {
+    case MessageType::UDP_VERIFICATION:
+        auto verify_msg = dynamic_cast<UdpVerificationMessage*>(message.get()); 
         client->handle_udp_verification(*verify_msg);
+        break; 
+
+        // Add handlers for other message types...
     }
-    // Add handlers for other message types...
 }
 
-GameClient::GameClient()
-    : tcp_connection_(nullptr)
-    , udp_socket_(io_context_)
-    , state_(ClientState::DISCONNECTED) {
+    
+std::string GameClient::GetName() const { return "GameClient"; }
+
+void GameClient::log(LogLevel level, std::string text) {
+    LOG(level, GetName() + "::" + text);
 }
 
-bool GameClient::connect(const std::string& address, unsigned short tcp_port) {
+GameClient::GameClient(asio::io_context* io_context, unsigned short tcp_port, unsigned short udp_port)
+    : tcp_connection_(nullptr), udp_socket_(*io_context), state_(ClientState::DISCONNECTED),
+    tcp_port(tcp_port), udp_port(udp_port)
+{
+   
+}
+
+bool GameClient::connect(asio::io_context* io_context ,const std::string& address) {
     try {
+        log(LOG_INFO, "Attempting to Connect to server"); 
         // Create TCP connection
-        tcp_connection_ = TcpConnection::create(io_context_, this);
+        tcp_connection_ = TcpConnection::create(*io_context, this);
 
         // Resolve and connect to server
-        tcp::resolver resolver(io_context_);
+        tcp::resolver resolver(*io_context);
         auto endpoints = resolver.resolve(address, std::to_string(tcp_port));
-        asio::connect(tcp_connection_->socket(), endpoints);
+        asio::connect(tcp_connection_->socket(), endpoints); 
 
-        // Start network thread
+        // Start network thread 
         state_ = ClientState::CONNECTING;
-        network_thread_ = std::thread([this]() { io_context_.run(); });
 
         // Send authentication request
         send_authentication();
+
+        set_udp_endpoint(io_context, address);  
 
         return true;
     }
@@ -164,7 +183,16 @@ bool GameClient::connect(const std::string& address, unsigned short tcp_port) {
     }
 }
 
+void GameClient::set_udp_endpoint(asio::io_context* io_context, const std::string& address)
+{
+    log(LOG_INFO, "Setting UDP endpoint");  
+    udp::resolver resolver(*io_context);  
+    remote_udp_endpoint_ = *(resolver.resolve(address, std::to_string(udp_port)).begin());  
+}
+
 void GameClient::send_authentication() {
+    log(LOG_INFO, "Sending Authentication Message"); 
+    
     if (!this->id_has_been_set) {
         // Generate a random uint32_t
         std::random_device rd;
@@ -204,7 +232,7 @@ void GameClient::handle_udp_verification(const UdpVerificationMessage& msg) {
     // Send response through UDP
     udp_socket_.async_send_to(
         asio::buffer(response_data),
-        server_udp_endpoint_,
+        remote_udp_endpoint_,
         [](const asio::error_code& ec, std::size_t /*bytes_sent*/) {
             if (ec) {
                 std::cerr << "UDP verification failed: " << ec.message() << std::endl;
@@ -218,7 +246,7 @@ void GameClient::send_message(INetworkMessage* msg) {
     // Send response through UDP
     udp_socket_.async_send_to(
         asio::buffer(data),
-        server_udp_endpoint_,
+        remote_udp_endpoint_,
         [](const asio::error_code& ec, std::size_t /*bytes_sent*/) {
             if (ec) {
                 std::cerr << "UDP verification failed: " << ec.message() << std::endl;

@@ -10,6 +10,24 @@ std::thread& GameEngine::GetIOThread() {
 	return io_thread;
 }
 
+void GameEngine::RunIOContextOnIOThread() {
+	log(LOG_INFO, "Run IO context on IO thread");
+	io_thread = std::thread([this]() {
+		io_context->run();
+		});
+}
+
+void GameEngine::StopIOThread() {
+	// Stop the event loop
+	log(LOG_INFO, "Stop IO context on IO thread");
+	io_context->stop();
+
+	// Wait for the thread to finish
+	if (io_thread.joinable()) {
+		io_thread.join();
+	}
+}
+
 GameEngine::GameEngine() {
 	
 	
@@ -17,6 +35,10 @@ GameEngine::GameEngine() {
 	camera = CameraObject();
 	inputHandler = InputHandler();
 
+}
+
+GameEngine::~GameEngine() {
+	StopIOThread();
 }
 
 bool GameEngine::Initialize() {

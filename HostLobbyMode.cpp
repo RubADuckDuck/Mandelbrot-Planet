@@ -9,13 +9,11 @@ void HostLobbyMode::Enter() {
 
     LOG(LOG_INFO, "HostLobbyMode::Initializing Gameserver");
     // Initialize the server when entering host mode
-    server = std::make_unique<GameServer>(*(gameEngine->GetIOContext())), tcp_port, udp_port);
+    server = std::make_unique<GameServer>(*(gameEngine->GetIOContext()), tcp_port, udp_port);
 
     LOG(LOG_INFO, "HostLobbyMode::Run IO Context on IO Thread"); 
 
-
-
-    io_context->run();
+    gameEngine->RunIOContextOnIOThread(); 
 }
 
 void HostLobbyMode::Update() {

@@ -6,6 +6,12 @@
 
 using pointer = std::shared_ptr<GameServer::TcpConnection>;
 
+std::string GameServer::GetName() const { return "GameServer"; }
+
+void GameServer::log(LogLevel level, std::string text) {
+    LOG(level, GetName() + "::" + text);
+}
+
 void GameServer::InitGameState() {
     LOG(LOG_INFO, "GameServer::Initializing Game State"); 
     game_state = new GameState(this);
@@ -83,6 +89,15 @@ void GameServer::set_network_codec(NetworkCodec* nc) {
 
 // Private constructor - forces use of create() method
 
+std::string GameServer::TcpConnection::GetName() const
+{
+    return "GameServer::TcpConnection";
+}
+
+void GameServer::TcpConnection::log(LogLevel level, std::string text) {
+    LOG(level, GetName() + "::" + text);
+}
+
 GameServer::TcpConnection::TcpConnection(asio::io_context& io_context, GameServer* ptrServer)
     : socket_(io_context), server(ptrServer) {
 }
@@ -155,6 +170,7 @@ void GameServer::TcpConnection::start_connection_process() {
     this->client_info = client_info;
 
     client_info->state = ClientInfo::State::CONNECTING;
+    log(LOG_INFO, "Client Connecting..."); 
 
     // Start authentication process
     begin_authentication(client_info);
@@ -163,6 +179,7 @@ void GameServer::TcpConnection::start_connection_process() {
 // tcp connection process #5
 // register client to server and start syncing gameState Information  
 std::shared_ptr<ClientInfo> GameServer::TcpConnection::handle_udp_establishment_and_get_client() {
+    log(LOG_INFO, "UDP established. Syncing GameState..."); 
     // Start to send Map info 
     client_info->state = ClientInfo::State::SYNCHRONIZING;
 
@@ -174,13 +191,19 @@ std::shared_ptr<ClientInfo> GameServer::TcpConnection::handle_udp_establishment_
 // tcp connection process #2
 // begin authentication process  
 void GameServer::TcpConnection::begin_authentication(std::shared_ptr<ClientInfo> client) {
+    log(LOG_INFO, "Waithing for authentication message...");
     asio::async_read(
         this->socket_, asio::buffer(read_buffer_),
         [this, client](std::error_code ec, std::size_t length) {
+            log(LOG_INFO, "Message Arrived!");
             if (!ec) {
+
                 std::vector<uint8_t> data(read_buffer_.begin(), read_buffer_.begin() + length);
                 handle_auth_request(client, data, length);
             }
+            log(LOG_INFO, "Errornous Message"); 
+            
+            begin_authentication(client); 
         });
 }
 
@@ -198,13 +221,17 @@ void GameServer::TcpConnection::handle_auth_request(std::shared_ptr<ClientInfo> 
     if (auto auth_msg = dynamic_cast<AuthRequestMessage*>(message.get())) {
         // safely received auth message  
         if (validate_auth_request(auth_msg)) {
+            log(LOG_INFO, "Authentication Successful"); 
             client->state = ClientInfo::State::ESTABLISHING;
             client->client_id = auth_msg->client_id;
-            begin_udp_establishment(client);
+            begin_udp_establishment(client); 
+        }
+        else {
+            log(LOG_INFO, "Authentication Failed"); 
         }
     }
     else {
-        LOG(LOG_INFO, "Client did not send a auth message. Retry connection"); 
+        log(LOG_INFO, "Client did not send a auth message. Retry connection"); 
         // try again 
         begin_authentication(client); 
     }
@@ -213,6 +240,8 @@ void GameServer::TcpConnection::handle_auth_request(std::shared_ptr<ClientInfo> 
 // tcp connection process #4 
 // Send UDP verification code 
 void GameServer::TcpConnection::begin_udp_establishment(std::shared_ptr<ClientInfo> client) {
+    log(LOG_INFO, "Begin UDP establishment"); 
+
     // Create verification message
     UdpVerificationMessage verify_msg = UdpVerificationMessage();
 
@@ -230,6 +259,7 @@ void GameServer::TcpConnection::begin_udp_establishment(std::shared_ptr<ClientIn
 }
 
 void GameServer::TcpConnection::send_udp_verification(std::shared_ptr<ClientInfo> client, std::vector<uint8_t> data) {
+    log(LOG_INFO, "UDP verification message sent through TCP"); 
     this->send_tcp_message(data);
 }
 
@@ -293,6 +323,8 @@ void GameServer::start_tcp_accept() {
     tcp_acceptor_.async_accept(
         new_connection->socket(), // the socket made by the connection goes here.
         [this, new_connection](std::error_code ec) {
+            LOG(LOG_INFO, "Accepting new Connection");
+
             if (!ec) {
                 // Register the new client
                 std::lock_guard<std::mutex> lock(clients_mutex_);

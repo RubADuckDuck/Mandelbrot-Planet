@@ -10,6 +10,7 @@
 #include <queue>
 #include <mutex>
 #include <thread>
+#include "../LOG.h"
 
 using asio::ip::tcp;
 using asio::ip::udp; 
@@ -25,11 +26,21 @@ class TcpConnection;
 // Just like the server, it maintains both TCP and UDP connections and manages
 // the complete connection lifecycle from initial handshake to gameplay.
 class GameClient {
+public:
+    std::string GetName() const;
+
+private:
+    void log(LogLevel level, std::string text);  
+
+    NetworkCodec* network_codec;
+    GameState* game_state;
 
 public:
-    GameClient();
+    GameClient(asio::io_context* io_context, unsigned short tcp_port, unsigned short udp_port); 
 
-    bool connect(const std::string& address, unsigned short tcp_port);
+    bool connect(asio::io_context* io_context, const std::string& address);
+
+    void set_udp_endpoint(asio::io_context* io_context, const std::string& address); 
 
 public:
     void send_authentication();
@@ -48,15 +59,16 @@ private:
         CONNECTED
     };
 
-    asio::io_context io_context_;
-    std::thread network_thread_;
     std::shared_ptr<TcpConnection> tcp_connection_;
+
     udp::socket udp_socket_;
-    udp::endpoint server_udp_endpoint_;
+    udp::endpoint remote_udp_endpoint_;
+
+    unsigned short tcp_port;  
+    unsigned short udp_port; 
 
     ClientState state_;
-    uint32_t session_id_;
-    NetworkCodec* network_codec;
+    uint32_t session_id_; 
     std::mutex state_mutex_;
 
     uint32_t client_id;
@@ -67,6 +79,12 @@ private:
 
 // The TcpConnection class handles reliable communication with the server
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
+public:
+    std::string GetName() const;
+
+private:
+    void log(LogLevel level, std::string text);
+
 private:
     tcp::socket socket_;
     std::queue<std::vector<uint8_t>> message_queue_;

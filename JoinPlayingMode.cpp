@@ -4,6 +4,9 @@ JoinPlayingMode::JoinPlayingMode(GameEngine* engine)
 	:GameMode(engine)
 {
 
+
+	
+
 }
 
 JoinPlayingMode::~JoinPlayingMode()

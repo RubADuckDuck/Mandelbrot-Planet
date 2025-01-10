@@ -12,7 +12,7 @@
 #include <queue>
 #include <mutex>
 #include <unordered_set>
-
+#include <string>
 
 #include "../LOG.h"
 #include "NetworkConfig.h"
@@ -52,8 +52,12 @@ struct ClientInfo {
 
 
 class GameServer {
+public:
+    std::string GetName() const;
 
 private: 
+    void log(LogLevel level, std::string text);
+
     NetworkCodec* network_codec;
     GameState* game_state; 
 
@@ -84,6 +88,12 @@ public:
 public:
     // TCP connection handling
     class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
+    public:
+        std::string GetName() const;
+
+    private:
+        void log(LogLevel level, std::string text);
+
     private: 
         std::queue<std::vector<uint8_t>> message_queue_;
         std::mutex queue_mutex_;

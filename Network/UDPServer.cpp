@@ -191,20 +191,42 @@ std::shared_ptr<ClientInfo> GameServer::TcpConnection::handle_udp_establishment_
 // tcp connection process #2
 // begin authentication process  
 void GameServer::TcpConnection::begin_authentication(std::shared_ptr<ClientInfo> client) {
-    log(LOG_INFO, "Waithing for authentication message...");
-    asio::async_read(
-        this->socket_, asio::buffer(read_buffer_),
-        [this, client](std::error_code ec, std::size_t length) {
-            log(LOG_INFO, "Message Arrived!");
+    log(LOG_INFO, "Waiting for authentication message...");
+    // First read size
+    asio::async_read(socket_,
+        asio::buffer(read_buffer_, sizeof(uint32_t)),
+        [this, client](std::error_code ec, std::size_t /*length*/) {
             if (!ec) {
+                uint32_t message_size;
+                std::memcpy(&message_size, read_buffer_.data(), sizeof(uint32_t));
 
-                std::vector<uint8_t> data(read_buffer_.begin(), read_buffer_.begin() + length);
-                handle_auth_request(client, data, length);
+                // Then read message
+                asio::async_read(socket_,
+                    asio::buffer(read_buffer_, message_size),
+                    [this, client](std::error_code ec, std::size_t length) {
+                        log(LOG_INFO, "Message Arrived!");
+                        if (!ec) {
+                            std::vector<uint8_t> data(read_buffer_.begin(), read_buffer_.begin() + length);
+                            handle_auth_request(client, data, length);
+                        }
+                        else {
+                            handle_error(ec, client);
+                        }
+                    });
             }
-            log(LOG_INFO, "Errornous Message"); 
-            
-            begin_authentication(client); 
+            else {
+                handle_error(ec, client);
+            }
         });
+}
+
+void GameServer::TcpConnection::handle_error(const std::error_code& ec, std::shared_ptr<ClientInfo> client) {
+    if (ec.value() == 10054) {
+        LOG(LOG_INFO, "Client disconnected normally");
+    }
+    else {
+        LOG(LOG_INFO, "Error: " + ec.message() + " (" + std::to_string(ec.value()) + ")");
+    }
 }
 
 bool GameServer::TcpConnection::validate_auth_request(AuthRequestMessage* auth_msg) {

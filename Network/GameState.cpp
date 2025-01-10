@@ -157,7 +157,7 @@ void GameState::SendPlayerInput(Direction direction) {
         direction, playerID
     );
 
-    client->send_message(curMessage);
+    client->send_message(curMessage, true);
 
     delete curMessage;
 }

@@ -15,6 +15,8 @@ void JoinLobbyMode::Enter() {
     client = std::make_unique<GameClient>(gameEngine->GetIOContext(), tcp_port, udp_port); 
 
     client->connect(gameEngine->GetIOContext(), serverAddress);
+
+    gameEngine->RunIOContextOnIOThread(); 
 }
 
 void JoinLobbyMode::Update() {

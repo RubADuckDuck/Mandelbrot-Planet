@@ -128,6 +128,8 @@ public:
     private:
         void begin_authentication(std::shared_ptr<ClientInfo> client);
 
+        void handle_error(const std::error_code& ec, std::shared_ptr<ClientInfo> client);
+
         bool validate_auth_request(AuthRequestMessage* auth_msg);
 
         void handle_auth_request(

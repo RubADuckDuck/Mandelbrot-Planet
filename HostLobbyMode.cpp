@@ -25,6 +25,9 @@ void HostLobbyMode::Update() {
         // Switch to PlayingMode
         gameEngine->GetModeController()->SwitchMode(GameModeType::PLAYING);
     }
+
+    
+
 }
 
 void HostLobbyMode::Draw() {

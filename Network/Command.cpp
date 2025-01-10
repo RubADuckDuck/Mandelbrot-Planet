@@ -48,7 +48,7 @@ void UdpVerificationCommand::Execute(GameState& gameState) {
         // send back verification message through udp 
         INetworkMessage* newMessage = new UdpVerificationMessage(session_id, verification_code);
 
-        gameState.client->send_message(newMessage);
+        gameState.client->send_message(newMessage, true);
 
         delete newMessage;
     }

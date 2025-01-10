@@ -19,8 +19,10 @@ class NetworkCodec;
 class GameState;
 class GameClient;
 class INetworkMessage;
+class AuthRequestMessage; 
 class UdpVerificationMessage;
 class TcpConnection;
+
 
 // The GameClient class handles all network communication with the game server.
 // Just like the server, it maintains both TCP and UDP connections and manages
@@ -43,11 +45,12 @@ public:
     void set_udp_endpoint(asio::io_context* io_context, const std::string& address); 
 
 public:
-    void send_authentication();
+    void send_authentication_and_wait_for_verification(); 
 
     void handle_udp_verification(const UdpVerificationMessage& msg);
+
 public:
-    void send_message(INetworkMessage* msg);
+    void send_message(INetworkMessage* msg, bool using_udp);
 
     std::unique_ptr<INetworkMessage> Decode(std::vector<uint8_t> data);
 private:
@@ -72,7 +75,9 @@ private:
     std::mutex state_mutex_;
 
     uint32_t client_id;
-    bool id_has_been_set = false;
+    bool id_has_been_set = false; 
+
+
 };
 
 
@@ -87,22 +92,30 @@ private:
 
 private:
     tcp::socket socket_;
+    asio::steady_timer read_timer_;
+
     std::queue<std::vector<uint8_t>> message_queue_;
     std::mutex queue_mutex_;
     bool is_writing_ = false;
     std::array<uint8_t, 1024> read_buffer_;
+    std::array<uint8_t, 1024> write_buffer_;
     GameClient* client;
 
+    bool is_waiting_for_udp_verification_code = true;
+
     // Just like in the server, we use a private constructor to ensure proper shared_ptr usage
-    TcpConnection(asio::io_context& io_context, GameClient* cli)
-        : socket_(io_context), client(cli) {
-    }
+    TcpConnection(asio::io_context& io_context, GameClient* cli);
 
 public:
     NetworkCodec* network_codec;
     GameState* game_state;
 
+    void SetToWaitForAuth();
 
+    void SendAuthenticationAndWaitForUDPVerification(AuthRequestMessage* ptrMsg);
+
+private:
+    void check_if_udp_verification_code_has_arrived_if_not_resend_authentication_message(AuthRequestMessage* ptrMsg);
 
 public:
     using pointer = std::shared_ptr<TcpConnection>;
@@ -112,7 +125,9 @@ public:
     tcp::socket& socket();
 
     // Implements the same message queuing system as the server
-    void send_tcp_message(const std::vector<uint8_t>& data);
+    void send_tcp_message(INetworkMessage* msg);
+
+    void send_tcp_data(std::vector<uint8_t> data); 
 
     void start_read();
 

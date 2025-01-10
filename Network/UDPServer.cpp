@@ -132,26 +132,31 @@ void GameServer::TcpConnection::do_write() {
     }
 
     // Prepare message with size prefix
+    // length of message to size 
     uint32_t size = static_cast<uint32_t>(current_message.size());
-    std::vector<uint8_t> complete_message;
-    complete_message.reserve(sizeof(size) + current_message.size());
+    complete_message_.empty(); 
+    // reserve 4byte(32bit) + (message size in bytes)
+    complete_message_.reserve(sizeof(size) + current_message.size());
 
     // Add size prefix
     const uint8_t* size_ptr = reinterpret_cast<const uint8_t*>(&size);
-    complete_message.insert(complete_message.end(), size_ptr, size_ptr + sizeof(size));
+    // I am a bit surprized that the end doesn't care about the reserved spaces 
+    complete_message_.insert(complete_message_.end(), size_ptr, size_ptr + sizeof(size));
 
     // Add message content
-    complete_message.insert(complete_message.end(),
+    complete_message_.insert(complete_message_.end(),
         current_message.begin(),
         current_message.end());
 
     // Send the message
     asio::async_write(socket_,
-        asio::buffer(complete_message),
+        asio::buffer(complete_message_),
         [self](const asio::error_code& ec, std::size_t /*length*/) {
             if (!ec) {
-                std::lock_guard<std::mutex> lock(self->queue_mutex_);
-                self->message_queue_.pop();
+                {
+                    std::lock_guard<std::mutex> lock(self->queue_mutex_);
+                    self->message_queue_.pop();
+                }
                 self->do_write();  // Process next message if any
             }
             else {
@@ -388,11 +393,15 @@ void GameServer::handle_data(const std::vector<uint8_t> data) {
 
 void GameServer::verify_pending_udp_connection(uint64_t verification_code) 
 {
+    log(LOG_INFO, "Verifying pending udp connection");  
+
     // when the message is a udp_verification, search from the pending verifications
     auto it = pendingVerification.find(verification_code);
 
     if (it != pendingVerification.end()) {
+        log(LOG_INFO, "Valid verification code.");
         std::shared_ptr<ClientInfo> newClient = it->second->handle_udp_establishment_and_get_client();
+
 
         // set udp endpoint of client 
         newClient->udp_endpoint = udp_remote_endpoint_;
@@ -402,6 +411,7 @@ void GameServer::verify_pending_udp_connection(uint64_t verification_code)
     }
     else {
         // none valid verification code
+        log(LOG_INFO, "Not a Valid verification code.");
         return;
     }
 }
@@ -441,6 +451,8 @@ void GameServer::send_data_to_specific_client_by_udp(udp::endpoint udp_endpoint,
 
 void GameServer::register_client(std::shared_ptr<ClientInfo> newClient) {
     uint32_t& newID = newClient->client_id;
+
+    log(LOG_INFO, "Registering new client of id: " + std::to_string(newID));
 
     clients[newID] = newClient;
 }

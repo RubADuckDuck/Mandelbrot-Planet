@@ -7,6 +7,12 @@
 
 // Encode a message to bytes
 
+void NetworkCodec::log(LogLevel level, std::string text) {
+    LOG(level, GetName() + "::" + text);
+}
+
+std::string NetworkCodec::GetName() { return "TcpConnection"; }
+
 std::vector<uint8_t> NetworkCodec::Encode(const INetworkMessage* message) {
     return message->Serialize();
 }
@@ -20,6 +26,7 @@ std::unique_ptr<INetworkMessage> NetworkCodec::Decode(const std::vector<uint8_t>
 // Helper method to handle incoming UDP/TCP messages
 
 void NetworkCodec::HandleNetworkData(const std::vector<uint8_t>& data, GameState& gameState) {
+    log(LOG_INFO, "Handling Network Data");
     try {
         std::unique_ptr<INetworkMessage> message = Decode(data);
         // Process message : Message -> Command

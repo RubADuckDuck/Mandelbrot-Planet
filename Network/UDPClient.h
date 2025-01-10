@@ -67,6 +67,8 @@ private:
     udp::socket udp_socket_;
     udp::endpoint remote_udp_endpoint_;
 
+    std::vector<uint8_t> current_udp_message_; 
+
     unsigned short tcp_port;  
     unsigned short udp_port; 
 

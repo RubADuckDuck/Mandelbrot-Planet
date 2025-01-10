@@ -96,7 +96,10 @@ public:
 
     private: 
         std::queue<std::vector<uint8_t>> message_queue_;
-        std::mutex queue_mutex_;
+        std::mutex queue_mutex_; 
+
+        std::vector<uint8_t> complete_message_; 
+
         bool is_writing_ = false;
 
 
@@ -133,9 +136,9 @@ public:
         bool validate_auth_request(AuthRequestMessage* auth_msg);
 
         void handle_auth_request(
-            std::shared_ptr<ClientInfo> client,
-            const std::vector<uint8_t>& data,
-            std::size_t length
+            std::shared_ptr<ClientInfo> client, 
+            const std::vector<uint8_t>& data, 
+            std::size_t length 
         );
 
         void begin_udp_establishment(std::shared_ptr<ClientInfo> client);

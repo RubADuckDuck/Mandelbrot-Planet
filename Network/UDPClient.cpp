@@ -96,7 +96,7 @@ void TcpConnection::handle_message(std::size_t length) {
         is_waiting_for_udp_verification_code = false;  // not anymore!
         auto verify_msg = dynamic_cast<UdpVerificationMessage*>(message.get());
 
-        log(LOG_INFO, "UDP verification code" + verify_msg->verification_code); 
+        log(LOG_INFO, "UDP verification code: " + std::to_string(verify_msg->verification_code)); 
 
         client->handle_udp_verification(*verify_msg);
         break;
@@ -311,15 +311,17 @@ void GameClient::handle_udp_verification(const UdpVerificationMessage& msg) {
 
     // Create verification response
     UdpVerificationMessage response = msg;
-    response.timestamp = get_current_timestamp();
+    response.timestamp = get_current_timestamp(); 
 
-    std::vector<uint8_t> response_data = network_codec->Encode(&response);
+
+    // you can't send this. this vector will get destoryed as soon as we leave the scope.
+    current_udp_message_ = network_codec->Encode(&response);
 
 
     log(LOG_INFO, "Sending back verification code Through UDP");
     // Send response through UDP
     udp_socket_.async_send_to(
-        asio::buffer(response_data),
+        asio::buffer(current_udp_message_),
         remote_udp_endpoint_,
         [](const asio::error_code& ec, std::size_t /*bytes_sent*/) {
             if (ec) {

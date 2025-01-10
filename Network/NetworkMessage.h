@@ -13,6 +13,7 @@
 
 #include "Command.h"  
 #include "NetworkConfig.h" 
+#include "../LOG.h"
 
 
 // Forward declarations
@@ -320,7 +321,14 @@ class IGameCommand;
 // NetworkCodec::HandleNetworkMessage : Data x GameState -> GameState
 class NetworkCodec { 
 private:
+    
+
+    static void log(LogLevel level, std::string text);
+
+
 public:
+    static std::string GetName();
+
     // Encode a message to bytes
     static std::vector<uint8_t> Encode(const INetworkMessage* message);
 

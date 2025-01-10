@@ -1,22 +1,6 @@
-﻿  GameModeController.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
-  HostLobbyMode.cpp
+﻿  UDPClient.cpp
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-  Command.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
-  GameState.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
-  UDPServer.cpp
-  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
-  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
-  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
-  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-E:\proj\[gameproj]\DontStarve\DuckFishing\Network\UDPServer.cpp(137,28): warning C4858: discarding return value: This member function returns a bool indicating whether the container is empty and has no other effects. It is not useful to call this member function and discard the return value. Use the 'clear()' member function if you want to erase all elements.
-  Generating Code...
   duckfishing.vcxproj -> E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe

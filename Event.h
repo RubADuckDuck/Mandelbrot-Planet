@@ -67,10 +67,13 @@ private:
 };
 
 
+class GameEngine; 
 
 class InputHandler {
 public:
-    Tag tag = Tag::USER_INPUT;
+    Tag tag = Tag::USER_INPUT; 
+
+    GameEngine* gameEngine;
 
     InputHandler();
 
@@ -87,7 +90,10 @@ public:
 
     void Subscribe(Listener* ptrListener);
 
+    void Publish(Direction direction);  
+
     void Publish(const std::vector<uint8_t> msg);
+
 
 private:
     bool quit;

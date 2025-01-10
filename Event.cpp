@@ -1,5 +1,6 @@
 #include "Event.h"
-
+#include "Network/NetworkMessage.h" 
+#include "PlayerDirection.h"
 
 // Public method to get the singleton instance
 
@@ -54,8 +55,8 @@ void EventDispatcher::Publish(const Tag tag, const std::vector<uint8_t> message)
     if (it != tag2Listener.end()) {
         for (const auto& ptrListener : it->second) {
             try {
-                LOG(LOG_DEBUG, "Triggering onEventFunctions")
-                    (*ptrListener)(message);
+                LOG(LOG_DEBUG, "Triggering onEventFunctions");
+                (*ptrListener)(message);
             }
             catch (const std::exception& e) {
                 std::cerr << "Listener exception: " << e.what() << std::endl;
@@ -166,6 +167,16 @@ void InputHandler::Subscribe(Listener* ptrListener) {
     dispatcher.Subscribe(this->tag, ptrListener);
 }
 
+void InputHandler::Publish(Direction direction)
+{
+    // create player input message 
+    PlayerInputMessage playerInputMsg = PlayerInputMessage(direction, 0);  
+
+    LOG(LOG_INFO, "Publishing Event Message through event dispatcher"); 
+
+    this->Publish(NetworkCodec::Encode(&playerInputMsg)); 
+}
+
 void InputHandler::Publish(const std::vector<uint8_t> msg) {
     // Get the singleton instance
     EventDispatcher& dispatcher = EventDispatcher::GetInstance();
@@ -190,12 +201,13 @@ void InputHandler::handleKeyUp(SDL_Keycode key) {
     // Get the singleton instance
     EventDispatcher& dispatcher = EventDispatcher::GetInstance();
 
-    //switch (key) {
-    //case SDLK_w: wPressed = false; this->Publish("w_up"); break;
-    //case SDLK_a: aPressed = false; this->Publish("a_up"); break;
-    //case SDLK_s: sPressed = false; this->Publish("s_up"); break;
-    //case SDLK_d: dPressed = false; this->Publish("d_up"); break;
-    //case SDLK_SPACE: spacePressed = false; this->Publish("space_up"); break;
-    //default: break;
-    //}
+
+    switch (key) {
+    case SDLK_w: wPressed = false; this->Publish(Direction::UP); break;
+    case SDLK_a: aPressed = false; this->Publish(Direction::LEFT); break;
+    case SDLK_s: sPressed = false; this->Publish(Direction::DOWN); break;
+    case SDLK_d: dPressed = false; this->Publish(Direction::RIGHT); break;
+    case SDLK_SPACE: spacePressed = false; this->Publish(Direction::IDLE); break;
+    default: break;
+    }
 }

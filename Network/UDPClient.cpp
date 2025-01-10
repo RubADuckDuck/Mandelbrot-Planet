@@ -3,6 +3,7 @@
 
 #include <limits> 
 #include <random>
+#include "../Event.h"
 
 using pointer = std::shared_ptr<TcpConnection>;
 
@@ -196,8 +197,40 @@ GameClient::GameClient(asio::io_context* io_context, unsigned short tcp_port, un
     : tcp_connection_(nullptr), udp_socket_(*io_context), state_(ClientState::DISCONNECTED),
     tcp_port(tcp_port), udp_port(udp_port)
 {
-   
+    this->register_to_dispatcher(); 
 }
+
+void GameClient::register_to_dispatcher()
+{
+    Listener* dataListener = new Listener([this](const std::vector<uint8_t> data) {
+        log(LOG_INFO, "DataListener Triggered");
+        this->handle_events(data);
+    });
+
+    EventDispatcher& dispatcher = EventDispatcher::GetInstance();
+
+    dispatcher.Subscribe(dataListener);
+    dispatcher.Subscribe(Tag::USER_INPUT, dataListener);
+    log(LOG_INFO, "Subscribing GameServer as Listener");
+}
+
+void GameClient::handle_events(std::vector<uint8_t> data)
+{
+    log(LOG_INFO, "hadling event"); 
+
+    // for now...  
+    std::unique_ptr<INetworkMessage> curMessage = NetworkCodec::Decode(data);   
+
+    MessageType mt = curMessage->GetType();  
+
+    switch (mt) {
+    case MessageType::PLAYER_INPUT: 
+        log(LOG_INFO, "Player Input event Triggered, Sending to Sever"); 
+        this->send_message(curMessage.get(), true);
+    }
+
+    
+} 
 
 bool GameClient::connect(asio::io_context* io_context ,const std::string& address) {
     try {
@@ -224,7 +257,7 @@ bool GameClient::connect(asio::io_context* io_context ,const std::string& addres
         return true;
     }
     catch (const std::exception& e) {
-        std::cerr << "Connection failed: " << e.what() << std::endl;
+        std::cerr << "Connection failed: " << e.what() << std::endl; 
         return false;
     }
 }
@@ -250,7 +283,9 @@ void GameClient::send_authentication_and_wait_for_verification() {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<uint32_t> dis(0, UINT32_MAX);
-        this->client_id = dis(gen);
+        this->client_id = dis(gen); 
+
+        log(LOG_INFO, "Generated Client id: " + std::to_string(client_id)); 
 
         this->id_has_been_set = true;
     }
@@ -331,12 +366,12 @@ void GameClient::handle_udp_verification(const UdpVerificationMessage& msg) {
 }
 
 void GameClient::send_message(INetworkMessage* msg, bool using_udp=true) {
-    std::vector<uint8_t> data = network_codec->Encode(msg);
+    current_udp_message_ = network_codec->Encode(msg);
 
     if (using_udp) {
         // Send response through UDP
         udp_socket_.async_send_to(
-            asio::buffer(data),
+            asio::buffer(current_udp_message_),
             remote_udp_endpoint_,
             [](const asio::error_code& ec, std::size_t /*bytes_sent*/) {
                 if (ec) {

@@ -40,6 +40,10 @@ private:
 public:
     GameClient(asio::io_context* io_context, unsigned short tcp_port, unsigned short udp_port); 
 
+    void register_to_dispatcher();
+
+    void handle_events(std::vector<uint8_t> data);
+
     bool connect(asio::io_context* io_context, const std::string& address);
 
     void set_udp_endpoint(asio::io_context* io_context, const std::string& address); 
@@ -47,7 +51,8 @@ public:
 public:
     void send_authentication_and_wait_for_verification(); 
 
-    void handle_udp_verification(const UdpVerificationMessage& msg);
+    void handle_udp_verification(const UdpVerificationMessage& msg); 
+
 
 public:
     void send_message(INetworkMessage* msg, bool using_udp);

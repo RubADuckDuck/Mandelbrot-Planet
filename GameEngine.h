@@ -51,6 +51,10 @@ public:
 	 
 	void Draw();
 
+	uint32_t GetUserID() {
+
+	}
+
 public:
 	InputHandler* GetInputHandler();
 	GameModeController* GetModeController(); 

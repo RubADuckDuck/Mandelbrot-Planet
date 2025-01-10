@@ -35,15 +35,16 @@ void GameServer::handle_events(const std::vector<uint8_t> data) {
 }
 
 void GameServer::register_to_dispatcher() {
-    Listener dataListener = [this](const std::vector<uint8_t> data) {
-        LOG(LOG_INFO, "GameServer::DataListener Triggered");
+    Listener* dataListener = new Listener([this](const std::vector<uint8_t> data) {
+        log(LOG_INFO, "DataListener Triggered");
         this->handle_events(data);
-    };
+        });
 
     EventDispatcher& dispatcher = EventDispatcher::GetInstance();
 
-    dispatcher.Subscribe(&dataListener);
-    LOG(LOG_INFO, "GameServer::Subscribing GameServer as Listener");
+    dispatcher.Subscribe(dataListener);
+    dispatcher.Subscribe(Tag::USER_INPUT, dataListener);
+    log(LOG_INFO, "Subscribing GameServer as Listener");
 }
 
 GameServer::GameServer(asio::io_context& io_context, unsigned short tcp_port, unsigned short udp_port)
@@ -134,7 +135,7 @@ void GameServer::TcpConnection::do_write() {
     // Prepare message with size prefix
     // length of message to size 
     uint32_t size = static_cast<uint32_t>(current_message.size());
-    complete_message_.empty(); 
+    complete_message_.clear(); 
     // reserve 4byte(32bit) + (message size in bytes)
     complete_message_.reserve(sizeof(size) + current_message.size());
 
@@ -250,8 +251,18 @@ void GameServer::TcpConnection::handle_auth_request(std::shared_ptr<ClientInfo> 
         if (validate_auth_request(auth_msg)) {
             log(LOG_INFO, "Authentication Successful"); 
             client->state = ClientInfo::State::ESTABLISHING;
-            client->client_id = auth_msg->client_id;
-            begin_udp_establishment(client); 
+            client->client_id = auth_msg->client_id; 
+
+            auto it = server->clients.find(client->client_id); 
+
+            if (it == server->clients.end()) {
+                begin_udp_establishment(client);
+            }
+            else {
+                log(LOG_WARNING, "That id already exists."); 
+
+                // We do nothing, The client will try again. 
+            }
         }
         else {
             log(LOG_INFO, "Authentication Failed"); 

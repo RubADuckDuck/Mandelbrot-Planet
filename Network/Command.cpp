@@ -8,7 +8,7 @@ PlayerInputCommand::PlayerInputCommand(Direction userInput, uint32_t playerID)
 
 void PlayerInputCommand::Execute(GameState& gameState) {
     LOG(LOG_INFO, "PlayerInput \n  Player id: " + std::to_string(player_id) + "\n  User Input: " + direction2String[user_input]);
-    // gameState.PlayerTakeAction(player_id, user_input, true);
+    gameState.PlayerTakeAction(player_id, user_input, true);
 }
 
 AddGameObjectCommand::AddGameObjectCommand(uint8_t gameObjectTypeID, uint32_t gameObjectID)

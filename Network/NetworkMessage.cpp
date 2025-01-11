@@ -539,3 +539,63 @@ uint64_t generate_verification_code() {
     std::uniform_int_distribution<uint64_t> dis;
     return dis(gen);
 }
+
+InteractionInfoMessage::InteractionInfoMessage(uint32_t item, uint32_t who, int yCoord, int xCoord, Direction goingWhere)
+    : heldItemID(item), whoID(who), yCoord(yCoord), xCoord(xCoord), goingWhere(goingWhere)  
+{
+}
+
+InteractionInfoMessage::InteractionInfoMessage()
+    : heldItemID(0), whoID(0), yCoord(0), xCoord(0), goingWhere(Direction::IDLE)
+{
+}
+
+MessageType InteractionInfoMessage::GetType() const
+{
+    return MessageType::INTERACTION_INFO;
+}
+
+size_t InteractionInfoMessage::GetSize() const
+{
+    return sizeof(MessageType) + sizeof(uint32_t) * 2 + sizeof(int) * 2 + sizeof(uint8_t);
+}
+
+std::vector<uint8_t> InteractionInfoMessage::Serialize() const
+{
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    // Add message type
+    buffer.push_back(static_cast<uint8_t>(GetType())); 
+
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, heldItemID);  
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, whoID);  
+
+    INetworkMessage::add_to_buffer<int>(buffer, yCoord);  
+    INetworkMessage::add_to_buffer<int>(buffer, xCoord);  
+
+    // add Player direction 
+    INetworkMessage::add_to_buffer<uint8_t>(buffer, static_cast<uint8_t>(goingWhere));
+
+    return buffer;
+}
+
+void InteractionInfoMessage::Deserialize(const std::vector<uint8_t>& data)
+{
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    } 
+
+    size_t offset = 1; 
+
+    heldItemID = extract_from_data<uint32_t>(data, offset);  
+
+    whoID = extract_from_data<uint32_t>(data, offset);  
+
+    yCoord = extract_from_data<int>(data, offset);  
+    xCoord = extract_from_data<int>(data, offset);  
+
+    goingWhere = static_cast<Direction>(extract_from_data<uint8_t>(data, offset));  
+
+    return;  
+}

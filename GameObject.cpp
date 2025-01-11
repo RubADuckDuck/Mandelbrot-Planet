@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Network/NetworkMessage.h"
 
 
 
@@ -313,18 +314,34 @@ void PlayableObject::DropItem() {
 }
 
 void PlayableObject::RequestWalk() {
-	// We don't drop item... yet
-	
-	InteractionInfo* newInteraction = new InteractionInfo(); 
-	newInteraction->item = heldItem; 
-	newInteraction->who = this; 
-	newInteraction->yCoord = this->yCoord; 
-	newInteraction->xCoord = this->xCoord; 
-	newInteraction->goingWhere = this->direction; 
+	//// We don't drop item... yet
+	//
+	//InteractionInfo* newInteraction = new InteractionInfo(); 
+	//newInteraction->item = heldItem; 
+	//newInteraction->who = this; 
+	//newInteraction->yCoord = this->yCoord; 
+	//newInteraction->xCoord = this->xCoord; 
+	//newInteraction->goingWhere = this->direction; 
 
-	PublishItem(newInteraction); 
+	//PublishItem(newInteraction); 
 
-	delete newInteraction;
+	//delete newInteraction; 
+
+	INetworkMessage* newMessage = new InteractionInfoMessage(
+		(heldItem == nullptr) ? 0 : heldItem->GetID(),
+		this->GetID(),
+		this->yCoord,
+		this->xCoord,
+		this->direction
+	); 
+
+	EventDispatcher& dispatcher = EventDispatcher::GetInstance();  
+
+	dispatcher.Publish(newMessage->Serialize());  
+
+	delete newMessage; 
+
+	return; 
 }
 
 void PlayableObject::Walk() {

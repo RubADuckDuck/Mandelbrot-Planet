@@ -3,8 +3,13 @@
 #include "NetworkMessage.h"
 
 
-// Grid Management 
+std::string GameState::GetName() const { return "GameState"; }
 
+void GameState::log(LogLevel level, std::string text) {
+    LOG(level, GetName() + "::" + text);
+}
+
+// Grid Management 
 void GameState::FoldGridIntoCubeAt(int startY, int startX, int size, bool fromNetwork) {
 
     if (gridTransformManager != nullptr) {
@@ -17,6 +22,38 @@ void GameState::FoldGridIntoCubeAt(int startY, int startX, int size, bool fromNe
 
 void GameState::CreatePortalOnGridAt(int yCoord, int xCoord, bool fromNetwork) {
     // to do
+}
+
+void GameState::CreateAndRegisterPlayerObject(uint32_t player_id)
+{
+    
+
+    GameObject* newPlayer = new PlayableObject();  
+
+    uint32_t newID = GenerateNewGameObjectId();  
+
+    log(LOG_INFO, "Creating Playerable Object for player id: " + std::to_string(player_id) + "  objID: " + std::to_string(newID));
+
+    // we could think of Using CreateGameObject. However, if the call of this method encompases all the functions, we don't have to pass GameObject Creation message 
+    gameObjects[newID] = std::unique_ptr<GameObject>(newPlayer);    
+    players[player_id] = dynamic_cast<PlayableObject*>(newPlayer);   
+
+    return; 
+}
+
+void GameState::CreateAndRegisterGameObject(uint8_t typeId, bool fromNetwork)
+{
+    // Create GameObject with factory 
+    std::unique_ptr<GameObject> newObject = factoryRegistry[typeId]->Create();  
+
+    uint32_t newID = GenerateNewGameObjectId();  
+
+    log(LOG_INFO, "Generated GameObject id of typeId: " + std::to_string(typeId) + "  ObjID: " + std::to_string(newID));  
+
+    gameObjects[newID] = std::move(newObject);  
+    objectsByType.insert({typeId, newID});  
+
+    return;  
 }
 
 void GameState::CreateAndRegisterGameObjectWithID(uint32_t id, uint8_t typeId, bool fromNetwork) {
@@ -193,11 +230,19 @@ void GameState::PlayerTakeAction(uint32_t playerId, Direction input, bool fromNe
     if (!fromNetwork) {
         // propagate update to server
     }
+    
+    auto it = players.find(playerId);  
 
-    // take action
-    playableObjects[playerId]->TakeAction(input);
+    if (it == players.end()) {
+        log(LOG_INFO, "Player id: " + std::to_string(playerId) + " is invalid");  
+    }
+    else {
+        // take action
+        log(LOG_INFO, "Player id: " + std::to_string(playerId) + " taking action : " + direction2String[input]);
+        players[playerId]->TakeAction(input);
+        return;
+    }
 
-    return;
 }
 
 void GameState::UpdateGameState(float deltaTime) {

@@ -33,6 +33,8 @@ uint64_t generate_verification_code();
 // Message type identifiers
 enum class MessageType : uint8_t {
     PLAYER_INPUT, // only message client sends to server
+
+    INTERACTION_INFO, 
     ADD_GAMEOBJECT, 
     REMOVE_GAMEOBJECT, 
     GAMEOBJECT_POSITION, 
@@ -167,6 +169,30 @@ public:
 
     void Deserialize(const std::vector<uint8_t>& data) override;
 }; 
+
+class InteractionInfoMessage : public INetworkMessage {
+public:  
+    uint32_t heldItemID;  
+
+    uint32_t whoID; 
+
+    int yCoord; 
+    int xCoord;  
+
+    Direction goingWhere;  
+
+    InteractionInfoMessage(uint32_t item, uint32_t who, int yCoord, int xCoord, Direction goingWhere); 
+
+    InteractionInfoMessage();  
+
+    MessageType GetType() const override; 
+
+    size_t GetSize() const override;  
+
+    std::vector<uint8_t> Serialize() const override;  
+
+    void Deserialize(const std::vector<uint8_t>& data) override;  
+};
 
 class AddGameObjectMessage : public INetworkMessage {
 public: 

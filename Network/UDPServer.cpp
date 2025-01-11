@@ -418,7 +418,10 @@ void GameServer::verify_pending_udp_connection(uint64_t verification_code)
         newClient->udp_endpoint = udp_remote_endpoint_;
 
         // register client  
-        register_client(newClient);
+        register_client(newClient); 
+
+        // GameState::AddPlayer(client_id) 
+        game_state->CreateAndRegisterPlayerObject(newClient->client_id); 
     }
     else {
         // none valid verification code
@@ -447,9 +450,11 @@ void GameServer::broadcast_data_through_udp(const std::vector<uint8_t> data) {
 
 // send to specific client by udp_endpoint
 
-void GameServer::send_data_to_specific_client_by_udp(udp::endpoint udp_endpoint, const std::vector<uint8_t> data) {
+void GameServer::send_data_to_specific_client_by_udp(udp::endpoint udp_endpoint, const std::vector<uint8_t> data) { 
+    udp_send_buffer_ = data;  
+
     udp_socket_.async_send_to(
-        asio::buffer(data), udp_endpoint,
+        asio::buffer(udp_send_buffer_), udp_endpoint,
         [](std::error_code ec, std::size_t /*bytes_sent*/) {
             if (ec) {
                 // Handle error

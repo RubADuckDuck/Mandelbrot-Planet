@@ -50,6 +50,12 @@ public:
 // 2. New Sort of items should be serialized easily. 
 
 class GameState {
+public:
+    std::string GetName() const;
+
+private:
+    void log(LogLevel level, std::string text);
+
 private:
     // Current highest ID + 1, always increases
     uint32_t nextGameObjectId = 1;
@@ -58,10 +64,14 @@ private:
     std::unordered_map<uint8_t, std::unique_ptr<GameObjectFactory>> factoryRegistry;
     // gameobject_id -> gameobject 
     std::unordered_map<uint32_t, std::unique_ptr<GameObject>> gameObjects;
+
     // Optional: Keep a separate map for quick type-based lookups
     std::unordered_multimap<uint8_t, uint32_t> objectsByType;
 
     std::unordered_map<uint8_t, PlayableObject*> playableObjects; 
+
+    // f: CLientID -> PlayerObject
+    std::unordered_map<uint32_t, PlayableObject*> players; 
 
 public: 
     uint32_t GenerateNewGameObjectId() {
@@ -80,8 +90,14 @@ public:
     void CreatePortalOnGridAt(int yCoord, int xCoord, bool fromNetwork);
 
     // Object Management
-    void CreateAndRegisterGameObjectWithID(uint32_t id, uint8_t typeId, bool fromNetwork);
+    void CreateAndRegisterPlayerObject(uint32_t player_id);  
+
+    void CreateAndRegisterGameObject(uint8_t typeId, bool fromNetwork);  
+    // How do you know the ID of Object in Prior? When The Object's ID is given by the server :) 
+    void CreateAndRegisterGameObjectWithID(uint32_t id, uint8_t typeId, bool fromNetwork); 
+    
     void RemoveGameObjectOfID(uint32_t id, bool fromNetwork);
+    
     GameObject* GetGameObject(uint32_t id);
 
     // Hierarchical Operations

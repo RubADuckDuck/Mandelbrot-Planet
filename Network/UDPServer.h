@@ -204,7 +204,8 @@ public:
     // UDP server components   
     udp::socket udp_socket_;
     udp::endpoint udp_remote_endpoint_;
-    std::array<uint8_t, 1024> udp_receive_buffer_;
+    std::array<uint8_t, 1024> udp_receive_buffer_;  
+    std::vector<uint8_t> udp_send_buffer_; 
 
     // Shared components  
     asio::io_context& io_context_;

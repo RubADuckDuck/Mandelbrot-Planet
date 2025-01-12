@@ -11,6 +11,8 @@
 #include "UDPServer.h"
 #include "UDPClient.h"
 
+#include "../TerrainObject.h"
+
 
 class PlayableObject;
 class GameObject;
@@ -128,6 +130,15 @@ public:
     void SendPlayerInput(Direction direction);
 
 public: 
+    FactoryComponentObject* GetStructureAtCoord(int y, int x);  
+
+    GroundType GetGroundTypeAtCoord(int y, int x);  
+
+    DroppedItemObject* GetDroppedItemAtCoord(int y, int x);  
+
+    void DropItemAt(int y, int x, Item* item); 
+
+public: 
     // abstract interface 
     // client::update
     void DrawGameState(); 
@@ -138,11 +149,11 @@ public:
     GameState() {
         isWorking = false; 
 
-        // movementManager = new MovementManager();  
-        // gridTransformManager = new GridTransformManager();  
 
         client = nullptr; 
         server = nullptr; 
+
+        Initialize();
     }
 
     GameState(GameClient* client) 
@@ -150,6 +161,8 @@ public:
     {
         isWorking = true;
         isServerSide = false;  
+
+        Initialize();
     }
 
     GameState(GameServer* server)
@@ -157,18 +170,22 @@ public:
     {
         isWorking = true; 
         isServerSide = true;
+
+        Initialize();
     }
 
     void Initialize() {
+        movementManager = std::make_unique<MovementManager>();  
 
+        gridTransformManager = std::make_unique<GridTransformManager>();
     }
 
-private: 
+public: 
     // server (& client potentially)
-    MovementManager* movementManager; 
+    std::unique_ptr<MovementManager> movementManager; 
 
     // Client 
-    GridTransformManager* gridTransformManager;
+    std::unique_ptr<GridTransformManager> gridTransformManager;
 
 
 public:  

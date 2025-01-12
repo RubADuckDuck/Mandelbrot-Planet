@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include "../PlayerDirection.h"
+#include "../LOG.h"
 
 // Forward declarations 
 class GameState;
@@ -15,6 +16,12 @@ class GameState;
 // Abstract base class for all game commands
 // GameState -> GameState
 class IGameCommand { 
+public:
+    std::string GetName() const;
+
+protected:
+    virtual void log(LogLevel level, std::string text); 
+
 public: 
     virtual ~IGameCommand() = default; 
     virtual void Execute(GameState& gameState) = 0; 
@@ -105,5 +112,24 @@ public:
 
     void Execute(GameState& gameState) override;
 }; 
+
+class InteractionInfoCommand : public IGameCommand {
+    uint32_t heldItemID;  
+
+    uint32_t whoID;  
+
+    int yCoord;  
+    int xCoord;  
+
+    Direction goingWhere;  
+
+public:
+    std::string GetName() const;
+
+public: 
+    InteractionInfoCommand(uint32_t item, uint32_t who, int yCoord, int xCoord, Direction goingWhere);
+
+    void Execute(GameState& gameState) override;  
+};
 
 

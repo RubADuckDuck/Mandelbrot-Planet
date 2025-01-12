@@ -32,6 +32,8 @@ void GameState::CreateAndRegisterPlayerObject(uint32_t player_id)
 
     uint32_t newID = GenerateNewGameObjectId();  
 
+    newPlayer->SetID(newID); 
+
     log(LOG_INFO, "Creating Playerable Object for player id: " + std::to_string(player_id) + "  objID: " + std::to_string(newID));
 
     // we could think of Using CreateGameObject. However, if the call of this method encompases all the functions, we don't have to pass GameObject Creation message 
@@ -48,6 +50,8 @@ void GameState::CreateAndRegisterGameObject(uint8_t typeId, bool fromNetwork)
 
     uint32_t newID = GenerateNewGameObjectId();  
 
+    newObject->SetID(newID);
+
     log(LOG_INFO, "Generated GameObject id of typeId: " + std::to_string(typeId) + "  ObjID: " + std::to_string(newID));  
 
     gameObjects[newID] = std::move(newObject);  
@@ -63,6 +67,8 @@ void GameState::CreateAndRegisterGameObjectWithID(uint32_t id, uint8_t typeId, b
 
     std::unique_ptr<GameObject> newGameObject;
     newGameObject = factoryRegistry[typeId]->Create();
+
+    newGameObject->SetID(id);
 
     gameObjects[id] = std::move(newGameObject);
 
@@ -243,6 +249,29 @@ void GameState::PlayerTakeAction(uint32_t playerId, Direction input, bool fromNe
         return;
     }
 
+}
+
+FactoryComponentObject* GameState::GetStructureAtCoord(int y, int x)
+{
+    return nullptr;
+}
+
+GroundType GameState::GetGroundTypeAtCoord(int y, int x)
+{
+    return GroundType();
+}
+
+DroppedItemObject* GameState::GetDroppedItemAtCoord(int y, int x)
+{
+    return nullptr;
+}
+
+void GameState::DropItemAt(int y, int x, Item* item)
+{
+}
+
+void GameState::DrawGameState()
+{
 }
 
 void GameState::UpdateGameState(float deltaTime) {

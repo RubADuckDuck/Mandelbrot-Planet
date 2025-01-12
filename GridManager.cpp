@@ -1,4 +1,5 @@
 #include "GridManager.h" 
+#include "LOG.h"
 
 int PositiveModulo(int x, int mod) {
     return ((x) % mod + mod) % mod;
@@ -289,6 +290,8 @@ void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 NavigationInfo MovementManager::Move(Coord2d position, Direction movingDirection, Direction facingDirection) {
 	int curY = position.first;
 	int curX = position.second;
+
+	LOG(LOG_INFO, "Attempting reference At: " + std::to_string(curY) + ", " + std::to_string(curX));
 
 	Action2Coord2d* curAction2Coord2d = grid2Transporter[curY][curX];
 	Coord2d targetCoord2d = (*curAction2Coord2d)[movingDirection];

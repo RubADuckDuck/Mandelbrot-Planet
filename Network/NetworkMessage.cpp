@@ -2,6 +2,25 @@
 #include "../PlayerDirection.h"
 #include "../LOG.h"
 
+
+#include <unordered_map>
+#include <string>
+
+// ... (your enum definition) ...
+
+std::unordered_map<MessageType, std::string> messageType2string = {
+    {MessageType::PLAYER_INPUT, "PLAYER_INPUT"},
+    {MessageType::INTERACTION_INFO, "INTERACTION_INFO"},
+    {MessageType::ADD_GAMEOBJECT, "ADD_GAMEOBJECT"},
+    {MessageType::REMOVE_GAMEOBJECT, "REMOVE_GAMEOBJECT"},
+    {MessageType::GAMEOBJECT_POSITION, "GAMEOBJECT_POSITION"},
+    {MessageType::GAMEOBJECT_PARENT_OBJECT, "GAMEOBJECT_PARENT_OBJECT"},
+    {MessageType::AUTHENTICATION, "AUTHENTICATION"},
+    {MessageType::UDP_VERIFICATION, "UDP_VERIFICATION"},
+    {MessageType::FULL_GAME_STATE, "FULL_GAME_STATE"}
+    // Add more entries as you add new message types
+};
+
 // Helper method to handle incoming UDP/TCP messages
 
 
@@ -61,6 +80,14 @@ std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetwor
             ipt_msg.playerDirection, ipt_msg.playerID
         );
     }
+    case MessageType::INTERACTION_INFO: {
+        const auto& interaction_msg = static_cast<const InteractionInfoMessage&>(message); 
+        return std::make_unique<InteractionInfoCommand>(
+            interaction_msg.heldItemID, interaction_msg.whoID, 
+            interaction_msg.yCoord, interaction_msg.xCoord, 
+            interaction_msg.goingWhere 
+        );
+    }
     case MessageType::ADD_GAMEOBJECT: {
         const auto& add_msg = static_cast<const AddGameObjectMessage&>(message);
         return std::make_unique<AddGameObjectCommand>(
@@ -91,7 +118,7 @@ std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetwor
                                               
                                               // Add cases for other message types
     default:
-        throw std::runtime_error("Unknown message type");
+        throw std::runtime_error("Unknown message type: " + messageType2string[message.GetType()]);
     }
 }
 
@@ -499,6 +526,10 @@ std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std::vector
     case MessageType::GAMEOBJECT_PARENT_OBJECT:
         message = std::make_unique<GameObjectParentObjectMessage>();
         break;
+    case MessageType::INTERACTION_INFO: 
+        message = std::make_unique<InteractionInfoMessage>();  
+        break; 
+    
     case MessageType::PLAYER_INPUT:
         message = std::make_unique<PlayerInputMessage>();
         break;
@@ -518,7 +549,7 @@ std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std::vector
         // add more 
 
     default:
-        throw std::runtime_error("Unknown message type");
+        throw std::runtime_error("Unknown message type: " + messageType2string[message->GetType()]);
     }
 
     message->Deserialize(data);

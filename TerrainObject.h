@@ -63,14 +63,15 @@ public:
 
     uint8_t GetTypeID() override;
 
-    void SetLocalCoord(int y, int x) {
+    void SetLocalCoord(int y, int x) { 
         yLocalCoord = y; 
         xLocalCoord = x; 
-    }
-    void SetOffset(int y, int x) {
+    } 
+    void SetOffset(int y, int x) { 
         initY = y; 
         initX = x; 
-    }
+    } 
+
     std::pair<int, int> Global2LocalCoord(int y, int x) {
         return { y - initY, x - initX };
     }
@@ -90,22 +91,22 @@ public:
 
 
     // server 
-    void Interact(Item* item) override;
+    void Interact(Item* item) override; 
 
-    Item* GetHeldItem();
+    Item* GetHeldItem(); 
 
-    void DropItem(Item* item) override;
+    void DropItem(Item* item) override; 
 
-    void DiscardHeldItem();
+    void DiscardHeldItem(); 
 
 
     // client
-    void SetTransform(Transform* transform) override;
+    void SetTransform(Transform* transform) override; 
 
-    void DrawGameObject(CameraObject& cameraObj) override;
+    void DrawGameObject(CameraObject& cameraObj) override; 
 
 private: 
-    void ResetFactoryFromCrafting();
+    void ResetFactoryFromCrafting(); 
 }; 
 
 

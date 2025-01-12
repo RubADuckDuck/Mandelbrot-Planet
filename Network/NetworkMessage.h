@@ -10,6 +10,7 @@
 #include <iostream>  
 #include <chrono> 
 #include <random> 
+#include <unordered_map>
 
 #include "Command.h"  
 #include "NetworkConfig.h" 
@@ -34,18 +35,20 @@ uint64_t generate_verification_code();
 enum class MessageType : uint8_t {
     PLAYER_INPUT, // only message client sends to server
 
-    INTERACTION_INFO, 
-    ADD_GAMEOBJECT, 
-    REMOVE_GAMEOBJECT, 
-    GAMEOBJECT_POSITION, 
+    INTERACTION_INFO,
+    ADD_GAMEOBJECT,
+    REMOVE_GAMEOBJECT,
+    GAMEOBJECT_POSITION,
     GAMEOBJECT_PARENT_OBJECT,
 
-    AUTHENTICATION, 
+    AUTHENTICATION,
     UDP_VERIFICATION,
     FULL_GAME_STATE
 
     // Add more message types as needed
 };
+
+extern std::unordered_map<MessageType, std::string> messageType2string;
 
 // Messages serialize and deserialize by themselves 
 // Serialize: Message -> Data 

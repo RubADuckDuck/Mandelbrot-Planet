@@ -75,6 +75,13 @@ private:
     // f: CLientID -> PlayerObject
     std::unordered_map<uint32_t, PlayableObject*> players; 
 
+    int gridHeight = 32; 
+    int gridWidth = 32; 
+
+    std::vector<uint32_t> droppedItemGrid; 
+    std::vector<uint32_t> structureGrid;  
+    std::vector<GroundType> groundTypeGrid;
+
 public: 
     uint32_t GenerateNewGameObjectId() {
         return nextGameObjectId++;
@@ -175,8 +182,17 @@ public:
     }
 
     void Initialize() {
-        movementManager = std::make_unique<MovementManager>();  
+        this->InitializeGrid(gridHeight, gridWidth); 
+    }
 
+    void InitializeGrid(int height, int width) {
+        int total_size = height * width; 
+
+        droppedItemGrid.resize(total_size, 0);  
+        structureGrid.resize(total_size, 0); 
+        groundTypeGrid.resize(total_size, GroundType::GRASS); 
+
+        movementManager = std::make_unique<MovementManager>();
         gridTransformManager = std::make_unique<GridTransformManager>();
     }
 

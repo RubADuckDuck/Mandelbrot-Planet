@@ -66,7 +66,7 @@ public:
 	virtual void SetTransform(Transform* ptrTransform);
 
 	// client::routine 
-	void SetTransformMatrixBeforeDraw();
+	virtual void SetTransformMatrixBeforeDraw();
 	virtual void DrawGameObject(CameraObject& cameraObj);
 
 	// server 

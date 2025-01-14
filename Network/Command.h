@@ -113,6 +113,20 @@ public:
     void Execute(GameState& gameState) override;
 }; 
 
+class WalkCommand : public IGameCommand {
+    uint32_t walkerID;  
+
+    Direction direction; 
+
+public:  
+    std::string GetName() const;  
+
+public: 
+    WalkCommand(); 
+
+    void Execute(GameState& gameState) override;  
+};
+
 class InteractionInfoCommand : public IGameCommand {
     uint32_t heldItemID;  
 

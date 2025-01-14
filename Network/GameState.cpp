@@ -253,21 +253,30 @@ void GameState::PlayerTakeAction(uint32_t playerId, Direction input, bool fromNe
 
 FactoryComponentObject* GameState::GetStructureAtCoord(int y, int x)
 {
-    return nullptr;
+    uint32_t id = structureGrid[y * gridWidth + x];
+    
+    return dynamic_cast<FactoryComponentObject*>(gameObjects[id].get());
 }
 
 GroundType GameState::GetGroundTypeAtCoord(int y, int x)
 {
-    return GroundType();
+    return groundTypeGrid[y * gridWidth + x];
 }
 
 DroppedItemObject* GameState::GetDroppedItemAtCoord(int y, int x)
 {
-    return nullptr;
+    uint32_t id = structureGrid[y * gridWidth + x];
+
+    return dynamic_cast<DroppedItemObject*>(gameObjects[id].get());
 }
 
 void GameState::DropItemAt(int y, int x, Item* item)
 {
+    // Publish Creation of new dropped Item.  
+
+    // Publish position change of (y, x) 
+
+    // Pushlish parent-child relation of droppedItem-item
 }
 
 void GameState::DrawGameState()

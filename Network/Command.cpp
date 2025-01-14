@@ -4,6 +4,7 @@
 #include "../LOG.h" 
 #include "../TerrainObject.h"
 #include "../Item.h"
+#include "../RidableObject.cpp"
 
 PlayerInputCommand::PlayerInputCommand(Direction userInput, uint32_t playerID)
     : user_input(userInput), player_id(playerID) {}
@@ -117,9 +118,7 @@ void InteractionInfoCommand::Execute(GameState& gameState)
 					// if factory component is input port 
 					log(LOG_INFO, "Interact with inputPort of factory"); 
 
-					
 					currTargetFactory->Interact(ptrItem);
-
 
 					// drop players item
 					PlayableObject* ptrPlayer = dynamic_cast<PlayableObject*>(ptrActor); 
@@ -165,8 +164,7 @@ void InteractionInfoCommand::Execute(GameState& gameState)
 		if (currTargetFactory != nullptr && currTargetFactory->componentType == INPUTPORT) {
 			// the gameobject is facing the input port
 			if (actorIsPlayer) {
-				// players can interact with factory by attempting to walk on it 
-				// don't end interaction player might one to grab something infront of the InputPort
+				// interact with factory?
 			}
 			else {
 				// if factory component is input port 
@@ -248,4 +246,40 @@ std::string IGameCommand::GetName() const { return "IGameCommand"; }
 
 void IGameCommand::log(LogLevel level, std::string text) {
 	LOG(level, GetName() + "::" + text);
+}
+
+void WalkCommand::Execute(GameState& gameState)
+{
+	 
+
+	RidableObject* walkerGameObject; // to do 
+	Direction curDirection = this->direction; 
+
+	uint32_t parentID = walkerGameObject->GetParentID();   
+
+	if (parentID == 0) {
+		log(LOG_WARNING, "The object which is trying to walk has no parent, therefore missing a grid. You don't have a space to walk on");  
+	}
+	else {
+		RidableObject* parentObj; // to do 
+
+		Coord2d curWalkerPos = parentObj->GetPosition(walkerID); 
+
+		NavigationInfo curNavigationInfo = parentObj->GetMovementManager()->Move(curWalkerPos, curDirection, curDirection);  
+
+		bool is_occupied = parentObj->CheckIfPositionIsOccupied(curNavigationInfo.pos);  
+
+		if (is_occupied) {
+			// well you can't walk there. 
+			// to do: Create Interaction Message, and Publish it 
+		}
+		else {
+			// is not occupied 
+			
+			// just walk. no problem
+			parentObj->SwapObjOnGrid(curWalkerPos, curNavigationInfo.pos); 
+		}
+		
+	}
+
 }

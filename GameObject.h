@@ -105,6 +105,7 @@ public:
 		return;
 	} 
 
+public:
 	uint32_t GetID() {
 		if (!hasID) {
 			LOG(LOG_ERROR, "This object has never been given an ID"); 

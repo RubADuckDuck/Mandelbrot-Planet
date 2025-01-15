@@ -188,7 +188,7 @@
     <ClCompile Include="Network\UDPServer.cpp" />
     <ClCompile Include="PlayerDirection.cpp" />
     <ClCompile Include="PlayingMode.cpp" />
-    <ClCompile Include="RidableObject.cpp" />
+    <ClCompile Include="RidableObject.h" />
     <ClCompile Include="ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="stb_image.h" />

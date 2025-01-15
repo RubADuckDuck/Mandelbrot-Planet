@@ -171,7 +171,7 @@
     <ClCompile Include="PlayerDirection.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="RidableObject.cpp">
+    <ClCompile Include="RidableObject.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClCompile>
   </ItemGroup>

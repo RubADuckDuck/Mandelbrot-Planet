@@ -31,6 +31,8 @@ private:
 	glm::mat4 modelTransformMat;
 
 public: 
+	uint32_t GetID(); 
+
 	uint32_t GetParentID(); 
 
 	MovementManager* GetMovementManager() {
@@ -40,6 +42,10 @@ public:
 	Coord2d GetPosition(uint32_t objID); 
 
 	bool CheckIfPositionIsOccupied(Coord2d pos); 
+
+	uint32_t GetObjectIDAt(Coord2d pos);  
+
+	void SetObjIdAtPos(Coord2d pos, uint32_t objID); 
 
 	void SwapObjOnGrid(Coord2d a, Coord2d b); 
 
@@ -64,6 +70,8 @@ public:
 		
 		return;
 	} 
+
+	void RemoveChildAtGrid(uint32_t childID);
 
 	bool SetParentObjectAndExit(uint32_t newParentID) {
 		if (parentID == 0) {

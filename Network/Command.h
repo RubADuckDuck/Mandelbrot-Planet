@@ -3,6 +3,8 @@
 #include <memory>
 #include "../PlayerDirection.h"
 #include "../LOG.h"
+#include "../GameObject.h"
+#include "../RidableObject.h"
 
 // Forward declarations 
 class GameState;
@@ -118,13 +120,17 @@ class WalkCommand : public IGameCommand {
 
     Direction direction; 
 
+    GameState* tempGameState; 
+
 public:  
     std::string GetName() const;  
 
 public: 
     WalkCommand(); 
 
-    void Execute(GameState& gameState) override;  
+    void Execute(GameState& gameState) override; 
+    void Interact(RidableObject* who, Direction did_what, GameObject* to_whom);
+    void Walk(RidableObject* who, Direction to_where, Coord2d from_where, RidableObject* walking_on); 
 };
 
 class InteractionInfoCommand : public IGameCommand {
@@ -144,6 +150,8 @@ public:
     InteractionInfoCommand(uint32_t item, uint32_t who, int yCoord, int xCoord, Direction goingWhere);
 
     void Execute(GameState& gameState) override;  
+
+    
 };
 
 

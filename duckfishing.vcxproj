@@ -188,12 +188,12 @@
     <ClCompile Include="Network\UDPServer.cpp" />
     <ClCompile Include="PlayerDirection.cpp" />
     <ClCompile Include="PlayingMode.cpp" />
+    <ClCompile Include="RidableObject.cpp" />
     <ClCompile Include="RidableObject.h" />
     <ClCompile Include="ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="stb_image.h" />
     <ClCompile Include="TerrainManager.cpp" />
-    <ClCompile Include="TerrainObject.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -236,8 +236,6 @@
     <ClInclude Include="PlayingMode.h" />
     <ClInclude Include="ShaderProgramLoader.h" />
     <ClInclude Include="SystemManager.h" />
-    <ClInclude Include="TerrainManager.h" />
-    <ClInclude Include="TerrainObject.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="utils.h" />

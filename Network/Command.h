@@ -116,42 +116,54 @@ public:
 }; 
 
 class WalkCommand : public IGameCommand {
-    uint32_t walkerID;  
+    uint32_t walkerID;
 
-    Direction direction; 
+    Direction direction;
 
-    GameState* tempGameState; 
+    GameState* tempGameState;
 
-public:  
-    std::string GetName() const;  
+public:
+    std::string GetName() const {
+        return "WalkCommand";
+    }
 
-public: 
-    WalkCommand(); 
+public:
+    WalkCommand(uint32_t walkerID, Direction direction)
+        : walkerID(walkerID), direction(direction), tempGameState(nullptr) {}
 
     void Execute(GameState& gameState) override; 
     void Interact(RidableObject* who, Direction did_what, GameObject* to_whom);
     void Walk(RidableObject* who, Direction to_where, Coord2d from_where, RidableObject* walking_on); 
 };
 
-class InteractionInfoCommand : public IGameCommand {
-    uint32_t heldItemID;  
+class RideCommand : public IGameCommand {
+    uint32_t vehicleID;
+    uint32_t riderID;
 
-    uint32_t whoID;  
-
-    int yCoord;  
-    int xCoord;  
-
-    Direction goingWhere;  
+    uint8_t rideAt;
 
 public:
-    std::string GetName() const;
+    std::string GetName() const {
+        return "RideCommand";
+    }
+public:
+    RideCommand(uint32_t vehicleID, uint32_t riderID, uint8_t rideAt)
+        : vehicleID(vehicleID), riderID(riderID), rideAt(rideAt) {}
 
-public: 
-    InteractionInfoCommand(uint32_t item, uint32_t who, int yCoord, int xCoord, Direction goingWhere);
+    void Execute(GameState& gameState) override {
+        RidableObject* vehicleObj = dynamic_cast<RidableObject*>(gameState.GetGameObject(vehicleID));  
+        
+        // I am torn between whether I should let Non-ridable objects Ride.
+        // I made up this rule to settle my mind. 
+        // You can only ride, if you let others ride yourself. 
+        RidableObject* riderObj = dynamic_cast<RidableObject*>(gameState.GetGameObject(vehicleID)); 
 
-    void Execute(GameState& gameState) override;  
+        riderObj->SetParentObjectAndExit(vehicleID); 
 
+        vehicleObj->SetObjIdAtPos(rideAt, riderID);
+
+        return; 
+    }
     
 };
-
 

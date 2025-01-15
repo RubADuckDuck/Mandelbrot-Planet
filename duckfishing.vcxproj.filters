@@ -120,9 +120,6 @@
     <ClCompile Include="ShaderProgramLoader.cpp">
       <Filter>Source Files\temp</Filter>
     </ClCompile>
-    <ClCompile Include="TerrainObject.cpp">
-      <Filter>Source Files\temp</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files\temp</Filter>
     </ClCompile>
@@ -174,12 +171,12 @@
     <ClCompile Include="RidableObject.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClCompile>
+    <ClCompile Include="RidableObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameObject.h">
-      <Filter>Header Files\GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainObject.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="Item.h">
@@ -189,9 +186,6 @@
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="FactoryType.h">
-      <Filter>Header Files\GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainManager.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="InteractionInfo.h">

@@ -193,7 +193,6 @@
     <ClCompile Include="ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="stb_image.h" />
-    <ClCompile Include="TerrainManager.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="GameModeController.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="GameScene.h" />
     <ClInclude Include="Gizmo.h" />
     <ClInclude Include="GlobalMappings.h" />
     <ClInclude Include="GridManager.h" />
@@ -231,7 +229,6 @@
     <ClInclude Include="Network\UDPClient.h" />
     <ClInclude Include="Network\UDPServer.h" />
     <ClInclude Include="ObjectType.h" />
-    <ClInclude Include="Planet.h" />
     <ClInclude Include="PlayerDirection.h" />
     <ClInclude Include="PlayingMode.h" />
     <ClInclude Include="ShaderProgramLoader.h" />

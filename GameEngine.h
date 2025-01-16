@@ -61,31 +61,4 @@ public:
 	SDL_Window* GetWindow() {
 		return systemManager->GetWindow();
 	}
-
-public:
-
-	void CreateAndAddGameObject( // I recommed not to use this. Shaders are no longer manually passed.
-		const std::string& meshPath, 
-		std::string& texturePath,
-		GLuint shaderProgram
-		);
-
-	void CreateAndAddGameObject(
-		const std::string& meshPath,
-		std::string& texturePath
-	);
-
-	void CreateAndAddGameObjectWithTransform( 
-		const std::string& meshPath, 
-		const std::string& texturePath, 
-		const glm::vec3& translation = glm::vec3(0.0f), 
-		const glm::vec3& scale = glm::vec3(1.0f), 
-		const glm::vec3& rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f), 
-		float rotationAngleRadians = 0.0f);
-
-	void DirectlyAddGameObject(GameObject* newGameObject);
-	
-	void ManuallySubscribe(GameObject* gameObj);
-private: 
-	void AddGameObjectToGameEngine(GameObject* gameObj);
 };

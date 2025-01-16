@@ -60,9 +60,6 @@
     <ClCompile Include="GroundType.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="TerrainManager.cpp">
-      <Filter>Source Files\GameObjects</Filter>
-    </ClCompile>
     <ClCompile Include="Network\Command.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
@@ -194,9 +191,6 @@
     <ClInclude Include="PlayerDirection.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Planet.h">
-      <Filter>Header Files\GameObjects</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectType.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
@@ -234,9 +228,6 @@
       <Filter>Header Files\temp</Filter>
     </ClInclude>
     <ClInclude Include="Event.h">
-      <Filter>Header Files\temp</Filter>
-    </ClInclude>
-    <ClInclude Include="GameScene.h">
       <Filter>Header Files\temp</Filter>
     </ClInclude>
     <ClInclude Include="Gizmo.h">

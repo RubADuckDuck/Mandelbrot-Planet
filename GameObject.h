@@ -18,8 +18,6 @@
 
 #include "ObjectType.h"
 
-// This is critical.
-// #include "../NetCustomCommon/NetworkMessage.h"
 
 //class Animation; 
 
@@ -36,24 +34,46 @@ using Publisher = std::function<void(const std::string&)>; // using 'Alias' = st
 
 
 
-
 class GameObject {
-public: 
-	Transform* ptrNodeTransform;
-	glm::mat4 modelTransformMat;
-
 public:
-	uint32_t meshID;  
-	uint32_t textureID;  
+	virtual std::string GetName() const;
+
+	// client & server 
+	virtual uint8_t GetTypeID();
+protected:
+	void log(LogLevel level, std::string text);
+
+public: 
+	Transform* ptrNodeTransform_;
+	glm::mat4 modelTransformMat_;
+
+	uint32_t meshID_;  
+	uint32_t textureID_;  
 
 	virtual ~GameObject();
 
-	// client & server 
-	virtual uint8_t GetTypeID() { return 0; };
+public: 	
+	GameObject()
+		: ptrNodeTransform_(nullptr), modelTransformMat_(glm::mat4(1)),
+		meshID_(0), textureID_(0) {} 
+
+	GameObject(uint32_t meshID, uint32_t textureID) 
+		: ptrNodeTransform_(nullptr), modelTransformMat_(glm::mat4(1)),
+		meshID_(meshID), textureID_(textureID) {}
+
+	GameObject(uint32_t objID, uint32_t meshID, uint32_t textureID)
+		: ptrNodeTransform_(nullptr), modelTransformMat_(glm::mat4(1)),
+		meshID_(meshID), textureID_(textureID) {
+		this->SetID(objID); 
+	}
 
 	// client::init
-	void SetMeshID(uint32_t id);
-	void SetTextureID(uint32_t id);
+	void SetMeshID(uint32_t id) {
+		meshID_ = id; 
+	}
+	void SetTextureID(uint32_t id) {
+		textureID_ = id; 
+	}
 	//void SetAnimation(Animation* ptrAnimation) { this->ptrTexture = ptrTexture; }
 	virtual void SetTransform(Transform* ptrTransform);
 
@@ -77,30 +97,30 @@ public:
 	//}
 
 	void SetID(uint32_t newID) {
-		if (hasID) {
+		if (hasID_) {
 			LOG(LOG_WARNING, "This game object already has an ID. ID will not be altered");
 		}
 		else {
-			hasID = true;
-			this->objectID = newID; 
+			hasID_ = true;
+			this->objectID_ = newID; 
 		}
 		return;
 	} 
 
 public:
 	uint32_t GetID() {
-		if (!hasID) {
+		if (!hasID_) {
 			LOG(LOG_ERROR, "This object has never been given an ID"); 
 			return 0; 
-		}
+		} 
 		else {
-			return this->objectID; 
-		}
+			return this->objectID_; 
+		} 
 	}
 
 private: 
-	bool hasID = false;
-	uint32_t objectID = 0;  
+	bool hasID_ = false;
+	uint32_t objectID_ = 0;  
 }; 
 
 //
@@ -191,42 +211,8 @@ private:
 //	uint32_t objectID = 0;  
 //}; 
 
-class GameObjectOnGrid : public GameObject {
-public: 
-	int yCoord = 0; int xCoord = 0;
-	Direction direction = Direction::UP;
-	int orientation = 0; 
 
-	
 
-	void SetCoordinates(int y, int x) { 
-		// publish change to server 
-		// however to generate message, 
-		// I should know what the id is of this particular instance. 
-
-		// there are two choices 
-		// 1. Add ID variable to objects. We will have to make the implementations of sending messages explicit within each instance of gameobject class. 
-		// 2. 
-		
-
-		yCoord = y;
-		xCoord = x;
-	}
-};
-
-class PlayableObject : public GameObjectOnGrid {
-public:
-	Item* heldItem; 
-	
-	// server & client
-	uint8_t GetTypeID() override;
-
-	void TakeAction(Direction direction);
-	void DropItem(); 
-	void RequestWalk(); 
-	void Walk(); 
-	void PickUpItem(Item* item); 
-}; 
 
 enum class MapLayerType {
     BIOME,        // Water, Grassland, volcano ...
@@ -283,44 +269,44 @@ enum class MapLayerType {
 //};
 //
 //
-//class CameraObject : GameObject{
-//public: 
-//	bool showCamera; 
-//
-//    glm::vec3 position; // High angle position
-//    glm::vec3 target;      // Looking at origin
-//    glm::vec3 up;          // Up vector 
-//
-//    float angle = 0;
-//
-//    // Define projection parameters
-//    float fov;                       // Field of view in degrees
-//    float aspectRatio;     // Aspect ratio (adjust as needed)
-//    float nearPlane;                  // Near clipping plane
-//    float farPlane;                  // Far clipping plane 
-//
-//    std::vector<GameObject*> targetGameObjects; 
-//
-//    void AddTarget(GameObject* targetGameObj);
-//
-//	glm::mat4 viewProjectionMatrix; 
-//
-//	// Default Constructor
-//	CameraObject();
-//
-//	// Function to set the viewProjectionMatrix
-//    void SetViewProjMat();
-//
-//	// Getter for viewProjectionMatrix
-//	const glm::mat4& GetViewProjMat() const;
-//
-//	glm::mat4& GetviewProjMat();
-//	glm::vec3& GetGlobalCameraPosition();
-//
-//    void Update() override;
-//
-//	void DrawGameObject(CameraObject& cameraObj) override;
-//private:
-//	// Method to initialize viewProjectionMatrix
-//	void InitializeCamera();
-//};
+
+
+class CameraObject : GameObject{
+public: 
+	bool showCamera; 
+
+    glm::vec3 position; // High angle position
+    glm::vec3 target;      // Looking at origin
+    glm::vec3 up;          // Up vector 
+
+    float angle = 0;
+
+    // Define projection parameters
+    float fov;                       // Field of view in degrees
+    float aspectRatio;     // Aspect ratio (adjust as needed)
+    float nearPlane;                  // Near clipping plane
+    float farPlane;                  // Far clipping plane 
+
+    std::vector<GameObject*> targetGameObjects; 
+
+    void AddTarget(GameObject* targetGameObj);
+
+	glm::mat4 viewProjectionMatrix; 
+
+	// Default Constructor
+	CameraObject();
+
+	// Function to set the viewProjectionMatrix
+    void SetViewProjMat();
+
+	// Getter for viewProjectionMatrix
+	const glm::mat4& GetViewProjMat() const;
+
+	glm::mat4& GetviewProjMat();
+	glm::vec3& GetGlobalCameraPosition();
+
+    void Update() override;
+private:
+	// Method to initialize viewProjectionMatrix
+	void InitializeCamera();
+};

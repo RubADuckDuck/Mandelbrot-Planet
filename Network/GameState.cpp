@@ -1,7 +1,8 @@
 #include "GameState.h" 
-#include "../GameObject.h" 
 #include "NetworkMessage.h"
 
+#include "../GameObject.h" 
+#include "../RidableObject.h"
 
 std::string GameState::GetName() const { return "GameState"; }
 
@@ -54,6 +55,7 @@ void GameState::CreateAndRegisterGameObject(uint8_t typeId, bool fromNetwork)
 
     log(LOG_INFO, "Generated GameObject id of typeId: " + std::to_string(typeId) + "  ObjID: " + std::to_string(newID));  
 
+    gameObjects[newID] = std::move(newObject);  
     gameObjects[newID] = std::move(newObject);  
     objectsByType.insert({typeId, newID});  
 
@@ -110,6 +112,36 @@ GameObject* GameState::GetGameObject(uint32_t id) {
     return nullptr;
 }
 
+// Hierarchical Operations
+void GameState::SetParent(uint32_t childId, uint32_t parentId, bool fromNetwork) {
+    // to do 
+    
+    //if (!fromNetwork) {
+    //    // propagate update to server
+    //}
+
+    //GameObject* pChild = gameObjects[childId].get();
+    //GameObject* pParent = gameObjects[parentId].get();
+
+    //pChild->SetParent(pParent);
+    //pParent->AddChild(pChild);
+}
+
+// Version 1: Safer map access and cleaner dynamic_cast
+void GameState::UpdateGameObjectPosition(uint32_t id, int y, int x, bool fromNetwork) { 
+    // to do 
+    //if (!fromNetwork) {
+    //    // propagate update to server
+    //}
+
+    //auto it = gameObjects.find(id);
+    //if (it != gameObjects.end()) {
+    //    if (auto* gridObject = dynamic_cast<GameObjectOnGrid*>(it->second.get())) {
+    //        gridObject->SetCoordinates(y, x);
+    //    }
+    //}
+}
+
 std::vector<GameObject*> GameState::GetObjectsByType(uint8_t typeId) {
     std::vector<GameObject*> objects;
 
@@ -160,22 +192,23 @@ void GameState::BroadcastGameObjectRemoval(uint32_t id) {
     delete curMessage;
 }
 
-void GameState::BroadcastGameObjectPosition(GameObject* gameObject) {
-    if (auto gridObject = dynamic_cast<GameObjectOnGrid*>(gameObject)) {
-        INetworkMessage* curMessage = new GameObjectPositionMessage(
-            gridObject->yCoord,
-            gridObject->xCoord,
-            gridObject->GetID()
-        );
-
-        server->broadcast_message(curMessage);
-
-        delete curMessage;
-    }
-    else {
-        // this gameObject has no position
-    }
-}
+// GameObjects don't set 
+//void GameState::BroadcastGameObjectPosition(GameObject* gameObject) {
+//    if (auto gridObject = dynamic_cast<GameObjectOnGrid*>(gameObject)) {
+//        INetworkMessage* curMessage = new GameObjectPositionMessage(
+//            gridObject->yCoord,
+//            gridObject->xCoord,
+//            gridObject->GetID()
+//        );
+//
+//        server->broadcast_message(curMessage);
+//
+//        delete curMessage;
+//    }
+//    else {
+//        // this gameObject has no position
+//    }
+//}
 
 void GameState::BroadcastGameObjectParenting(uint32_t parentID, uint32_t objID) {
     INetworkMessage* curMessage = new GameObjectParentObjectMessage(parentID, objID);
@@ -205,32 +238,34 @@ void GameState::SendPlayerInput(Direction direction) {
     delete curMessage;
 }
 
-// Hierarchical Operations
-void GameState::SetParent(uint32_t childId, uint32_t parentId, bool fromNetwork) {
-    if (!fromNetwork) {
-        // propagate update to server
-    }
+// We don't set parents this way
+//// Hierarchical Operations
+//void GameState::SetParent(uint32_t childId, uint32_t parentId, bool fromNetwork) {
+//    if (!fromNetwork) {
+//        // propagate update to server
+//    }
+//
+//    GameObject* pChild = gameObjects[childId].get();
+//    GameObject* pParent = gameObjects[parentId].get();
+//
+//    pChild->SetParent(pParent);
+//    pParent->AddChild(pChild);
+//}
 
-    GameObject* pChild = gameObjects[childId].get();
-    GameObject* pParent = gameObjects[parentId].get();
-
-    pChild->SetParent(pParent);
-    pParent->AddChild(pChild);
-}
-
-// Version 1: Safer map access and cleaner dynamic_cast
-void GameState::UpdateGameObjectPosition(uint32_t id, int y, int x, bool fromNetwork) {
-    if (!fromNetwork) {
-        // propagate update to server
-    }
-
-    auto it = gameObjects.find(id);
-    if (it != gameObjects.end()) {
-        if (auto* gridObject = dynamic_cast<GameObjectOnGrid*>(it->second.get())) {
-            gridObject->SetCoordinates(y, x);
-        }
-    }
-}
+// No more Object On Grid
+//// Version 1: Safer map access and cleaner dynamic_cast
+//void GameState::UpdateGameObjectPosition(uint32_t id, int y, int x, bool fromNetwork) {
+//    if (!fromNetwork) {
+//        // propagate update to server
+//    }
+//
+//    auto it = gameObjects.find(id);
+//    if (it != gameObjects.end()) {
+//        if (auto* gridObject = dynamic_cast<GameObjectOnGrid*>(it->second.get())) {
+//            gridObject->SetCoordinates(y, x);
+//        }
+//    }
+//}
 
 void GameState::PlayerTakeAction(uint32_t playerId, Direction input, bool fromNetwork) {
     if (!fromNetwork) {
@@ -251,24 +286,26 @@ void GameState::PlayerTakeAction(uint32_t playerId, Direction input, bool fromNe
 
 }
 
-FactoryComponentObject* GameState::GetStructureAtCoord(int y, int x)
-{
-    uint32_t id = structureGrid[y * gridWidth + x];
-    
-    return dynamic_cast<FactoryComponentObject*>(gameObjects[id].get());
-}
+// No more Factory Component objects 
+//FactoryComponentObject* GameState::GetStructureAtCoord(int y, int x)
+//{
+//    uint32_t id = structureGrid[y * gridWidth + x];
+//    
+//    return dynamic_cast<FactoryComponentObject*>(gameObjects[id].get());
+//}
 
 GroundType GameState::GetGroundTypeAtCoord(int y, int x)
 {
     return groundTypeGrid[y * gridWidth + x];
 }
 
-DroppedItemObject* GameState::GetDroppedItemAtCoord(int y, int x)
-{
-    uint32_t id = structureGrid[y * gridWidth + x];
-
-    return dynamic_cast<DroppedItemObject*>(gameObjects[id].get());
-}
+// No More Dropped Item
+//DroppedItemObject* GameState::GetDroppedItemAtCoord(int y, int x)
+//{
+//    uint32_t id = structureGrid[y * gridWidth + x];
+//
+//    return dynamic_cast<DroppedItemObject*>(gameObjects[id].get());
+//}
 
 void GameState::DropItemAt(int y, int x, Item* item)
 {

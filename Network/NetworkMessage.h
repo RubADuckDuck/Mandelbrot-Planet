@@ -35,12 +35,19 @@ uint64_t generate_verification_code();
 enum class MessageType : uint8_t {
     PLAYER_INPUT, // only message client sends to server
 
+    // v0.5
     INTERACTION_INFO,
     ADD_GAMEOBJECT,
     REMOVE_GAMEOBJECT,
     GAMEOBJECT_POSITION,
-    GAMEOBJECT_PARENT_OBJECT,
+    GAMEOBJECT_PARENT_OBJECT, 
 
+    // v1.0 
+    ADD_RIDABLE_OBJECT, 
+    WALK_ON_RIDABLE_OBJECT, 
+    RIDE_ON_RIDABLE_OBJECT, 
+
+    // Authentication & Verification Related message Types 
     AUTHENTICATION,
     UDP_VERIFICATION,
     FULL_GAME_STATE
@@ -173,30 +180,6 @@ public:
     void Deserialize(const std::vector<uint8_t>& data) override;
 }; 
 
-class InteractionInfoMessage : public INetworkMessage {
-public:  
-    uint32_t heldItemID;  
-
-    uint32_t whoID; 
-
-    int yCoord; 
-    int xCoord;  
-
-    Direction goingWhere;  
-
-    InteractionInfoMessage(uint32_t item, uint32_t who, int yCoord, int xCoord, Direction goingWhere); 
-
-    InteractionInfoMessage();  
-
-    MessageType GetType() const override; 
-
-    size_t GetSize() const override;  
-
-    std::vector<uint8_t> Serialize() const override;  
-
-    void Deserialize(const std::vector<uint8_t>& data) override;  
-};
-
 class AddGameObjectMessage : public INetworkMessage {
 public: 
     uint8_t gameObjectTypeID = 0;  
@@ -273,6 +256,56 @@ public:
 }; 
 
 
+// new v1.0 ----------------------------------------------------------------
+class AddRidableObjectMessage : public INetworkMessage {
+public:  
+    uint32_t objID_ = 0;  
+    uint32_t meshID_ = 0;  
+    uint32_t textureID_ = 0;  
+
+    uint8_t gridHeight_ = 0; 
+    uint8_t gridWidth = 0;  
+
+    MessageType GetType() const override;
+
+    size_t GetSize() const override;
+
+    std::vector<uint8_t> Serialize() const override;
+
+    void Deserialize(const std::vector<uint8_t>& data) override;
+}; 
+
+class WalkOnRidableObjectMessage : public INetworkMessage {
+public:  
+    uint32_t walkerID_ = 0;  
+    Direction direction = Direction::IDLE;  
+
+    MessageType GetType() const override;
+
+    size_t GetSize() const override;
+
+    std::vector<uint8_t> Serialize() const override;
+
+    void Deserialize(const std::vector<uint8_t>& data) override;
+};
+
+class RideOnRidableObjectMessage : public INetworkMessage {
+public: 
+    uint32_t vehicleID;  
+    uint32_t riderID;  
+
+    uint8_t rideAt;  
+
+    MessageType GetType() const override;
+
+    size_t GetSize() const override;
+
+    std::vector<uint8_t> Serialize() const override;
+
+    void Deserialize(const std::vector<uint8_t>& data) override;
+};
+
+//------------------------------------------------------------
 //// Example message implementation
 //class PlayerPositionMessage : public INetworkMessage {
 //public:

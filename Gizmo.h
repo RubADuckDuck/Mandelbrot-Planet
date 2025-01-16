@@ -97,9 +97,7 @@ public:
 
     void Update() override {
         if (targetObject != nullptr) {
-            // Follow the target object's position
-            glm::vec3 translation = targetObject->ptrTransform->GetTranslation();
-            transform.SetTranslation(glm::vec3(translation.x, 0.0f, translation.z)); // Stay at Y=0
+            // to do
         }
     }
 

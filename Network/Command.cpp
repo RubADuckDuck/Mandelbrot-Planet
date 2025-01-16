@@ -67,7 +67,7 @@ void IGameCommand::log(LogLevel level, std::string text) {
 	LOG(level, GetName() + "::" + text);
 }
 
-void WalkCommand::Execute(GameState& gameState)
+void WalkOnRidableObjectCommand::Execute(GameState& gameState)
 {
 	tempGameState = &gameState; 
 
@@ -101,7 +101,7 @@ void WalkCommand::Execute(GameState& gameState)
 
 }
 
-void WalkCommand::Interact(RidableObject* who, Direction did_what, GameObject* to_whom)
+void WalkOnRidableObjectCommand::Interact(RidableObject* who, Direction did_what, GameObject* to_whom)
 {
 	uint32_t previousParentID = who->GetParentID(); 
 	RidableObject* prevParentObj = dynamic_cast<RidableObject*>(tempGameState->GetGameObject(previousParentID));
@@ -134,7 +134,7 @@ void WalkCommand::Interact(RidableObject* who, Direction did_what, GameObject* t
 
 
 }
-void WalkCommand::Walk(RidableObject* who, Direction to_where, Coord2d from_where, RidableObject* walking_on)
+void WalkOnRidableObjectCommand::Walk(RidableObject* who, Direction to_where, Coord2d from_where, RidableObject* walking_on)
 {
 	NavigationInfo curNavigationInfo = walking_on->GetMovementManager()->Move(from_where, to_where, to_where);
 

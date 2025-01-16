@@ -1,10 +1,10 @@
+#include <unordered_map>
+#include <string>
+
 #include "NetworkMessage.h"
 #include "../PlayerDirection.h"
 #include "../LOG.h"
-
-
-#include <unordered_map>
-#include <string>
+#include "../RidableObject.h"
 
 // ... (your enum definition) ...
 
@@ -80,14 +80,6 @@ std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetwor
             ipt_msg.playerDirection, ipt_msg.playerID
         );
     }
-    case MessageType::INTERACTION_INFO: {
-        const auto& interaction_msg = static_cast<const InteractionInfoMessage&>(message); 
-        return std::make_unique<InteractionInfoCommand>(
-            interaction_msg.heldItemID, interaction_msg.whoID, 
-            interaction_msg.yCoord, interaction_msg.xCoord, 
-            interaction_msg.goingWhere 
-        );
-    }
     case MessageType::ADD_GAMEOBJECT: {
         const auto& add_msg = static_cast<const AddGameObjectMessage&>(message);
         return std::make_unique<AddGameObjectCommand>(
@@ -114,9 +106,29 @@ std::unique_ptr<IGameCommand> GameMessageProcessor::ProcessMessage(const INetwor
     }
     case MessageType::AUTHENTICATION:
         LOG(LOG_WARNING, "Authenication message cannot be handled by a MessageProcessor."); 
-        return nullptr;
-                                              
-                                              // Add cases for other message types
+        return nullptr; 
+
+        // v1.0 
+
+    case MessageType::ADD_RIDABLE_OBJECT: {
+        const auto& add_msg = static_cast<const AddRidableObjectMessage&>(message);
+        return std::make_unique<AddRidableObjectCommand>(
+            add_msg.objID_, add_msg.meshID_, add_msg.textureID_,
+            add_msg.gridHeight_, add_msg.gridWidth
+        );
+    }
+    case MessageType::WALK_ON_RIDABLE_OBJECT: {
+        const auto& walk_msg = static_cast<const WalkOnRidableObjectMessage&>(message);
+        return std::make_unique<WalkOnRidableObjectCommand>(
+            walk_msg.walkerID_, walk_msg.direction
+        );
+    }
+    case MessageType::RIDE_ON_RIDABLE_OBJECT: {
+        const auto& ride_msg = static_cast<const RideOnRidableObjectMessage&>(message);
+        return std::make_unique<RideOnRidableObjectCommand>(
+            ride_msg.vehicleID, ride_msg.riderID, ride_msg.rideAt
+        );
+    }
     default:
         throw std::runtime_error("Unknown message type: " + messageType2string[message.GetType()]);
     }
@@ -526,10 +538,6 @@ std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std::vector
     case MessageType::GAMEOBJECT_PARENT_OBJECT:
         message = std::make_unique<GameObjectParentObjectMessage>();
         break;
-    case MessageType::INTERACTION_INFO: 
-        message = std::make_unique<InteractionInfoMessage>();  
-        break; 
-    
     case MessageType::PLAYER_INPUT:
         message = std::make_unique<PlayerInputMessage>();
         break;
@@ -571,62 +579,100 @@ uint64_t generate_verification_code() {
     return dis(gen);
 }
 
-InteractionInfoMessage::InteractionInfoMessage(uint32_t item, uint32_t who, int yCoord, int xCoord, Direction goingWhere)
-    : heldItemID(item), whoID(who), yCoord(yCoord), xCoord(xCoord), goingWhere(goingWhere)  
-{
+MessageType AddRidableObjectMessage::GetType() const {
+    return MessageType::ADD_RIDABLE_OBJECT;
 }
 
-InteractionInfoMessage::InteractionInfoMessage()
-    : heldItemID(0), whoID(0), yCoord(0), xCoord(0), goingWhere(Direction::IDLE)
-{
+size_t AddRidableObjectMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(uint32_t) * 3 + sizeof(uint8_t) * 2;
 }
 
-MessageType InteractionInfoMessage::GetType() const
-{
-    return MessageType::INTERACTION_INFO;
-}
-
-size_t InteractionInfoMessage::GetSize() const
-{
-    return sizeof(MessageType) + sizeof(uint32_t) * 2 + sizeof(int) * 2 + sizeof(uint8_t);
-}
-
-std::vector<uint8_t> InteractionInfoMessage::Serialize() const
-{
+std::vector<uint8_t> AddRidableObjectMessage::Serialize() const {
     std::vector<uint8_t> buffer;
     buffer.reserve(GetSize());
 
-    // Add message type
-    buffer.push_back(static_cast<uint8_t>(GetType())); 
+    buffer.push_back(static_cast<uint8_t>(GetType()));
 
-    INetworkMessage::add_to_buffer<uint32_t>(buffer, heldItemID);  
-    INetworkMessage::add_to_buffer<uint32_t>(buffer, whoID);  
-
-    INetworkMessage::add_to_buffer<int>(buffer, yCoord);  
-    INetworkMessage::add_to_buffer<int>(buffer, xCoord);  
-
-    // add Player direction 
-    INetworkMessage::add_to_buffer<uint8_t>(buffer, static_cast<uint8_t>(goingWhere));
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, objID_);
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, meshID_);
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, textureID_);
+    INetworkMessage::add_to_buffer<uint8_t>(buffer, gridHeight_);
+    INetworkMessage::add_to_buffer<uint8_t>(buffer, gridWidth);
 
     return buffer;
 }
 
-void InteractionInfoMessage::Deserialize(const std::vector<uint8_t>& data)
-{
+void AddRidableObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
     if (data.size() < GetSize()) {
         throw std::runtime_error("Invalid message size");
-    } 
+    }
 
-    size_t offset = 1; 
+    size_t offset = 1;
 
-    heldItemID = extract_from_data<uint32_t>(data, offset);  
+    objID_ = extract_from_data<uint32_t>(data, offset);
+    meshID_ = extract_from_data<uint32_t>(data, offset);
+    textureID_ = extract_from_data<uint32_t>(data, offset);
+    gridHeight_ = extract_from_data<uint8_t>(data, offset);
+    gridWidth = extract_from_data<uint8_t>(data, offset); 
+}
 
-    whoID = extract_from_data<uint32_t>(data, offset);  
 
-    yCoord = extract_from_data<int>(data, offset);  
-    xCoord = extract_from_data<int>(data, offset);  
+MessageType WalkOnRidableObjectMessage::GetType() const {
+    return MessageType::WALK_ON_RIDABLE_OBJECT;
+}
 
-    goingWhere = static_cast<Direction>(extract_from_data<uint8_t>(data, offset));  
+size_t WalkOnRidableObjectMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(uint32_t) + sizeof(Direction);
+}
 
-    return;  
+std::vector<uint8_t> WalkOnRidableObjectMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, walkerID_);
+    INetworkMessage::add_to_buffer<Direction>(buffer, direction);
+
+    return buffer;
+}
+
+void WalkOnRidableObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1;
+    walkerID_ = extract_from_data<uint32_t>(data, offset);
+    direction = extract_from_data<Direction>(data, offset);
+}
+
+MessageType RideOnRidableObjectMessage::GetType() const {
+    return MessageType::RIDE_ON_RIDABLE_OBJECT;
+}
+
+size_t RideOnRidableObjectMessage::GetSize() const {
+    return sizeof(MessageType) + sizeof(uint32_t) * 2 + sizeof(uint8_t);
+}
+
+std::vector<uint8_t> RideOnRidableObjectMessage::Serialize() const {
+    std::vector<uint8_t> buffer;
+    buffer.reserve(GetSize());
+
+    buffer.push_back(static_cast<uint8_t>(GetType()));
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, vehicleID);
+    INetworkMessage::add_to_buffer<uint32_t>(buffer, riderID);
+    INetworkMessage::add_to_buffer<uint8_t>(buffer, rideAt);
+
+    return buffer;
+}
+
+void RideOnRidableObjectMessage::Deserialize(const std::vector<uint8_t>& data) {
+    if (data.size() < GetSize()) {
+        throw std::runtime_error("Invalid message size");
+    }
+
+    size_t offset = 1;
+    vehicleID = extract_from_data<uint32_t>(data, offset);
+    riderID = extract_from_data<uint32_t>(data, offset);
+    rideAt = extract_from_data<uint8_t>(data, offset);
 }

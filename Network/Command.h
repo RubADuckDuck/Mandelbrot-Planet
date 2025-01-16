@@ -5,6 +5,7 @@
 #include "../LOG.h"
 #include "../GameObject.h"
 #include "../RidableObject.h"
+#include "GameState.h"
 
 // Forward declarations 
 class GameState;
@@ -115,20 +116,58 @@ public:
     void Execute(GameState& gameState) override;
 }; 
 
-class WalkCommand : public IGameCommand {
+// v1.0 ----------------------------------------------------
+class AddRidableObjectCommand : public IGameCommand {
+    uint32_t objID_;
+    uint32_t meshID_;
+    uint32_t textureID_;
+    uint8_t gridHeight_;
+    uint8_t gridWidth_;
+public:
+    std::string GetName() const {
+        return "AddRidableObjectCommand";
+    }
+public:
+    AddRidableObjectCommand(
+        uint32_t objID,
+        uint32_t meshID,
+        uint32_t textureID,
+        uint8_t gridHeight,
+        uint8_t gridWidth
+    ) :
+        objID_(objID),
+        meshID_(meshID),
+        textureID_(textureID),
+        gridHeight_(gridHeight),
+        gridWidth_(gridWidth)
+    {}
+
+    void Execute(GameState& gameState) override {
+        gameState.AddRidableObject(
+            objID_,
+            meshID_,
+            textureID_,
+            gridHeight_,
+            gridWidth_
+        );
+    }
+};
+
+class WalkOnRidableObjectCommand : public IGameCommand {
     uint32_t walkerID;
 
     Direction direction;
 
-    GameState* tempGameState;
 
+    // -----------------------------
+    GameState* tempGameState;
 public:
     std::string GetName() const {
-        return "WalkCommand";
+        return "WalkOnRidableObjectCommand";
     }
 
 public:
-    WalkCommand(uint32_t walkerID, Direction direction)
+    WalkOnRidableObjectCommand(uint32_t walkerID, Direction direction)
         : walkerID(walkerID), direction(direction), tempGameState(nullptr) {}
 
     void Execute(GameState& gameState) override; 
@@ -136,7 +175,7 @@ public:
     void Walk(RidableObject* who, Direction to_where, Coord2d from_where, RidableObject* walking_on); 
 };
 
-class RideCommand : public IGameCommand {
+class RideOnRidableObjectCommand : public IGameCommand {
     uint32_t vehicleID;
     uint32_t riderID;
 
@@ -144,10 +183,10 @@ class RideCommand : public IGameCommand {
 
 public:
     std::string GetName() const {
-        return "RideCommand";
+        return "RideOnRidableObjectCommand";
     }
 public:
-    RideCommand(uint32_t vehicleID, uint32_t riderID, uint8_t rideAt)
+    RideOnRidableObjectCommand(uint32_t vehicleID, uint32_t riderID, uint8_t rideAt)
         : vehicleID(vehicleID), riderID(riderID), rideAt(rideAt) {}
 
     void Execute(GameState& gameState) override {

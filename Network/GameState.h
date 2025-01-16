@@ -12,7 +12,7 @@
 #include "UDPClient.h"
 
 #include "../TerrainObject.h"
-
+#include "../RidableObject.h"
 
 class PlayableObject;
 class GameObject;
@@ -104,6 +104,26 @@ public:
     void CreateAndRegisterGameObject(uint8_t typeId, bool fromNetwork);  
     // How do you know the ID of Object in Prior? When The Object's ID is given by the server :) 
     void CreateAndRegisterGameObjectWithID(uint32_t id, uint8_t typeId, bool fromNetwork); 
+
+    void AddRidableObject(
+        uint32_t objID,
+        uint32_t meshID,
+        uint32_t textureID,
+        uint8_t gridHeight,
+        uint8_t gridWidth
+        )
+    {
+        if (objID == 0) {
+            // when 0, allocate a new ID
+            objID = GenerateNewGameObjectId(); 
+        }
+
+        std::unique_ptr<RidableObject> newRidableObject = std::make_unique<RidableObject>(objID, meshID, textureID, gridHeight, gridWidth);
+        gameObjects[objID] = std::move(newRidableObject); 
+
+        log(LOG_INFO, "Generated Ridable of ID: " + std::to_string(objID));
+    }
+
     
     void RemoveGameObjectOfID(uint32_t id, bool fromNetwork);
     
@@ -137,11 +157,7 @@ public:
     void SendPlayerInput(Direction direction);
 
 public: 
-    FactoryComponentObject* GetStructureAtCoord(int y, int x);  
-
     GroundType GetGroundTypeAtCoord(int y, int x);  
-
-    DroppedItemObject* GetDroppedItemAtCoord(int y, int x);  
 
     void DropItemAt(int y, int x, Item* item); 
 

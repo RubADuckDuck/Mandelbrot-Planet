@@ -27,11 +27,11 @@ E:\proj\[gameproj]\DontStarve\DuckFishing\Network\UDPClient.cpp;E:\proj\[gamepro
 E:\proj\[gameproj]\DontStarve\DuckFishing\Network\UDPServer.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\UDPServer.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\PlayerDirection.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\PlayerDirection.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\PlayingMode.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\PlayingMode.obj
+E:\proj\[gameproj]\DontStarve\DuckFishing\RidableObject.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\RidableObject.obj
+E:\proj\[gameproj]\DontStarve\DuckFishing\RidableObject.h;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\RidableObject.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\ShaderProgramLoader.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\ShaderProgramLoader.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\src\glad.c;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\glad.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\stb_image.h;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\stb_image.obj
-E:\proj\[gameproj]\DontStarve\DuckFishing\TerrainManager.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\TerrainManager.obj
-E:\proj\[gameproj]\DontStarve\DuckFishing\TerrainObject.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\TerrainObject.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\Texture.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Texture.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\Transform.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Transform.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\utils.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\utils.obj

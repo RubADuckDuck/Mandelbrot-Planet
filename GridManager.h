@@ -105,15 +105,48 @@ class MovementManager {
 		There Exist Curvature.
 		This class Helps the playes and other objects to move through the Geodisics of space
 	*/
-	static const int GRID_SIZE = 24;
-	float BLOCK_SIZE = 0.5f;
-	float BLOCK_OFFSET = 1.0f;
+	uint8_t gridHeight_; 
+	uint8_t gridWidth_;  
 public:
 	std::vector<std::vector<Action2Coord2d*>> grid2Transporter;
 	std::vector<std::vector<ParallelTransporter*>> grid2ParallelTransporter;
 	// std::vector<std::vector<Transform*>> grid2Transform; 
 
-	MovementManager();
+	MovementManager() : gridHeight_(0), gridWidth_(0)  {
+		this->InitializeTori(); 
+
+		// this->InitPlanarFigure(0, 0, 4);
+	}
+
+	MovementManager(uint8_t cubeEdgeLength) : gridHeight_(cubeEdgeLength), gridWidth_(cubeEdgeLength*6) {
+		this->InitializeTori(); 
+
+		this->InitPlanarFigure(0, 0, cubeEdgeLength); 
+	}
+
+	MovementManager(uint8_t gridHeight, uint8_t gridWidth) :gridHeight_(gridHeight), gridWidth_(gridWidth) {
+		this->InitializeTori();  
+	}
+
+	void InitializeTori() {
+		grid2Transporter.resize(gridHeight_, std::vector<Action2Coord2d*>(gridWidth_, nullptr));
+		grid2ParallelTransporter.resize(gridHeight_, std::vector<ParallelTransporter*>(gridWidth_, nullptr));
+
+		for (int y = 0; y < gridHeight_; ++y) {
+			for (int x = 0; x < gridWidth_; ++x) {
+				// Create a new Action2Coord2d map for the current cell
+				grid2Transporter[y][x] = new Action2Coord2d({
+					{Direction::RIGHT, {y, (x + 1) % gridWidth_}},                        // Wrap horizontally to the left
+					{Direction::UP, {(y - 1 + gridHeight_) % gridHeight_, x}},              // Wrap vertically to the bottom
+					{Direction::LEFT, {y, (x - 1 + gridWidth_) % gridWidth_}},           // Wrap horizontally to the right
+					{Direction::DOWN, {(y + 1) % gridHeight_, x}}                        // Wrap vertically to the top
+					});
+
+				// Initialize the ParallelTransporter for the current cell
+				grid2ParallelTransporter[y][x] = new ParallelTransporter();
+			}
+		}
+	}
 
 	void InitPlanarFigure(int startY, int startX, int size);
 	void InitTransporters(int startY, int startX, int size);  
@@ -124,13 +157,40 @@ public:
 
 // client 
 class GridTransformManager {
-	static const int GRID_SIZE = 24;
+	
+	uint8_t gridHeight_;
+	uint8_t gridWidth_;
+
 	float BLOCK_SIZE = 0.5f;
 	float BLOCK_OFFSET = 1.0f;
 public:
+	GridTransformManager() : gridHeight_(0), gridWidth_(0) {
+		Initialize();
+	}
+
+	GridTransformManager(uint8_t cubeEdgeLength) : gridHeight_(cubeEdgeLength), gridWidth_(cubeEdgeLength * 6) {
+		Initialize();
+
+		this->InitTransforms(0, 0, cubeEdgeLength);
+	}
+
+	GridTransformManager(uint8_t gridHeight, uint8_t gridWidth) :gridHeight_(gridHeight), gridWidth_(gridWidth) {
+		Initialize();
+	}
+
+	void Initialize() {
+		grid2Transform.resize(gridHeight_, std::vector<Transform*>(gridWidth_, nullptr));
+
+		for (int y = 0; y < gridHeight_; ++y) {
+			for (int x = 0; x < gridWidth_; ++x) {
+				grid2Transform[y][x] = new Transform();
+			}
+		}
+	}
+
+
 	std::vector<std::vector<Transform*>> grid2Transform; 
 
-	GridTransformManager();
 
 	void InitTransforms(int startY, int startX, int size);
 };

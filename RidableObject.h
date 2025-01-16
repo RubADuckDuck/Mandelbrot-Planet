@@ -1,26 +1,34 @@
+#pragma once
 #include "GameObject.h"
 #include "GridManager.h"
 
 class RidableObject : public GameObject {
 public:
-	std::string GetName() const;
+	std::string GetName() const override;
 
+	virtual uint8_t GetTypeID();
 private:
-	void log(LogLevel level, std::string text);
-
-	uint8_t gridHeight;
-	uint8_t gridWidth;  
+	uint8_t gridHeight_;
+	uint8_t gridWidth_;  
 
 	// f: Index -> ObjectID
-	std::vector<uint32_t> grid;  
+	std::vector<uint32_t> grid_;  
 
-	std::unique_ptr<MovementManager> movementManager;  
-	std::unique_ptr<GridTransformManager> gridTransformManager;  
+	std::unique_ptr<MovementManager> movementManager_;  
+	std::unique_ptr<GridTransformManager> gridTransformManager_;  
 
 	// This tells the ID of the object we are riding on. 
-	uint32_t parentID; 
+	uint32_t parentID_; 
 
 public: 
+	RidableObject();
+
+	RidableObject(uint32_t meshID, uint32_t textureID, uint8_t cubeEdgeLength);
+
+	RidableObject(uint32_t meshID, uint32_t textureID, uint8_t gridHeight, uint8_t gridWidth);
+
+	RidableObject(uint32_t objID, uint32_t meshID, uint32_t textureID, uint8_t gridHeight, uint8_t gridWidth);
+
 	uint32_t GetParentID();
 	uint32_t GetObjectIDAt(Coord2d pos);
 	Coord2d GetPosition(uint32_t objID);
@@ -42,4 +50,17 @@ public:
 	void AddChildObjectToGridAtPosition(uint32_t childID, Coord2d pos);
 
 	bool RemoveChildAtGrid(uint32_t childID);
+};
+
+class PlayableObject : public RidableObject {
+public:
+
+	// server & client
+	uint8_t GetTypeID() override;;
+
+	void TakeAction(Direction direction);
+	void DropItem();
+	void RequestWalk();
+	void Walk();
+	void PickUpItem(Item* item);
 };

@@ -2,7 +2,7 @@
 #include <vector> 
 #include <map>
 #include "ItemType.h"
-#include "GameObject.h"
+#include "RidableObject.h"
 
 enum ItemState {
 	ON_GROUND, 
@@ -11,7 +11,7 @@ enum ItemState {
 	INVALID_STATE
 };
 
-class Item : public GameObject {
+class Item : public RidableObject {
 public:
     ItemType itemType = ItemType::INVALID;
 	ItemState itemState; 

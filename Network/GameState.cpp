@@ -10,6 +10,15 @@ void GameState::log(LogLevel level, std::string text) {
     LOG(level, GetName() + "::" + text);
 }
 
+uint32_t GameState::GenerateNewGameObjectId() {
+    return nextGameObjectId++;
+}
+
+void GameState::Draw() {
+    // Debug 
+    renderer_->DrawRespectTo(2, 1, 2);
+}
+
 // Grid Management 
 void GameState::FoldGridIntoCubeAt(int startY, int startX, int size, bool fromNetwork) {
 
@@ -78,6 +87,19 @@ void GameState::CreateAndRegisterGameObjectWithID(uint32_t id, uint8_t typeId, b
     objectsByType.insert({ typeId, id });
 
     return;
+}
+
+void GameState::AddRidableObject(uint32_t objID, uint32_t meshID, uint32_t textureID, uint8_t gridHeight, uint8_t gridWidth)
+{
+    if (objID == 0) {
+        // when 0, allocate a new ID
+        objID = GenerateNewGameObjectId();
+    }
+
+    std::unique_ptr<RidableObject> newRidableObject = std::make_unique<RidableObject>(objID, meshID, textureID, gridHeight, gridWidth);
+    gameObjects[objID] = std::move(newRidableObject);
+
+    log(LOG_INFO, "Generated Ridable of ID: " + std::to_string(objID));
 }
 
 void GameState::RemoveGameObjectOfID(uint32_t id, bool fromNetwork) {

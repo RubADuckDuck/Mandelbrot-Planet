@@ -20,6 +20,7 @@ class GameObject;
 
 class MovementManager;
 class GridTransformManager;
+class Renderer;
 
 class GameObjectFactory { 
 public:  
@@ -87,14 +88,9 @@ private:
     std::unique_ptr<Renderer> renderer_; 
 
 public: 
-    uint32_t GenerateNewGameObjectId() {
-        return nextGameObjectId++;
-    }
+    uint32_t GenerateNewGameObjectId();
 
-    void Draw() {
-        // Debug 
-        renderer_->DrawRespectTo(2, 1, 2);
-    }
+    void Draw();
 
 public:
     // If from Network. The resulting updates don't have to be passed on to the network. 
@@ -120,18 +116,7 @@ public:
         uint32_t textureID,
         uint8_t gridHeight,
         uint8_t gridWidth
-        )
-    {
-        if (objID == 0) {
-            // when 0, allocate a new ID
-            objID = GenerateNewGameObjectId(); 
-        }
-
-        std::unique_ptr<RidableObject> newRidableObject = std::make_unique<RidableObject>(objID, meshID, textureID, gridHeight, gridWidth);
-        gameObjects[objID] = std::move(newRidableObject); 
-
-        log(LOG_INFO, "Generated Ridable of ID: " + std::to_string(objID));
-    }
+        );
 
     
     void RemoveGameObjectOfID(uint32_t id, bool fromNetwork);

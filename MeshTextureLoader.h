@@ -7,6 +7,14 @@
  
 template <typename T> class Type2MeshAndTexture {
 public:
+	std::string GetName() const {
+		return "Type2meshAndTexture"; 
+	};
+
+private:
+	void log(LogLevel level, std::string text) { LOG(level, GetName() + "::" + text); }
+
+public:
 	std::string assetDirectory = "E:/repos/[DuckFishing]/model";
 
 	std::map<T, std::string> type2ObjPath;
@@ -21,6 +29,8 @@ public:
 	Type2MeshAndTexture(
 		const std::map<T, const std::string>& typeToNameMap
 	) {
+		log(LOG_INFO, "Initializing Type2MeshAndTexture");  
+
 		errorIndex = typeToNameMap.begin()->first; 
 		
 		InitObjPaths(typeToNameMap);
@@ -47,11 +57,14 @@ public:
 	}
 
 	void InitObjPaths(const std::map<T, const std::string>& typeToNameMap) {
+		log(LOG_INFO, "Initializing path to obj files"); 
+
 		for (const auto& pair : typeToNameMap) {
 			const T& type = pair.first;
 			const std::string& name = pair.second;
 
 			type2ObjPath[type] = assetDirectory + "/" + name + ".obj";
+			log(LOG_INFO, "  " + type2ObjPath[type]);
 		}
 	}
 
@@ -62,6 +75,7 @@ public:
 			const std::string& name = pair.second;
 
 			type2TexturePath[type] = assetDirectory + "/texture/" + name + ".png";
+			log(LOG_INFO, "  " + type2TexturePath[type]);
 		}
 	}
 
@@ -74,7 +88,7 @@ public:
 
 			currMesh = new StaticMesh();
 			currMesh->LoadMesh(path);
-			type2Mesh[type] = currMesh;
+			type2Mesh[type].reset(currMesh);
 		}
 	}
 
@@ -86,7 +100,7 @@ public:
 
 			currTexture = new Texture;
 			currTexture->LoadandSetTextureIndexFromPath(path);
-			type2Texture[type] = currTexture;
+			type2Texture[type].reset(currTexture);
 		}
 	}
 
@@ -106,12 +120,6 @@ public:
 			return textureIt->second.get();
 		}
 
-		// If texture doesn't exist or is null, create and return error texture
-		static std::unique_ptr<Texture> errorTexture;
-		if (!errorTexture) {
-			errorTexture = std::make_unique<Texture>();
-			errorTexture->LoadandSetTextureIndexFromPath(errorTexturePath);
-		}
 		return type2Texture[errorIndex]; 
 	}
 	

@@ -13,6 +13,7 @@
 
 #include "../TerrainObject.h"
 #include "../RidableObject.h"
+#include "../Renderer.h"
 
 class PlayableObject;
 class GameObject;
@@ -82,9 +83,17 @@ private:
     std::vector<uint32_t> structureGrid;  
     std::vector<GroundType> groundTypeGrid;
 
+    // Render 
+    std::unique_ptr<Renderer> renderer_; 
+
 public: 
     uint32_t GenerateNewGameObjectId() {
         return nextGameObjectId++;
+    }
+
+    void Draw() {
+        // Debug 
+        renderer_->DrawRespectTo(2, 1, 2);
     }
 
 public:
@@ -198,7 +207,9 @@ public:
     }
 
     void Initialize() {
-        this->InitializeGrid(gridHeight, gridWidth); 
+        log(LOG_INFO, "Initialize GameState"); 
+        this->InitializeGrid(gridHeight, gridWidth);  
+        this->InitializeRenderer(); 
     }
 
     void InitializeGrid(int height, int width) {
@@ -210,6 +221,10 @@ public:
 
         movementManager = std::make_unique<MovementManager>();
         gridTransformManager = std::make_unique<GridTransformManager>();
+    } 
+
+    void InitializeRenderer() {
+        renderer_ = std::make_unique<Renderer>(this);
     }
 
 public: 

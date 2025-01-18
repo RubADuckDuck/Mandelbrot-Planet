@@ -220,6 +220,7 @@
     <ClInclude Include="LOG.h" />
     <ClInclude Include="MainMenuMode.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshTextureLoader.h" />
     <ClInclude Include="MessageParser.h" />
     <ClInclude Include="Network\Command.h" />
     <ClInclude Include="Network\GameState.h" />
@@ -231,6 +232,7 @@
     <ClInclude Include="ObjectType.h" />
     <ClInclude Include="PlayerDirection.h" />
     <ClInclude Include="PlayingMode.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderProgramLoader.h" />
     <ClInclude Include="SystemManager.h" />
     <ClInclude Include="Texture.h" />

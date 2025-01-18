@@ -34,10 +34,6 @@ RidableObject::RidableObject(uint32_t objID, uint32_t meshID, uint32_t textureID
 	gridTransformManager_ = std::unique_ptr<GridTransformManager>(new GridTransformManager());
 }
 
-uint32_t RidableObject::GetParentID() {
-	return parentID_;
-}
-
 MovementManager* RidableObject::GetMovementManager() {
 	return movementManager_.get();
 }

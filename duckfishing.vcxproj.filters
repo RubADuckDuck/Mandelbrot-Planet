@@ -53,7 +53,7 @@
       <UniqueIdentifier>{5328fbd7-8533-44e6-91e7-431f3374d1ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Renderer">
-      <UniqueIdentifier>{500d520f-8db1-4f57-b620-653d1b5687f7}</UniqueIdentifier>
+      <UniqueIdentifier>{87838857-8857-4a0e-af13-bab83bcba8d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -289,6 +289,12 @@
     </ClInclude>
     <ClInclude Include="PlayingMode.h">
       <Filter>Header Files\GameMode\PlayingMode</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshTextureLoader.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

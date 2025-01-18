@@ -164,6 +164,8 @@ class GridTransformManager {
 	float BLOCK_SIZE = 0.5f;
 	float BLOCK_OFFSET = 1.0f;
 public:
+	std::vector<std::vector<Transform*>> grid2Transform;
+
 	GridTransformManager() : gridHeight_(0), gridWidth_(0) {
 		Initialize();
 	}
@@ -187,10 +189,6 @@ public:
 			}
 		}
 	}
-
-
-	std::vector<std::vector<Transform*>> grid2Transform; 
-
 
 	void InitTransforms(int startY, int startX, int size);
 };

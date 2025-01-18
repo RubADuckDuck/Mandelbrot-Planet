@@ -50,7 +50,11 @@ public:
 	uint32_t meshID_;  
 	uint32_t textureID_;  
 
+	uint32_t parentID_; 
+
 	virtual ~GameObject();
+
+
 
 public: 	
 	GameObject()
@@ -65,6 +69,10 @@ public:
 		: ptrNodeTransform_(nullptr), modelTransformMat_(glm::mat4(1)),
 		meshID_(meshID), textureID_(textureID) {
 		this->SetID(objID); 
+	}
+
+	uint32_t GetParentID() {
+		return parentID_;
 	}
 
 	// client::init

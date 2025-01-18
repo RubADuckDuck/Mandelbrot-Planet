@@ -52,6 +52,9 @@
     <Filter Include="Source Files\GameMode\PlayingMode">
       <UniqueIdentifier>{5328fbd7-8533-44e6-91e7-431f3374d1ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer">
+      <UniqueIdentifier>{500d520f-8db1-4f57-b620-653d1b5687f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Item.cpp">

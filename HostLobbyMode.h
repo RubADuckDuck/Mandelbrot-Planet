@@ -21,5 +21,8 @@ public:
     void Draw() override;
 
     void Exit() override;
+
+private: 
+    void TestRendering(); 
 }; 
 

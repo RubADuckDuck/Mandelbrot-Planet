@@ -1,4 +1,5 @@
 #include "HostLobbyMode.h"
+#include "Network/NetworkMessage.h"
 
 HostLobbyMode::HostLobbyMode(GameEngine* engine) : GameMode(engine) {}
 
@@ -13,7 +14,12 @@ void HostLobbyMode::Enter() {
 
     LOG(LOG_INFO, "HostLobbyMode::Run IO Context on IO Thread"); 
 
-    gameEngine->RunIOContextOnIOThread(); 
+    gameEngine->RunIOContextOnIOThread();  
+
+
+    {
+        this->TestRendering(); 
+    }
 }
 
 void HostLobbyMode::Update() {
@@ -25,8 +31,6 @@ void HostLobbyMode::Update() {
         // Switch to PlayingMode
         gameEngine->GetModeController()->SwitchMode(GameModeType::PLAYING);
     }
-
-    
 
 }
 
@@ -41,4 +45,94 @@ void HostLobbyMode::Exit() {
     // Clean up server when leaving
     server.reset();
     connectedPlayers.clear();
+}
+
+void HostLobbyMode::TestRendering()
+{        
+    // test purpose 
+
+    EventDispatcher& dispatcher = EventDispatcher::GetInstance();
+
+    AddRidableObjectMessage* cur_aro_msg; 
+    RideOnRidableObjectMessage* cur_ror_msg; 
+
+    std::vector<uint8_t> data; 
+
+    // spawn 8 objects 
+    for (uint8_t i = 0; i < 8; i++) {
+        cur_aro_msg= new AddRidableObjectMessage(); 
+        cur_aro_msg->gridHeight_ = 2;  
+
+        data = cur_aro_msg->Serialize();  
+        delete cur_aro_msg; 
+
+        dispatcher.Publish(data);  
+    }
+
+    //----------------------------------------------------------
+    cur_ror_msg = new RideOnRidableObjectMessage(); 
+    cur_ror_msg->vehicleID = 1; 
+    cur_ror_msg->riderID = 2; 
+    cur_ror_msg->rideAt = 5; 
+
+    data = cur_ror_msg->Serialize(); 
+    delete cur_ror_msg; 
+
+    dispatcher.Publish(data); 
+
+
+    cur_ror_msg = new RideOnRidableObjectMessage();
+    cur_ror_msg->vehicleID = 1;
+    cur_ror_msg->riderID = 3;
+    cur_ror_msg->rideAt = 6;
+
+    data = cur_ror_msg->Serialize();
+    delete cur_ror_msg;
+
+    dispatcher.Publish(data);
+
+
+    cur_ror_msg = new RideOnRidableObjectMessage();
+    cur_ror_msg->vehicleID = 2;
+    cur_ror_msg->riderID = 4;
+    cur_ror_msg->rideAt = 5;
+
+    data = cur_ror_msg->Serialize();
+    delete cur_ror_msg;
+
+    dispatcher.Publish(data);
+
+
+    cur_ror_msg = new RideOnRidableObjectMessage();
+    cur_ror_msg->vehicleID = 2;
+    cur_ror_msg->riderID = 5;
+    cur_ror_msg->rideAt = 6;
+
+    data = cur_ror_msg->Serialize();
+    delete cur_ror_msg;
+
+    dispatcher.Publish(data);
+
+
+    cur_ror_msg = new RideOnRidableObjectMessage();
+    cur_ror_msg->vehicleID = 3;
+    cur_ror_msg->riderID = 6;
+    cur_ror_msg->rideAt = 5;
+
+    data = cur_ror_msg->Serialize();
+    delete cur_ror_msg;
+
+    dispatcher.Publish(data);
+
+
+    cur_ror_msg = new RideOnRidableObjectMessage();
+    cur_ror_msg->vehicleID = 3;
+    cur_ror_msg->riderID = 7;
+    cur_ror_msg->rideAt = 6;
+
+    data = cur_ror_msg->Serialize();
+    delete cur_ror_msg;
+
+    dispatcher.Publish(data);
+    // ---------------------------------------------
 }

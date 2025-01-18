@@ -74,7 +74,7 @@ std::string GameObject::GetName() const { return "GameObject"; }
 uint8_t GameObject::GetTypeID() { return 0; }
 
 void GameObject::log(LogLevel level, std::string text) {
-	LOG(level, GetName() + "::" + text);
+	LOG(level, GetName() + "::" + "(ID-" + std::to_string(this->GetID()) + ")::" + text);
 }
 
 GameObject::~GameObject() {

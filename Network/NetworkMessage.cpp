@@ -554,6 +554,17 @@ std::unique_ptr<INetworkMessage> MessageFactory::CreateMessage(const std::vector
         message = std::make_unique<UdpVerificationMessage>();  
         break; 
 
+        // v1.0
+    case MessageType::ADD_RIDABLE_OBJECT:
+        message = std::make_unique<AddRidableObjectMessage>(); 
+        break; 
+    case MessageType::WALK_ON_RIDABLE_OBJECT:
+        message = std::make_unique<WalkOnRidableObjectMessage>(); 
+        break; 
+    case MessageType::RIDE_ON_RIDABLE_OBJECT:
+        message = std::make_unique<RideOnRidableObjectMessage>(); 
+        break; 
+
         // add more 
 
     default:

@@ -9,29 +9,35 @@ uint8_t RidableObject::GetTypeID() { return 1; }
 RidableObject::RidableObject()
 	: GameObject(),
 	gridHeight_(0), gridWidth_(0) {
+	Initialize();
+
 	movementManager_ = std::unique_ptr<MovementManager>(new MovementManager());
 	gridTransformManager_ = std::unique_ptr<GridTransformManager>(new GridTransformManager());
 }
 
-RidableObject::RidableObject(uint32_t meshID, uint32_t textureID, uint8_t cubeEdgeLength)
-	: GameObject(meshID, textureID),
+RidableObject::RidableObject(uint32_t objID, uint32_t meshID, uint32_t textureID, uint8_t cubeEdgeLength)
+	: GameObject(objID, meshID, textureID),
 	gridHeight_(cubeEdgeLength), gridWidth_(cubeEdgeLength * 6) {
+	Initialize();
+
 	movementManager_ = std::unique_ptr<MovementManager>(new MovementManager(cubeEdgeLength));
 	gridTransformManager_ = std::unique_ptr<GridTransformManager>(new GridTransformManager(cubeEdgeLength));
-}
-
-RidableObject::RidableObject(uint32_t meshID, uint32_t textureID, uint8_t gridHeight, uint8_t gridWidth)
-	: GameObject(meshID, textureID),
-	gridHeight_(gridHeight), gridWidth_(gridWidth) {
-	movementManager_ = std::unique_ptr<MovementManager>(new MovementManager());
-	gridTransformManager_ = std::unique_ptr<GridTransformManager>(new GridTransformManager());
 }
 
 RidableObject::RidableObject(uint32_t objID, uint32_t meshID, uint32_t textureID, uint8_t gridHeight, uint8_t gridWidth)
 	: GameObject(objID, meshID, textureID),
 	gridHeight_(gridHeight), gridWidth_(gridWidth) {
-	movementManager_ = std::unique_ptr<MovementManager>(new MovementManager());
-	gridTransformManager_ = std::unique_ptr<GridTransformManager>(new GridTransformManager());
+	Initialize();
+
+	movementManager_ = std::unique_ptr<MovementManager>(new MovementManager(gridHeight, gridWidth));
+	gridTransformManager_ = std::unique_ptr<GridTransformManager>(new GridTransformManager(gridHeight, gridWidth));
+}
+
+void RidableObject::Initialize() {
+	log_info();
+
+	log(LOG_INFO, "Resetting Grid Size");
+	grid_.resize(gridHeight_ * gridWidth_, 0);
 }
 
 MovementManager* RidableObject::GetMovementManager() {
@@ -77,6 +83,7 @@ uint32_t RidableObject::GetObjectIDAt(Coord2d pos) {
 }
 
 void RidableObject::SetObjIdAtPos(Coord2d pos, uint32_t objID) {
+
 	uint8_t index = coord2d_to_index_on_vector(pos);
 
 	SetObjIdAtPos(index, objID); 
@@ -85,6 +92,8 @@ void RidableObject::SetObjIdAtPos(Coord2d pos, uint32_t objID) {
 void RidableObject::SetObjIdAtPos(uint8_t pos_index, uint32_t objID) {
 	if (IsInBounds(pos_index)) {
 		grid_[pos_index] = objID;
+
+		log(LOG_INFO, "Set ObjID: " + std::to_string(objID) + " at pos: " + std::to_string(pos_index));
 		return;
 	}
 	else {
@@ -94,8 +103,20 @@ void RidableObject::SetObjIdAtPos(uint8_t pos_index, uint32_t objID) {
 }
 
 bool RidableObject::IsInBounds(int index) {
-	log(LOG_WARNING, "Index is out of bounds");
-	return index >= 0 && index < gridHeight_ * gridWidth_;
+	if (index >= 0 && index < gridHeight_ * gridWidth_) {
+		log(LOG_INFO,
+			"Index:" + std::to_string(index)
+			+ " of length: "
+			+ std::to_string(gridHeight_ * gridWidth_));
+		return true; 
+	}
+	else {
+		log(LOG_WARNING, 
+			"Index:" + std::to_string(index) 
+			+ " is out of bounds of length: " 
+			+ std::to_string(gridHeight_ * gridWidth_));
+		return false; 
+	}
 }
 
 void RidableObject::SwapObjOnGrid(Coord2d a, Coord2d b) {
@@ -152,12 +173,15 @@ bool RidableObject::RemoveChildAtGrid(uint32_t childID) {
 }
 
 bool RidableObject::SetParentObjectAndExit(uint32_t newParentID) {
+	log(LOG_INFO, "Setting ParentObject");
+
 	if (parentID_ == 0) {
 		// previously had no parent  
 
 		// find empty spot and place exit to parent there
 		for (int i = 0; i < grid_.size(); i++) {
 			if (grid_[i] == 0) {
+				log(LOG_INFO, "Creating Exit at index: " + std::to_string(i));
 				grid_[i] = newParentID;
 
 				parentID_ = newParentID;
@@ -166,7 +190,7 @@ bool RidableObject::SetParentObjectAndExit(uint32_t newParentID) {
 			}
 		}
 
-		log(LOG_ERROR, "There should be room to place an Exit to the Parent Object Grid. ");
+		log(LOG_ERROR, "  There should be room to place an Exit to the Parent Object Grid. ");
 		return false;
 	}
 	else {
@@ -175,6 +199,7 @@ bool RidableObject::SetParentObjectAndExit(uint32_t newParentID) {
 		// find empty spot and place exit to parent there
 		for (int i = 0; i < grid_.size(); i++) {
 			if (grid_[i] == parentID_) {
+				log(LOG_INFO, "Replacing Parent at index: " + std::to_string(i));
 				grid_[i] = newParentID;
 
 				parentID_ = newParentID;

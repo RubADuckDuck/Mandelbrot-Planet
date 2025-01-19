@@ -135,4 +135,7 @@ void HostLobbyMode::TestRendering()
 
     dispatcher.Publish(data);
     // ---------------------------------------------
+    // Draw 
+
+    this->server->GetGameState()->Draw();
 }

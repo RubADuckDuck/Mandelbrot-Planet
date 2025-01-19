@@ -22,11 +22,11 @@ private:
 public: 
 	RidableObject();
 
-	RidableObject(uint32_t meshID, uint32_t textureID, uint8_t cubeEdgeLength);
-
-	RidableObject(uint32_t meshID, uint32_t textureID, uint8_t gridHeight, uint8_t gridWidth);
+	RidableObject(uint32_t objID, uint32_t meshID, uint32_t textureID, uint8_t cubeEdgeLength);
 
 	RidableObject(uint32_t objID, uint32_t meshID, uint32_t textureID, uint8_t gridHeight, uint8_t gridWidth);
+
+	void Initialize();
 
 	uint32_t GetObjectIDAt(Coord2d pos);
 	Coord2d GetPosition(uint32_t objID);
@@ -82,6 +82,16 @@ public:
 	void AddChildObjectToGridAtPosition(uint32_t childID, Coord2d pos);
 
 	bool RemoveChildAtGrid(uint32_t childID); 
+
+private: 
+	void log_info() {
+		log(
+			LOG_INFO,
+			"\n  meshID: " + std::to_string(meshID_)
+			+ "\n  textureID: " + std::to_string(textureID_)
+			+ "\n  height: " + std::to_string(gridHeight_)
+			+ "\n  width: " + std::to_string(gridWidth_));
+	}
 };
 
 class PlayableObject : public RidableObject {

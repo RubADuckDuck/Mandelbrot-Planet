@@ -1,5 +1,18 @@
 #include "Renderer.h"
 #include "Network/GameState.h"
+#include <string>
+#include <sstream>
+
+std::string PrintLineage(const std::vector<uint32_t>& lineage, uint8_t depth) {
+    std::stringstream ss;
+    ss << "Lineage: ";
+    for (size_t i = 0; i <= depth && i < lineage.size(); ++i) {
+        if (lineage[i] != 0) {
+            ss << "->" << lineage[i] ;
+        }
+    }
+    return ss.str();
+}
 
 std::string Renderer::GetName() const {
     return "Renderer";
@@ -32,6 +45,9 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
 
 
     for (uint8_t i = 0; i < ascendLevels; i++) {
+        std::stringstream ss;
+        ss << "Ascending to parent (Level: " << (i + 1) << ")";
+        log(LOG_INFO, ss.str());
         // go up one level 
         currID = currObj->GetParentID();
 
@@ -46,8 +62,10 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
     std::stack<GameObject*> obj_stack;
     std::vector<uint8_t> n_frontier;
     std::vector<glm::mat4> transformationMats;
+    std::vector<uint32_t> lineage;
     n_frontier.resize(descendDepth + 1, 0);
     transformationMats.resize(descendDepth + 1, 0);
+    lineage.resize(descendDepth + 1, 0); 
 
     // for internal iteration
     std::vector<uint32_t> currGrid;
@@ -55,7 +73,7 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
     GameObject* currChildObj = 0;
     glm::mat4 currGridTransformMat;
 
-    uint8_t depth = 0;
+    uint8_t currDepthIndex = 0;
 
     currObj = gameState_->GetGameObject(currID);
 
@@ -67,41 +85,57 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
         currObj->modelTransformMat_ = glm::mat4(1);
     }
 
-
+    std::stringstream ss;
+    ss << "Pushing root object (ID: " << currID << ") to stack";
+    log(LOG_INFO, ss.str());
     obj_stack.push(currObj);
-    n_frontier[0] += 1; // add 1 element at depth 0 
+    n_frontier[0] += 1; // add 1 element at currDepthIndex 0 
+    lineage[0] = currID; // Root lineage
 
     while (obj_stack.empty() != true) {
+        log(LOG_INFO, "---------------------------------------------------------------------");
+
         // get current object
         currObj = obj_stack.top();
         obj_stack.pop();
+        ss.str("");
+        ss << "Processing object (ID: " << currObj->GetID() << ") at depth: " << std::to_string(descendDepth + 1);
+        log(LOG_INFO, ss.str());
+
         // delete number of elements at current depth
-        n_frontier[depth] -= 1;
+        n_frontier[currDepthIndex] -= 1;
         // if current depth value zeros out, 
         // and current obj has no child, 
         // that is what causes depth to retract.
+        lineage[currDepthIndex] = currObj->GetID(); 
+
+        log(LOG_INFO, PrintLineage(lineage, currDepthIndex));
 
         // currentTransoformation
-        transformationMats[depth] = currObj->modelTransformMat_;
+        transformationMats[currDepthIndex] = currObj->modelTransformMat_;
 
         RidableObject* currRidable = dynamic_cast<RidableObject*>(currObj);
 
         if (currRidable == nullptr) {
-            // no children here 
+            log(LOG_INFO, "Object is not a RidableObject, skipping children");
             continue;
         }
         else {
-            if (depth < descendDepth) {
+            if (currDepthIndex < descendDepth) {
+                ss.str("");
+                ss << "Going deeper (Depth: " << (currDepthIndex + 1) << "/" << std::to_string(descendDepth+1) << ")";
+                log(LOG_INFO, ss.str());
+
                 // if we can go deeper
                 currGrid = currRidable->GetGrid();
-                depth += 1;
+                currDepthIndex += 1;
 
                 for (uint8_t index = 0; index < currGrid.size(); index++) {
                     // get current child at index from grid
                     currChildID = currGrid[index];
 
                     if (currChildID == 0) {
-                        // 0 -> nullptr
+                        log(LOG_DEBUG, "Grid element is empty (Skipping)");
                     }
                     else {
                         // get childObj
@@ -111,30 +145,38 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
 
                         // parentTransformation * currGridTransform * ptrNodeTransformation -> current Transformation
                         currChildObj->modelTransformMat_ =
-                            transformationMats[depth - 1]
+                            transformationMats[currDepthIndex - 1]
                             * currGridTransformMat
                             * currChildObj->ptrNodeTransform_->GetTransformMatrix();
+
+                        ss.str("");
+                        ss << "Pushing child object (ID: " << currChildID << ") to stack";
+                        log(LOG_INFO, ss.str());
 
                         // add to frontier 
                         obj_stack.push(currChildObj);
 
                         // increase number in current depth
-                        n_frontier[depth] += 1;
+                        n_frontier[currDepthIndex] += 1;
                     }
                 }
             }
         }
 
         // set depth 
-        for (uint8_t i = depth; -1 < i; i--) {
+        for (uint8_t i = currDepthIndex; -1 < i; i--) {
             if (n_frontier[i] != 0) {
-                depth = i;
+                currDepthIndex = i;
                 break;
             }
             else {
                 if (i == 0) {
                     if (!obj_stack.empty()) {
                         log(LOG_ERROR, "Stack Should be empty");
+                    }
+                    else {
+                        log(LOG_DEBUG, "Stack is Empty"); 
+                        break;
                     }
                 }
             }

@@ -58,15 +58,15 @@ public:
 
 public: 	
 	GameObject()
-		: ptrNodeTransform_(nullptr), modelTransformMat_(glm::mat4(1)),
+		: ptrNodeTransform_(new Transform()), modelTransformMat_(glm::mat4(1)),
 		meshID_(0), textureID_(0) {} 
 
 	GameObject(uint32_t meshID, uint32_t textureID) 
-		: ptrNodeTransform_(nullptr), modelTransformMat_(glm::mat4(1)),
+		: ptrNodeTransform_(new Transform()), modelTransformMat_(glm::mat4(1)),
 		meshID_(meshID), textureID_(textureID) {}
 
 	GameObject(uint32_t objID, uint32_t meshID, uint32_t textureID)
-		: ptrNodeTransform_(nullptr), modelTransformMat_(glm::mat4(1)),
+		: ptrNodeTransform_(new Transform()), modelTransformMat_(glm::mat4(1)),
 		meshID_(meshID), textureID_(textureID) {
 		this->SetID(objID); 
 	}

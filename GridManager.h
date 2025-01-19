@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include "Transform.h"
+#include "LOG.h"
 
 using Coord2d = std::pair<int, int>;
 
@@ -100,6 +101,14 @@ public:
 
 // server & client
 class MovementManager {
+public:
+	std::string GetName() const {
+		return "MovementManager";
+	};
+
+private:
+	void log(LogLevel level, std::string text) { LOG(level, GetName() + "::" + text); }
+
 	/*
 		Our objects live on a Non Euclidean Space
 		There Exist Curvature.
@@ -115,17 +124,21 @@ public:
 	MovementManager() : gridHeight_(0), gridWidth_(0)  {
 		this->InitializeTori(); 
 
-		// this->InitPlanarFigure(0, 0, 4);
+		log(LOG_INFO, "zero");
 	}
 
 	MovementManager(uint8_t cubeEdgeLength) : gridHeight_(cubeEdgeLength), gridWidth_(cubeEdgeLength*6) {
 		this->InitializeTori(); 
 
 		this->InitPlanarFigure(0, 0, cubeEdgeLength); 
+
+		log(LOG_INFO, "Init to cube of size: " + std::to_string(cubeEdgeLength));
 	}
 
 	MovementManager(uint8_t gridHeight, uint8_t gridWidth) :gridHeight_(gridHeight), gridWidth_(gridWidth) {
 		this->InitializeTori();  
+
+		log(LOG_INFO, "Init Tori of size H x W: " + std::to_string(gridHeight_) + " x " + std::to_string(gridWidth_));
 	}
 
 	void InitializeTori() {
@@ -157,6 +170,13 @@ public:
 
 // client 
 class GridTransformManager {
+public:
+	std::string GetName() const {
+		return "GridTransformManager";
+	};
+
+private:
+	void log(LogLevel level, std::string text) { LOG(level, GetName() + "::" + text); }
 	
 	uint8_t gridHeight_;
 	uint8_t gridWidth_;
@@ -174,6 +194,7 @@ public:
 		Initialize();
 
 		this->InitTransforms(0, 0, cubeEdgeLength);
+		log(LOG_INFO, "Initialize to Cube");
 	}
 
 	GridTransformManager(uint8_t gridHeight, uint8_t gridWidth) :gridHeight_(gridHeight), gridWidth_(gridWidth) {

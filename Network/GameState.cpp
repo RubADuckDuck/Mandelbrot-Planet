@@ -96,7 +96,15 @@ void GameState::AddRidableObject(uint32_t objID, uint32_t meshID, uint32_t textu
         objID = GenerateNewGameObjectId();
     }
 
-    std::unique_ptr<RidableObject> newRidableObject = std::make_unique<RidableObject>(objID, meshID, textureID, gridHeight, gridWidth);
+    std::unique_ptr<RidableObject> newRidableObject; 
+
+    if (gridWidth != 0) {
+        newRidableObject = std::make_unique<RidableObject>(objID, meshID, textureID, gridHeight, gridWidth);
+    }
+    else {
+        newRidableObject = std::make_unique<RidableObject>(objID, meshID, textureID, gridHeight);
+    }
+
     gameObjects[objID] = std::move(newRidableObject);
 
     log(LOG_INFO, "Generated Ridable of ID: " + std::to_string(objID));

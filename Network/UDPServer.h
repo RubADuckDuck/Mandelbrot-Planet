@@ -68,6 +68,8 @@ public:
 
     void stop_accepting_connections();
 
+    GameState* GetGameState();
+
 private: 
     // Event Related 
     void handle_events(const std::vector<uint8_t> data);
@@ -84,6 +86,7 @@ public:
     void set_game_state(GameState* gs);
 
     void set_network_codec(NetworkCodec* nc);
+
 
 public:
     // TCP connection handling

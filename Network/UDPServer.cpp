@@ -21,6 +21,10 @@ void GameServer::stop_accepting_connections() {
     should_accept_new_connections = false;
 }
 
+GameState* GameServer::GetGameState() {
+    return game_state;
+}
+
 
 // Register GameServer As listener to data type event messages 
 

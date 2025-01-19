@@ -187,20 +187,31 @@ public:
     }
 public:
     RideOnRidableObjectCommand(uint32_t vehicleID, uint32_t riderID, uint8_t rideAt)
-        : vehicleID(vehicleID), riderID(riderID), rideAt(rideAt) {}
+        : vehicleID(vehicleID), riderID(riderID), rideAt(rideAt) {
+        // Construct the log message as a single string
+        std::string log_message = "RideOnRidableObjectCommand: vehicleID="
+            + std::to_string(vehicleID)
+            + ", riderID="
+            + std::to_string(riderID)
+            + ", rideAt="
+            + std::to_string(static_cast<int>(rideAt));
+
+        log(LOG_INFO, log_message);
+    }
 
     void Execute(GameState& gameState) override {
+        log(LOG_INFO, "Executing Command --------------------------------------------------");
         RidableObject* vehicleObj = dynamic_cast<RidableObject*>(gameState.GetGameObject(vehicleID));  
         
         // I am torn between whether I should let Non-ridable objects Ride.
         // I made up this rule to settle my mind. 
         // You can only ride, if you let others ride yourself. 
-        RidableObject* riderObj = dynamic_cast<RidableObject*>(gameState.GetGameObject(vehicleID)); 
+        RidableObject* riderObj = dynamic_cast<RidableObject*>(gameState.GetGameObject(riderID)); 
 
         riderObj->SetParentObjectAndExit(vehicleID); 
 
         vehicleObj->SetObjIdAtPos(rideAt, riderID);
-
+        log(LOG_INFO, "--------------------------------------------------------------------");
         return; 
     }
     

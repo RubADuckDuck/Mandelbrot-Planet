@@ -32,7 +32,10 @@ Renderer::Renderer(GameState* gameState)
         {0, "Error"}
     };
 
-    id2MeshAndTexture = std::make_unique<Type2MeshAndTexture<uint32_t>>(ID2String);
+    id2MeshAndTexture = std::make_unique<Type2MeshAndTexture<uint32_t>>(ID2String); 
+
+    // init camera
+    ptrCamera_ = std::make_unique<CameraObject>();
 }
 
 void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t descendDepth) {
@@ -99,8 +102,13 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
         currObj = obj_stack.top();
         obj_stack.pop();
         ss.str("");
-        ss << "Processing object (ID: " << currObj->GetID() << ") at depth: " << std::to_string(descendDepth + 1);
+        ss << "Processing object (ID: " << currObj->GetID() << ") at depth: " << std::to_string(currDepthIndex + 1);
         log(LOG_INFO, ss.str());
+
+        log(LOG_INFO, "Drawing Object");  
+        // I don't remember how to draw. LOL 
+        this->DrawMesh(currObj->meshID_, currObj->textureID_, currObj->modelTransformMat_);
+
 
         // delete number of elements at current depth
         n_frontier[currDepthIndex] -= 1;
@@ -188,4 +196,20 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
         // 010000 depth: 1 could happen
         //
     }
+}
+
+void Renderer::DrawMesh(uint32_t meshID, uint32_t textureID, glm::mat4 transfromMatrix) {
+
+    GeneralMesh* currMesh = id2MeshAndTexture->GetMesh(meshID);
+    Texture* currTexture = id2MeshAndTexture->GetTexture(textureID);
+
+    std::cout << "==============DrawInfo==============" << std::endl;
+    std::cout << "MeshID: " << std::to_string(meshID) << std::endl;
+    std::cout << "TextureID: " << std::to_string(textureID) << std::endl;
+    std::cout << std::endl << transfromMatrix << std::endl;
+    std::cout << "==============================================" << std::endl;
+
+    currMesh->Render(*ptrCamera_, transfromMatrix, currTexture);
+
+    return;
 }

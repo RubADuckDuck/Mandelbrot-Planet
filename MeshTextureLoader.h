@@ -81,26 +81,36 @@ public:
 
 
 	void SetMeshes() {
-		GeneralMesh* currMesh;
+		GeneralMesh* currMesh; 
+		uint32_t i = 0; 
 		for (const auto& pair : type2ObjPath) {
 			const auto& type = pair.first;
 			const auto& path = pair.second;
 
+			log(LOG_INFO, "(index " + std::to_string(i) + ")" + " Loading Mesh at path : " + path);
+
 			currMesh = new StaticMesh();
 			currMesh->LoadMesh(path);
 			type2Mesh[type].reset(currMesh);
+
+			i++; 
 		}
 	}
 
 	void SetTextures() {
 		Texture* currTexture;
+		uint32_t i = 0;
 		for (const auto& pair : type2TexturePath) {
 			const auto& type = pair.first;
-			const auto& path = pair.second;
+			const auto& path = pair.second; 
+
+			log(LOG_INFO, "(index " + std::to_string(i) + ")" + " Loading texture at path : " + path);
 
 			currTexture = new Texture;
 			currTexture->LoadandSetTextureIndexFromPath(path);
 			type2Texture[type].reset(currTexture);
+
+			i++; 
 		}
 	}
 
@@ -111,7 +121,7 @@ public:
 			return meshIt->second.get();
 		}
 
-		return type2Mesh[errorIndex];
+		return type2Mesh[errorIndex].get();
 	}
 
 	Texture* GetTexture(const T& type) {
@@ -120,7 +130,7 @@ public:
 			return textureIt->second.get();
 		}
 
-		return type2Texture[errorIndex]; 
+		return type2Texture[errorIndex].get(); 
 	}
 	
 };

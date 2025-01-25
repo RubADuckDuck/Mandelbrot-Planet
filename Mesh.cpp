@@ -851,6 +851,8 @@ void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
 void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
 {
+    LOG(LOG_INFO, "StaticMesh::Render Called");  
+
     if (sharedShaderProgram==NULL) {
         std::cout << "Object ??? Missing sharedShaderProgram" << std::endl;
     }

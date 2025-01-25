@@ -100,7 +100,7 @@ void GameObject::Update(float deltaTime) {
 
 // Default Constructor
 CameraObject::CameraObject()
-	: showCamera(true) // Initialize showCamera to true by default
+	: showCamera(false) // Initialize showCamera to true by default
 {
 	InitializeCamera();
 }
@@ -202,8 +202,10 @@ void CameraObject::Update() { // todo: ptrTransforms are not used anymore
 
 // Method to initialize viewProjectionMatrix
 void CameraObject::InitializeCamera() {
+	log(LOG_INFO, "Initializing Camera"); 
+
 	// Define camera parameters
-	position = glm::vec3(0.0f, 10.0f, 10.0f); // High angle position
+	position = glm::vec3(0.0f, 100.0f, 100.0f); // High angle position
 	target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
 	up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
 

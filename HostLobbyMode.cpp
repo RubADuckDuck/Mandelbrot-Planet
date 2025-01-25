@@ -137,5 +137,8 @@ void HostLobbyMode::TestRendering()
     // ---------------------------------------------
     // Draw 
 
-    this->server->GetGameState()->Draw();
+    {
+        this->server->GetGameState()->Draw();
+    }
+    
 }

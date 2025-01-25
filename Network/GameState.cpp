@@ -16,7 +16,7 @@ uint32_t GameState::GenerateNewGameObjectId() {
 
 void GameState::Draw() {
     // Debug 
-    renderer_->DrawRespectTo(2, 1, 2);
+    renderer_->DrawRespectTo(2, 1, 3);
 }
 
 // Grid Management 

@@ -61,7 +61,7 @@ void HostLobbyMode::TestRendering()
     std::vector<uint8_t> data; 
 
     // spawn 8 objects 
-    for (uint8_t i = 0; i < 8; i++) {
+    for (uint8_t i = 0; i < 24; i++) {
         cur_aro_msg= new AddRidableObjectMessage(); 
         cur_aro_msg->gridHeight_ = 2;  
 
@@ -73,69 +73,14 @@ void HostLobbyMode::TestRendering()
 
     //----------------------------------------------------------
     cur_ror_msg = new RideOnRidableObjectMessage(); 
-    cur_ror_msg->vehicleID = 1; 
-    cur_ror_msg->riderID = 2; 
-    cur_ror_msg->rideAt = 5; 
-
-    data = cur_ror_msg->Serialize(); 
-    delete cur_ror_msg; 
-
-    dispatcher.Publish(data); 
-
-
-    cur_ror_msg = new RideOnRidableObjectMessage();
     cur_ror_msg->vehicleID = 1;
-    cur_ror_msg->riderID = 3;
-    cur_ror_msg->rideAt = 6;
+    for (uint8_t i = 1; i < 24; i++) {
+        cur_ror_msg->riderID = i;
+        cur_ror_msg->rideAt = i;
+        data = cur_ror_msg->Serialize();
 
-    data = cur_ror_msg->Serialize();
-    delete cur_ror_msg;
-
-    dispatcher.Publish(data);
-
-
-    cur_ror_msg = new RideOnRidableObjectMessage();
-    cur_ror_msg->vehicleID = 2;
-    cur_ror_msg->riderID = 4;
-    cur_ror_msg->rideAt = 5;
-
-    data = cur_ror_msg->Serialize();
-    delete cur_ror_msg;
-
-    dispatcher.Publish(data);
-
-
-    cur_ror_msg = new RideOnRidableObjectMessage();
-    cur_ror_msg->vehicleID = 2;
-    cur_ror_msg->riderID = 5;
-    cur_ror_msg->rideAt = 6;
-
-    data = cur_ror_msg->Serialize();
-    delete cur_ror_msg;
-
-    dispatcher.Publish(data);
-
-
-    cur_ror_msg = new RideOnRidableObjectMessage();
-    cur_ror_msg->vehicleID = 3;
-    cur_ror_msg->riderID = 6;
-    cur_ror_msg->rideAt = 5;
-
-    data = cur_ror_msg->Serialize();
-    delete cur_ror_msg;
-
-    dispatcher.Publish(data);
-
-
-    cur_ror_msg = new RideOnRidableObjectMessage();
-    cur_ror_msg->vehicleID = 3;
-    cur_ror_msg->riderID = 7;
-    cur_ror_msg->rideAt = 6;
-
-    data = cur_ror_msg->Serialize();
-    delete cur_ror_msg;
-
-    dispatcher.Publish(data);
+        dispatcher.Publish(data);
+    }
 
     
 }

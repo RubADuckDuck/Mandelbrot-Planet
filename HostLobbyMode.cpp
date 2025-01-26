@@ -39,6 +39,8 @@ void HostLobbyMode::Draw() {
     // You'll need to implement actual rendering
     // Show connected players
     // Show "Start Game" button when ready
+
+    this->server->GetGameState()->Draw();
 }
 
 void HostLobbyMode::Exit() {
@@ -134,11 +136,6 @@ void HostLobbyMode::TestRendering()
     delete cur_ror_msg;
 
     dispatcher.Publish(data);
-    // ---------------------------------------------
-    // Draw 
 
-    {
-        this->server->GetGameState()->Draw();
-    }
     
 }

@@ -8,6 +8,8 @@
 #include "asio.hpp" 
 #include <thread>
 
+void GetOpenGLVersionInfo();
+
 // SystemManager.h - New class to handle SDL/OpenGL initialization
 class SystemManager {
 private:
@@ -17,49 +19,10 @@ private:
 
 
 public:
-    bool InitializeSDLAndOpenGL() {
-        // Move SDL and OpenGL initialization here
-        LOG(LOG_INFO, "  Current system: SDL + OPENGL");  
-         
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-            std::cout << "SDL could not init" << std::endl;
-            return false;
-        }
+    bool InitializeSDLAndOpenGL();
 
-        // Your existing SDL/OpenGL setup code...
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        // ... rest of the attributes
-
-        window = SDL_CreateWindow("OpenGL", 
-            100, 100,
-            ApplicationConfig::GetScreenWidth(), 
-            ApplicationConfig::GetScreenHeight(), 
-            SDL_WINDOW_OPENGL
-        ); 
+    SDL_Window* GetWindow();
 
 
-        if (!window) return false;
-
-        glContext = SDL_GL_CreateContext(window);
-        if (!glContext) return false;
-
-        if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) return false;
-
-        // OpenGL settings
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_DEBUG_OUTPUT);
-        // ... rest of OpenGL setup
-
-        return true;
-    }
-
-    SDL_Window* GetWindow() { return window; } 
-
-
-    void Cleanup() {
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-    }
+    void Cleanup();
 };

@@ -151,6 +151,8 @@ void MainMenuMode::Draw() {
         // Use SDL_ttf or other text rendering library to draw the text
         // at the center of the button rectangle
     }
+
+    // SDL_GL_SwapWindow(gameEngine->GetWindow());
 }
 
 void MainMenuMode::Exit() {}

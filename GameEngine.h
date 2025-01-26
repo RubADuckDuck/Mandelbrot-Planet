@@ -6,6 +6,17 @@
 #include "GameModeController.h"
 
 class GameEngine {
+private:
+	// Add these member variables
+	float deltaTime;      // Time between frames in seconds
+	float fps;           // Current frames per second
+	float fpsUpdateInterval;  // How often to update the FPS counter (e.g., every 0.5 seconds)
+	float fpsTimer;      // Tracks time since last FPS update
+	int frameCount;      // Counts frames between FPS updates
+
+	// Timing variables for precise measurements
+	std::chrono::steady_clock::time_point lastFrameTime;
+
 public: 
 	std::string GetName() const; 
 

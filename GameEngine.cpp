@@ -42,6 +42,7 @@ GameEngine::~GameEngine() {
 }
 
 bool GameEngine::Initialize() {
+
 	LOG(LOG_INFO, GetName() + "::Initializing Application Configuration");
 	ApplicationConfig::Initialize(720, 480);  
 
@@ -61,10 +62,40 @@ bool GameEngine::Initialize() {
 	log(LOG_INFO, "Initializing io_context"); 
 	io_context = std::make_unique<asio::io_context>();
 
+
+	log(LOG_INFO, "Initializing FPS tracker");
+	deltaTime = 0.0f;
+	fps = 0.0f;
+	fpsUpdateInterval = 0.5f;  // Update FPS display twice per second
+	fpsTimer = 0.0f;
+	frameCount = 0;
+	lastFrameTime = std::chrono::steady_clock::now();
+
 	return true;
 }
 
 void GameEngine::Update() {
+	// Calculate delta time
+	auto currentTime = std::chrono::steady_clock::now();
+	deltaTime = std::chrono::duration<float>(currentTime - lastFrameTime).count();
+	lastFrameTime = currentTime;
+
+	// Update FPS calculation
+	fpsTimer += deltaTime;
+	frameCount++;
+
+	// Update FPS value every fpsUpdateInterval seconds
+	if (fpsTimer >= fpsUpdateInterval) {
+		fps = static_cast<float>(frameCount) / fpsTimer;  // Calculate average FPS
+
+		// Log the current FPS
+		log(LOG_INFO, "FPS: " + std::to_string(static_cast<int>(fps)));
+
+		// Reset counters
+		fpsTimer = 0.0f;
+		frameCount = 0;
+	}
+
 	inputHandler.pollEvents();
 	if (inputHandler.isQuit()) {
 		ApplicationConfig::SetQuit(true);

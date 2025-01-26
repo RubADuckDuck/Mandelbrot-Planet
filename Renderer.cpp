@@ -39,6 +39,12 @@ Renderer::Renderer(GameState* gameState)
 }
 
 void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t descendDepth) {
+    // debug 
+    bool doLog = false; 
+    std::stringstream ss;
+
+    ptrCamera_->Update(); 
+
     if (objID == 0) {
         log(LOG_WARNING, "ID Cannot be 0.");
     }
@@ -48,9 +54,11 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
 
 
     for (uint8_t i = 0; i < ascendLevels; i++) {
-        std::stringstream ss;
-        ss << "Ascending to parent (Level: " << (i + 1) << ")";
-        log(LOG_INFO, ss.str());
+        if (doLog) {
+            ss << "Ascending to parent (Level: " << (i + 1) << ")";
+            log(LOG_INFO, ss.str());
+        }
+
         // go up one level 
         currID = currObj->GetParentID();
 
@@ -80,34 +88,45 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
 
     currObj = gameState_->GetGameObject(currID);
 
-    // set position of root. might as well have to fix this.
+    // When we decide the position of the transform, it is pushed in to the stack
+    // and as it is drawn, this value is popped. 
+    // The reason for this implementation is that same objects are drawn multiple times, 
+    // So there are cases where a single spot for saving the matrix is not enough to keep track of. 
     if (currObj->ptrNodeTransform_) {
-        currObj->modelTransformMat_ = currObj->ptrNodeTransform_->GetTransformMatrix();
+        currObj->modelTransformMats_.push(currObj->ptrNodeTransform_->GetTransformMatrix());
     }
     else {
-        currObj->modelTransformMat_ = glm::mat4(1);
+        currObj->modelTransformMats_.push(glm::mat4(1));
     }
 
-    std::stringstream ss;
-    ss << "Pushing root object (ID: " << currID << ") to stack";
-    log(LOG_INFO, ss.str());
+    if(doLog) {
+        ss << "Pushing root object (ID: " << currID << ") to stack";
+        log(LOG_INFO, ss.str());
+    }
+
     obj_stack.push(currObj);
     n_frontier[0] += 1; // add 1 element at currDepthIndex 0 
     lineage[0] = currID; // Root lineage
 
     while (obj_stack.empty() != true) {
-        log(LOG_INFO, "---------------------------------------------------------------------");
+
+        if (doLog) {
+            log(LOG_INFO, "---------------------------------------------------------------------");
+        }
 
         // get current object
         currObj = obj_stack.top();
         obj_stack.pop();
-        ss.str("");
-        ss << "Processing object (ID: " << currObj->GetID() << ") at depth: " << std::to_string(currDepthIndex + 1);
-        log(LOG_INFO, ss.str());
 
-        log(LOG_INFO, "Drawing Object");  
-        // I don't remember how to draw. LOL 
-        this->DrawMesh(currObj->meshID_, currObj->textureID_, currObj->modelTransformMat_);
+        if (doLog) {
+            ss.str("");
+            ss << "Processing object (ID: " << currObj->GetID() << ") at depth: " << std::to_string(currDepthIndex + 1);
+            log(LOG_INFO, ss.str());
+
+            log(LOG_INFO, "Drawing Object");
+        }
+        
+
 
 
         // delete number of elements at current depth
@@ -116,23 +135,31 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
         // and current obj has no child, 
         // that is what causes depth to retract.
         lineage[currDepthIndex] = currObj->GetID(); 
+        // read the top and pop
+        transformationMats[currDepthIndex] = currObj->modelTransformMats_.top(); 
+        currObj->modelTransformMats_.pop(); 
 
-        log(LOG_INFO, PrintLineage(lineage, currDepthIndex));
+        this->DrawMesh(currObj->meshID_, currObj->textureID_, transformationMats[currDepthIndex]);
 
-        // currentTransoformation
-        transformationMats[currDepthIndex] = currObj->modelTransformMat_;
+        if (doLog) {
+            log(LOG_INFO, PrintLineage(lineage, currDepthIndex));
+        }
 
         RidableObject* currRidable = dynamic_cast<RidableObject*>(currObj);
 
         if (currRidable == nullptr) {
-            log(LOG_INFO, "Object is not a RidableObject, skipping children");
+            if (doLog) {
+                log(LOG_INFO, "Object is not a RidableObject, skipping children");
+            }
             continue;
         }
         else {
             if (currDepthIndex < descendDepth) {
-                ss.str("");
-                ss << "Going deeper (Depth: " << (currDepthIndex + 1) << "/" << std::to_string(descendDepth+1) << ")";
-                log(LOG_INFO, ss.str());
+                if (doLog) {
+                    ss.str("");
+                    ss << "Going deeper (Depth: " << (currDepthIndex + 1) << "/" << std::to_string(descendDepth + 1) << ")";
+                    log(LOG_INFO, ss.str());
+                }
 
                 // if we can go deeper
                 currGrid = currRidable->GetGrid();
@@ -143,7 +170,9 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
                     currChildID = currGrid[index];
 
                     if (currChildID == 0) {
-                        log(LOG_DEBUG, "Grid element is empty (Skipping)");
+                        if (doLog) {
+                            log(LOG_DEBUG, "Grid element is empty (Skipping)");
+                        }
                     }
                     else {
                         // get childObj
@@ -151,15 +180,19 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
 
                         currGridTransformMat = currRidable->GetGridTransformAt(index);
 
-                        // parentTransformation * currGridTransform * ptrNodeTransformation -> current Transformation
-                        currChildObj->modelTransformMat_ =
+                        // parentTransformation * currGridTransform * ptrNodeTransformation -> current Transformation 
+                        // push it to the stack 
+                        currChildObj->modelTransformMats_.push(
                             transformationMats[currDepthIndex - 1]
                             * currGridTransformMat
-                            * currChildObj->ptrNodeTransform_->GetTransformMatrix();
+                            * currChildObj->ptrNodeTransform_->GetTransformMatrix()
+                        );
 
-                        ss.str("");
-                        ss << "Pushing child object (ID: " << currChildID << ") to stack";
-                        log(LOG_INFO, ss.str());
+                        if (doLog) {
+                            ss.str("");
+                            ss << "Pushing child object (ID: " << currChildID << ") to stack";
+                            log(LOG_INFO, ss.str());
+                        }
 
                         // add to frontier 
                         obj_stack.push(currChildObj);
@@ -180,10 +213,14 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
             else {
                 if (i == 0) {
                     if (!obj_stack.empty()) {
-                        log(LOG_ERROR, "Stack Should be empty");
+                        if (doLog) {
+                            log(LOG_ERROR, "Stack Should be empty");
+                        }
                     }
                     else {
-                        log(LOG_DEBUG, "Stack is Empty"); 
+                        if (doLog) {
+                            log(LOG_DEBUG, "Stack is Empty");
+                        }
                         break;
                     }
                 }
@@ -202,12 +239,14 @@ void Renderer::DrawMesh(uint32_t meshID, uint32_t textureID, glm::mat4 transfrom
 
     GeneralMesh* currMesh = id2MeshAndTexture->GetMesh(meshID);
     Texture* currTexture = id2MeshAndTexture->GetTexture(textureID);
-
-    std::cout << "==============DrawInfo==============" << std::endl;
-    std::cout << "MeshID: " << std::to_string(meshID) << std::endl;
-    std::cout << "TextureID: " << std::to_string(textureID) << std::endl;
-    std::cout << std::endl << transfromMatrix << std::endl;
-    std::cout << "==============================================" << std::endl;
+    
+    //{
+    //    std::cout << "==============DrawInfo==============" << std::endl;
+    //    std::cout << "MeshID: " << std::to_string(meshID) << std::endl;
+    //    std::cout << "TextureID: " << std::to_string(textureID) << std::endl;
+    //    std::cout << std::endl << transfromMatrix << std::endl;
+    //    std::cout << "==============================================" << std::endl;
+    //}
 
     currMesh->Render(*ptrCamera_, transfromMatrix, currTexture);
 

@@ -851,7 +851,7 @@ void RiggedMesh::Render(CameraObject& cameraObj, glm::mat4& tranform)
 
 void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* ptrTexture)
 {
-    LOG(LOG_INFO, "StaticMesh::Render Called");  
+    
 
     if (sharedShaderProgram==NULL) {
         std::cout << "Object ??? Missing sharedShaderProgram" << std::endl;
@@ -928,21 +928,22 @@ void StaticMesh::Render(CameraObject& cameraObj, glm::mat4& tranform, Texture* p
         // curMwvp = viewProj * tranform * this->meshIndex2meshTransform[i]; 
         curMwvp = viewProj * tranform;
 
-        { // debugging render 
-            std::cout << "ViewProj Mat: " << std::endl << viewProj << std::endl;
-            std::cout << "GameWorld Mat: " << std::endl << tranform << std::endl;
-            // std::cout << "MeshTransform Mat: " << std::endl << this->meshIndex2meshTransform[i] << std::endl;
-            std::cout << "MWVP Array" << std::endl << curMwvp << std::endl; 
-            glm::vec4 temp; 
-            for (const glm::vec3& position : positions) {
-                temp = curMwvp * glm::vec4(position, 1);
-                temp /= temp.w;  // Perspective divide
-                std::cout << "NDC coords: " << temp.x << "," << temp.y << "," << temp.z << std::endl;
-            std::string msg = "IndexNum in Currently drawn mesh: " + std::to_string(meshes[i].NumIndices);
-            log(msg);
-            }
-        }
-         // debugging
+        //{ // debugging render 
+        //    LOG(LOG_INFO, "StaticMesh::Render Called");
+        //    std::cout << "ViewProj Mat: " << std::endl << viewProj << std::endl;
+        //    std::cout << "GameWorld Mat: " << std::endl << tranform << std::endl;
+        //    // std::cout << "MeshTransform Mat: " << std::endl << this->meshIndex2meshTransform[i] << std::endl;
+        //    std::cout << "MWVP Array" << std::endl << curMwvp << std::endl; 
+        //    glm::vec4 temp; 
+        //    for (const glm::vec3& position : positions) {
+        //        temp = curMwvp * glm::vec4(position, 1);
+        //        temp /= temp.w;  // Perspective divide
+        //        std::cout << "NDC coords: " << temp.x << "," << temp.y << "," << temp.z << std::endl;
+        //    std::string msg = "IndexNum in Currently drawn mesh: " + std::to_string(meshes[i].NumIndices);
+        //    log(msg);
+        //    }
+        //}
+        // // debugging
 
         // get TextureIndex 
         // curTextureIndex = this->textures[i].GetTextureIndex();

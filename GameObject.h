@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <utility> // Required for std::pair
+#include <stack>
 
 #include "Mesh.h"
 #include "utils.h"
@@ -45,7 +46,7 @@ protected:
 
 public: 
 	Transform* ptrNodeTransform_;
-	glm::mat4 modelTransformMat_;
+	std::stack<glm::mat4> modelTransformMats_; 
 
 	uint32_t meshID_;  
 	uint32_t textureID_;  
@@ -58,15 +59,15 @@ public:
 
 public: 	
 	GameObject()
-		: ptrNodeTransform_(new Transform()), modelTransformMat_(glm::mat4(1)),
+		: ptrNodeTransform_(new Transform()),
 		meshID_(0), textureID_(0) {} 
 
 	GameObject(uint32_t meshID, uint32_t textureID) 
-		: ptrNodeTransform_(new Transform()), modelTransformMat_(glm::mat4(1)),
+		: ptrNodeTransform_(new Transform()),
 		meshID_(meshID), textureID_(textureID) {}
 
 	GameObject(uint32_t objID, uint32_t meshID, uint32_t textureID)
-		: ptrNodeTransform_(new Transform()), modelTransformMat_(glm::mat4(1)),
+		: ptrNodeTransform_(new Transform()),
 		meshID_(meshID), textureID_(textureID) {
 		this->SetID(objID); 
 	}
@@ -280,6 +281,13 @@ enum class MapLayerType {
 
 
 class CameraObject : GameObject{
+private:
+	bool rotationEnabled = true;  // Toggle for rotation
+	float rotationAngle = 0.0f;   // Current rotation angle in radians
+	float rotationSpeed = 0.5f;    // Rotations per second
+	float orbitRadius = 10.0f;     // Distance from center
+	float orbitHeight = 2.0f;     // Height of camera above ground
+
 public: 
 	bool showCamera; 
 
@@ -287,7 +295,6 @@ public:
     glm::vec3 target;      // Looking at origin
     glm::vec3 up;          // Up vector 
 
-    float angle = 0;
 
     // Define projection parameters
     float fov;                       // Field of view in degrees

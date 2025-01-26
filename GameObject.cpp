@@ -131,13 +131,7 @@ glm::vec3& CameraObject::GetGlobalCameraPosition() {
 };
 
 void CameraObject::AddTarget(GameObject* targetGameObj) { // todo: ptr Transforms are not used
-	if (targetGameObj && targetGameObj->modelTransformMat_!=glm::mat4(0.0f)) {
-		targetGameObjects.push_back(targetGameObj);
-		std::cout << "Added target object at: " << targetGameObj->modelTransformMat_ << std::endl;
-	}
-	else {
-		std::cerr << "Invalid target object or missing transform!" << std::endl;
-	}
+	// to do
 }
 
 glm::vec3 rotateVector(const glm::vec3& v, float theta) {
@@ -151,49 +145,69 @@ glm::vec3 rotateVector(const glm::vec3& v, float theta) {
 	return glm::vec3(rotatedVector);
 }
 
-void CameraObject::Update() { // todo: ptrTransforms are not used anymore
+void CameraObject::Update() { // todo: ptrTransforms are not used anymore 
+	if (rotationEnabled) {
+		// Update rotation angle based on time
+		// Assuming you have access to delta time from your game engine
+		float deltaTime = 1.0f/60.0f; // Replace with actual delta time if available
+		rotationAngle += rotationSpeed * deltaTime;
+
+		// Calculate new camera position using trigonometry
+		position = glm::vec3(
+			orbitRadius * sin(rotationAngle), // X coordinate
+			orbitHeight,                      // Y coordinate (height)
+			orbitRadius * cos(rotationAngle)  // Z coordinate
+		);
+
+		SetViewProjMat(); 
+		return; 
+	}
+	
 	bool doUpdate = false; 
 
-	if (doUpdate) {
-		glm::vec3 prevPosition = position; 
-		glm::vec3 prevTarget = target; 
-		glm::vec3 prevUp = up; 
+	if (doUpdate) { 
+
+		// to do 
+		// 
+		//glm::vec3 prevPosition = position; 
+		//glm::vec3 prevTarget = target; 
+		//glm::vec3 prevUp = up; 
 
 
-		int distance = 50;
-		// Define camera parameters
-		position = glm::vec3(5.0f, distance * 1.0f,- distance * 1.0f); // High angle position
-		target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
-		up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
+		//int distance = 50;
+		//// Define camera parameters
+		//position = glm::vec3(5.0f, distance * 1.0f,- distance * 1.0f); // High angle position
+		//target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
+		//up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
 
-		glm::mat4 totalTransform(0.0f);
+		//glm::mat4 totalTransform(0.0f);
 
-		// Calculate the average translation of target objects
-		for (const auto& targetGameObj : targetGameObjects) {
-			if (targetGameObj && targetGameObj->modelTransformMat_ != glm::mat4(0.0f)) {
-				totalTransform += targetGameObj->modelTransformMat_;
-			}
-		}
+		//// Calculate the average translation of target objects
+		//for (const auto& targetGameObj : targetGameObjects) {
+		//	if (targetGameObj && targetGameObj->modelTransformMat_ != glm::mat4(0.0f)) {
+		//		totalTransform += targetGameObj->modelTransformMat_;
+		//	}
+		//}
 
-		glm::mat4 averageTransform = totalTransform / static_cast<float>(targetGameObjects.size()); 
+		//glm::mat4 averageTransform = totalTransform / static_cast<float>(targetGameObjects.size()); 
 
-		position = glm::vec3(averageTransform * glm::vec4(position, 1));
-		target = glm::vec3(averageTransform * glm::vec4(target, 1)); 
-		
+		//position = glm::vec3(averageTransform * glm::vec4(position, 1));
+		//target = glm::vec3(averageTransform * glm::vec4(target, 1)); 
+		//
 
-		// Extract the rotation component from the average transformation matrix
-		glm::mat3 rotationMatrix = glm::mat3(averageTransform);
+		//// Extract the rotation component from the average transformation matrix
+		//glm::mat3 rotationMatrix = glm::mat3(averageTransform);
 
-		// Apply the rotation to the up vector
-		up = glm::normalize(rotationMatrix * up);
+		//// Apply the rotation to the up vector
+		//up = glm::normalize(rotationMatrix * up);
 
-		// Lerp factor (t), between 0 and 1
-		float t = 0.01f; // Example value, update this based on your logic (e.g., time)
+		//// Lerp factor (t), between 0 and 1
+		//float t = 0.01f; // Example value, update this based on your logic (e.g., time)
 
-		// Apply linear interpolation (lerp) for smooth transitions
-		position = glm::mix(prevPosition, position, t);
-		target = glm::mix(prevTarget, target, t);
-		up = glm::mix(prevUp, up, t);
+		//// Apply linear interpolation (lerp) for smooth transitions
+		//position = glm::mix(prevPosition, position, t);
+		//target = glm::mix(prevTarget, target, t);
+		//up = glm::mix(prevUp, up, t);
 	}
 
 	// Update view-projection matrix
@@ -205,12 +219,10 @@ void CameraObject::InitializeCamera() {
 	log(LOG_INFO, "Initializing Camera"); 
 
 	// Define camera parameters
-	position = glm::vec3(0.0f, 5.0f, 5.0f); // High angle position
+	position = glm::vec3(0.0f, 0.0f, 5.0f); // High angle position
 	target = glm::vec3(0.0f, 0.0f, 0.0f);      // Looking at origin
 	up = glm::vec3(0.0f, 1.0f, 0.0f);          // Up vector
 
-	// Create view matrix using glm::lookAt
-	glm::mat4 view = glm::lookAt(position, target, up);
 
 	// Define projection parameters
 	fov = 45.0f;                       // Field of view in degrees
@@ -218,14 +230,5 @@ void CameraObject::InitializeCamera() {
 	nearPlane = 0.1f;                  // Near clipping plane
 	farPlane = 1000.0f;                  // Far clipping plane
 
-	// Create projection matrix using glm::perspective
-	glm::mat4 projection = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
-
-	std::cout << "==============(Camera's View and Projection Matrix)==============" << std::endl;
-	std::cout << "View Matrix: " << std::endl << view << std::endl;
-	std::cout << "Proj Matrix: " << std::endl << projection << std::endl;
-	std::cout << "==================================================================" << std::endl;
-
-	// Combine view and projection matrices
-	viewProjectionMatrix = projection * view;
+	this->SetViewProjMat(); 
 }

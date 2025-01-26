@@ -32,6 +32,12 @@ void HostLobbyMode::Update() {
         gameEngine->GetModeController()->SwitchMode(GameModeType::PLAYING);
     }
 
+    
+}
+
+void HostLobbyMode::Update(float delta_time)
+{
+    server->GetGameState()->UpdateGameState(delta_time);
 }
 
 void HostLobbyMode::Draw() {

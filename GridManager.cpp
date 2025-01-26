@@ -205,7 +205,7 @@ void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 				curY = 0;
 				curX = j % facePieceSize;
 
-				curY += -1; 
+				curY += -GROUND_OFFSET; 
 
 				break;
 			case 1:
@@ -213,7 +213,7 @@ void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 				curY = j % facePieceSize;
 				curX = facePieceSize - 1;
 
-				curX += 1;
+				curX += GROUND_OFFSET;
 
 				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-90.0f), glm::vec3(0, 0, 1));
 				break;
@@ -222,7 +222,7 @@ void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 				curY = facePieceSize - 1;
 				curX = facePieceSize - (j % facePieceSize) - 1; 
 
-				curY += 1;
+				curY += GROUND_OFFSET;
 
 				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-180.0f), glm::vec3(0, 0, 1));
 				break;
@@ -231,7 +231,7 @@ void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 				curY = facePieceSize - (j % facePieceSize) - 1;
 				curX = 0;
 
-				curX += -1; 
+				curX += -GROUND_OFFSET;
 
 				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-270.0f), glm::vec3(0, 0, 1));
 				break;
@@ -240,7 +240,7 @@ void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 				curY = facePieceSize - i - 1;
 				curX = j % facePieceSize;
 
-				curZ += -1; 
+				curZ += -GROUND_OFFSET;
 
 				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(-90.0f), glm::vec3(1, 0, 0));
 				break;
@@ -249,14 +249,14 @@ void GridTransformManager::InitTransforms(int startY, int startX, int size) {
 				curY = i;
 				curX = j % facePieceSize;
 
-				curZ += 1;
+				curZ += GROUND_OFFSET;
 
 				grid2Transform[i + startY][j + startX]->SetRotation(glm::radians(90.0f), glm::vec3(1, 0, 0));
 				break;
 			}
 
 			curZ += -0.5;
-			curY += -2.125;
+			curY += -0.5;
 			curX += -0.5;
 
 			curZ *= BLOCK_OFFSET;

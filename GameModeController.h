@@ -19,6 +19,7 @@ public:
     void Initialize();
     void SwitchMode(GameModeType newMode);
     void Update();
+    void Update(float delta_time); 
     void Draw();
 };
 

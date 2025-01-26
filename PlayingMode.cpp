@@ -17,6 +17,10 @@ void PlayingMode::Update() {
 
 }
 
+void PlayingMode::Update(float delta_time)
+{
+}
+
 void PlayingMode::Draw() {
     // Your existing game rendering logic
 

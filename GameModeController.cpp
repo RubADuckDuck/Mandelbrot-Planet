@@ -46,6 +46,13 @@ void GameModeController::Update() {
     }
 }
 
+void GameModeController::Update(float delta_time)
+{
+    if (currentMode) {
+        currentMode->Update(delta_time); 
+    }
+}
+
 void GameModeController::Draw() {
     if (currentMode) {
         currentMode->Draw();

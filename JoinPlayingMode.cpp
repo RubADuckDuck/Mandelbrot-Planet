@@ -24,6 +24,10 @@ void JoinPlayingMode::Update()
 
 }
 
+void JoinPlayingMode::Update(float delta_time)
+{
+}
+
 void JoinPlayingMode::Draw()
 {
 

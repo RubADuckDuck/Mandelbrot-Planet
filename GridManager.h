@@ -182,7 +182,8 @@ private:
 	uint8_t gridWidth_;
 
 	float BLOCK_SIZE = 0.2f;
-	float BLOCK_OFFSET = 1.0f;
+	float BLOCK_OFFSET = 1.0f; 
+	float GROUND_OFFSET = 1.0f; 
 public:
 	std::vector<std::vector<Transform*>> grid2Transform;
 

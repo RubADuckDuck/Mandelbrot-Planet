@@ -28,6 +28,7 @@ public:
     // Core functions that every game mode must implement
     virtual void Enter() = 0;   // Called when entering this mode
     virtual void Update() = 0;  // Called each frame for logic updates
+    virtual void Update(float delta_time) = 0; 
     virtual void Draw() = 0;    // Called each frame for rendering
     virtual void Exit() = 0;    // Called when leaving this mode
 }; 

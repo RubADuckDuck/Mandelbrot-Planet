@@ -92,7 +92,7 @@ void GameObject::Update() {
 };
 
 void GameObject::Update(float deltaTime) {
-	return; 
+	ptrNodeTransform_->AddRotation(deltaTime, glm::vec3(1, 1, 1)); 
 }
 
 

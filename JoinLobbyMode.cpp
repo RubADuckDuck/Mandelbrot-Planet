@@ -23,6 +23,10 @@ void JoinLobbyMode::Update() {
 
 }
 
+void JoinLobbyMode::Update(float delta_time)
+{
+}
+
 void JoinLobbyMode::Draw() {
 
 }

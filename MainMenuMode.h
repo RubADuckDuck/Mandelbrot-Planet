@@ -37,6 +37,7 @@ public:
     ~MainMenuMode();
     void Enter() override;
     void Update() override;
+    void Update(float delta_time) override;
     void Draw() override;
     void Exit() override;
 };

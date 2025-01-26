@@ -44,7 +44,7 @@ GameEngine::~GameEngine() {
 bool GameEngine::Initialize() {
 
 	LOG(LOG_INFO, GetName() + "::Initializing Application Configuration");
-	ApplicationConfig::Initialize(720, 480);  
+	ApplicationConfig::Initialize(360 * 4, 360 * 3);  
 
 	// Initialize core systems
 	LOG(LOG_INFO, GetName() + "::Initializing System");
@@ -103,6 +103,7 @@ void GameEngine::Update() {
 	}
 
 	modeController.get()->Update();
+	modeController.get()->Update(deltaTime); 
 }
 
 void GameEngine::Draw() {

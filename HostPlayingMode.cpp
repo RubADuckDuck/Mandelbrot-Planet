@@ -17,6 +17,10 @@ void HostPlayingMode::Update()
 {
 }
 
+void HostPlayingMode::Update(float delta_time)
+{
+}
+
 void HostPlayingMode::Draw()
 {
 }

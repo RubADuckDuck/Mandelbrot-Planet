@@ -67,7 +67,7 @@ void HostLobbyMode::TestRendering()
     std::vector<uint8_t> data; 
 
     // spawn 8 objects 
-    for (uint8_t i = 0; i < 24; i++) {
+    for (uint8_t i = 0; i < 25; i++) {
         cur_aro_msg= new AddRidableObjectMessage(); 
         cur_aro_msg->gridHeight_ = 2;  
 
@@ -80,9 +80,9 @@ void HostLobbyMode::TestRendering()
     //----------------------------------------------------------
     cur_ror_msg = new RideOnRidableObjectMessage(); 
     cur_ror_msg->vehicleID = 1;
-    for (uint8_t i = 1; i < 24; i++) {
+    for (uint8_t i = 2; i < 26; i++) {
         cur_ror_msg->riderID = i;
-        cur_ror_msg->rideAt = i;
+        cur_ror_msg->rideAt = i - 2;
         data = cur_ror_msg->Serialize();
 
         dispatcher.Publish(data);

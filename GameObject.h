@@ -46,7 +46,12 @@ protected:
 
 public: 
 	Transform* ptrNodeTransform_;
-	std::stack<glm::mat4> modelTransformMats_; 
+	std::stack<glm::mat4> modelTransformMats_;  
+	glm::mat4 prevGridTransform_; 
+
+	std::unordered_map<uint32_t, glm::mat4> gameObjectID2respectiveTransformationMat; 
+
+	float interpolationValue_ = 1; // scales from 0 to 1, > 1 means interpolation is complete
 
 	uint32_t meshID_;  
 	uint32_t textureID_;  
@@ -74,6 +79,34 @@ public:
 
 	uint32_t GetParentID() {
 		return parentID_;
+	}
+
+	void AddToRenderList(uint32_t gameObjectID, glm::mat4 transformMat) { 
+		auto it = gameObjectID2respectiveTransformationMat.find(gameObjectID); 
+
+		if (it == gameObjectID2respectiveTransformationMat.end()) {
+			// no duplicates  
+			gameObjectID2respectiveTransformationMat[gameObjectID] = transformMat; 
+		}
+		else {
+			log(LOG_ERROR, "::AddToRenderList the transformMatrix of this gameObject has already been registered"); 
+		}
+	}
+
+	glm::mat4 GetMatrixFromRenderList(uint32_t gameObjectID) {
+		auto it = gameObjectID2respectiveTransformationMat.find(gameObjectID);
+
+		if (it == gameObjectID2respectiveTransformationMat.end()) {
+			log(LOG_ERROR, "Doesn'tExist" );
+			return glm::mat4(1); 
+		}
+		else {
+			return gameObjectID2respectiveTransformationMat[gameObjectID];
+		}
+	}
+
+	void ClearRenderList() {
+		gameObjectID2respectiveTransformationMat.clear(); 
 	}
 
 	// client::init

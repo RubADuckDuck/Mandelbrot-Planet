@@ -4,12 +4,24 @@
 #include <stack>
 #include "MeshTextureLoader.h"
 
+
+
 class Renderer {
 public:
     std::string GetName() const;
 
+
 private:
     void log(LogLevel level, std::string text);
+
+    struct ParentWithGridIndex {
+        GameObject* ptrParent = nullptr;
+        uint8_t gridIndex = 0;
+    };
+
+    using GameObjectChain = std::vector<ParentWithGridIndex>;
+
+    GameObjectChain previousGameObjectChain; 
 
     GameState* gameState_; 
     // (mesh & texture id) -> (mesh & texture)
@@ -20,6 +32,10 @@ private:
 
 public: 
     Renderer(GameState* gameState);
+
+    void SetTransformationsForEachGameObject();
+
+    void DrawDepth(uint32_t objID, uint8_t descendDepth);
 
     void DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t descendDepth);
 

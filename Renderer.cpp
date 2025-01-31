@@ -55,16 +55,19 @@ void Renderer::SetTransformationsForEachGameObject() {
         E: D' 
 
     A: (A), (A -> B) , (A -> C), (A -> B -> D), (A -> B -> D -> E) 
-    A': (A -> B -> A'), (A -> C -> A') 
+    Exits: (A -> C -> A'), (A -> B -> A'), (A -> B -> D -> B'), (A -> B -> D -> E -> D') 
 
     B: (B) ,(B -> D), (B -> D -> E) 
-    B': (B -> A'), (B -> D -> B') 
+    Exits: (B -> A'), (B -> D -> B'), (B -> D -> E -> D') 
 
     C: (C)
-    C': (C -> A')
+    Exits: (C -> A')
 
     D: (D), (D -> E) 
-    D': (D -> B'), (D -> E -> D') 
+    Exits: (D -> B'), (D -> E -> D') 
+
+    E: (E)  
+    Exits: (E -> D')
 
 
 
@@ -74,16 +77,16 @@ void Renderer::SetTransformationsForEachGameObject() {
         D: E 
 
     A: (A), (A -> B) , (A -> C), (A -> D), (A -> D -> E) 
-    A': (A -> B -> A'), (A -> C -> A'), (A -> D -> A')
+    Exits: (A -> B -> A'), (A -> C -> A'), (A -> D -> A'), (A -> D -> E -> D')
 
     B: (B) 
-    B': (B -> A')
+    Exits: (B -> A')
 
     C: (C) 
-    C': (C -> A')
+    Exits: (C -> A')
 
     D: (D), (D -> E)
-    D': (D -> A'), (D -> E -> D')
+    Exits: (D -> A'), (D -> E -> D')
 
     how the transition between BeforeAction -> AfterAction is done. 
 
@@ -103,18 +106,30 @@ void Renderer::SetTransformationsForEachGameObject() {
 
     While the interpolation is happening transition of D will be overriden as follows. 
     Each arrow between B and D is substituted with '-(i)->' which will be the result of the interpolation.
+    Since D is not anymore a descendant of B, but rather of A, B' in D would have been altered to A'. 
+
+    (I found an edge case I think. 
+    If I have hierarchy of 
+    A -> B -> C -> D 
+    B' is in D  
+    A' is in C 
+    and D go through A', D is commiting creating disapster by taking B' to a position which is not a descendant.
+    Which is quite problematic. We will 
 
     A: (A), (A -> B) , (A -> C), (A -> B -(i)-> D), (A -> B -(i)-> D -> E) 
-    A': (A -> B -> A'), (A -> C -> A') 
+    Exits: (A -> C -> A'), (A -> B -> A'), (A -> B -(i)-> D -> B'), (A -> B -(i)-> D -> E -> D') 
 
     B: (B) ,(B -(i)-> D), (B -(i)-> D -> E) 
-    B': (B -> A'), (B -(i)-> D -> B') 
+    Exits: (B -> A'), (B -(i)-> D -> B'), (B -(i)-> D -> E -> D') 
 
     C: (C)
-    C': (C -> A')
+    Exits: (C -> A')
 
-    D: (D), (D -> E) 
-    D': (D -> B'), (D -> E -> D')  
+    D: (D), (D -> E)
+    Exits: (D -> B'), (D -> E -> D')
+
+    E: (E)
+    Exits: (E -> D')
 
     Inorder for above to be applied the state Before action has to be captured.
     Now, what about cases where another movement is requested while another is already moving?  
@@ -158,8 +173,30 @@ void Renderer::SetTransformationsForEachGameObject() {
 
     You might be asking "How is it okay to make B': (B -(i)-> D ~) disappear?". 
     Remember What we were interpolating? It's this (A -> B -> D) -> (A -> B -> A' -> D). 
-    Now that the interpolation is complete, (B -(i)-> D ~) = (B -> A' -> D ~), but that will be drawn though B: (B -> A') A: (A -> D ~)
-    Rather the problem is that (A -> D ~) has been emtpy until this point. Let's make somthing sparkle there. This is enough.
+    Now that the interpolation is complete, (B -(i)-> D ~) = (B -> A' -> D ~), but that will be drawn by B: (B -> A') A: (A -> D ~).
+    That explains why it is okay for it to disappear.
+
+    Rather the problem is that (A -> D ~) has been emtpy until this point. Let's make somthing sparkle there. This is enough. 
+    If we draw D, then we would need to draw the whole hierarchy. I don't want to.
+
+    As interpolation (A -> D -> E) -> (A -> E) is finished 
+
+    A: (A), (A -> B) , (A -> C), (A -> D), (A -> E)
+    A': (A -> B -> A'), (A -> C -> A')
+
+    B: (B)
+    B': (B -> A')
+
+    C: (C)
+    C': (C -> A')
+
+    D: (D), 
+    D': (D -> A')
+
+    todo: 
+    - detailed explaination about ( - )': ~
+    - What if ( - )' moves? 
+
 */
 void Renderer::SetTransformationChainForEachGameObject() { 
     

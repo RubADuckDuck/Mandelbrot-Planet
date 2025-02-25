@@ -93,6 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -108,6 +109,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,6 +125,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +143,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,95 +155,91 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="ApplicationConfig.cpp" />
-    <ClCompile Include="Event.cpp" />
-    <ClCompile Include="GameEngine.cpp" />
-    <ClCompile Include="GameMode.cpp" />
-    <ClCompile Include="GameModeController.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GlobalMappings.cpp" />
-    <ClCompile Include="GridManager.cpp" />
-    <ClCompile Include="GroundType.h" />
-    <ClCompile Include="HostLobbyMode.cpp" />
-    <ClCompile Include="HostPlayingMode.cpp" />
-    <ClCompile Include="ImageLoader.cpp" />
-    <ClCompile Include="Item.cpp" />
-    <ClCompile Include="JoinLobbyMode.cpp" />
-    <ClCompile Include="JoinPlayingMode.cpp" />
-    <ClCompile Include="LOG.cpp" />
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\Core\Animation.cpp" />
+    <ClCompile Include="src\Core\ApplicationConfig.cpp" />
+    <ClCompile Include="src\Core\Event.cpp" />
+    <ClCompile Include="src\Core\GameEngine.cpp" />
+    <ClCompile Include="src\Core\GameMode.cpp" />
+    <ClCompile Include="src\Core\GameModeController.cpp" />
+    <ClCompile Include="src\Core\GameObject.cpp" />
+    <ClCompile Include="src\Core\GlobalMappings.cpp" />
+    <ClCompile Include="src\Core\GridManager.cpp" />
+    <ClCompile Include="include\Core\GroundType.h" />
+    <ClCompile Include="src\GameModes\HostLobbyMode.cpp" />
+    <ClCompile Include="src\GameModes\HostPlayingMode.cpp" />
+    <ClCompile Include="src\Rendering\ImageLoader.cpp" />
+    <ClCompile Include="src\Core\Item.cpp" />
+    <ClCompile Include="src\GameModes\JoinLobbyMode.cpp" />
+    <ClCompile Include="src\GameModes\JoinPlayingMode.cpp" />
+    <ClCompile Include="src\Utils\LOG.cpp" />
+    <ClCompile Include="src\main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="main1.cpp">
+    <ClCompile Include="src\main1.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="MainMenuMode.cpp" />
-    <ClCompile Include="main_game.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="MessageParser.cpp" />
-    <ClCompile Include="Network\Command.cpp" />
-    <ClCompile Include="Network\GameState.cpp" />
-    <ClCompile Include="Network\GameStateManager.cpp" />
-    <ClCompile Include="Network\NetworkMessage.cpp" />
-    <ClCompile Include="Network\UDPClient.cpp" />
-    <ClCompile Include="Network\UDPServer.cpp" />
-    <ClCompile Include="PlayerDirection.cpp" />
-    <ClCompile Include="PlayingMode.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RidableObject.cpp" />
-    <ClCompile Include="RidableObject.h" />
-    <ClCompile Include="ShaderProgramLoader.cpp" />
+    <ClCompile Include="src\GameModes\MainMenuMode.cpp" />
+    <ClCompile Include="src\main_game.cpp" />
+    <ClCompile Include="src\Rendering\Mesh.cpp" />
+    <ClCompile Include="src\Core\MessageParser.cpp" />
+    <ClCompile Include="src\Network\Command.cpp" />
+    <ClCompile Include="src\Network\GameState.cpp" />
+    <ClCompile Include="src\Network\GameStateManager.cpp" />
+    <ClCompile Include="src\Network\NetworkMessage.cpp" />
+    <ClCompile Include="src\Network\UDPClient.cpp" />
+    <ClCompile Include="src\Network\UDPServer.cpp" />
+    <ClCompile Include="src\Core\PlayerDirection.cpp" />
+    <ClCompile Include="src\GameModes\PlayingMode.cpp" />
+    <ClCompile Include="src\Core\RidableObject.cpp" />
+    <ClCompile Include="include\Core\RidableObject.h" />
+    <ClCompile Include="src\Rendering\ShaderProgramLoader.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="stb_image.h" />
-    <ClCompile Include="SystemManager.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="include\ThirdParty\stb_image.h" />
+    <ClCompile Include="src\Rendering\Texture.cpp" />
+    <ClCompile Include="src\Core\Transform.cpp" />
+    <ClCompile Include="src\Utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="ApplicationConfig.h" />
-    <ClInclude Include="JoinPlayingMode.h" />
-    <ClInclude Include="Event.h" />
-    <ClInclude Include="FactoryType.h" />
-    <ClInclude Include="GameEngine.h" />
-    <ClInclude Include="GameMode.h" />
-    <ClInclude Include="GameModeController.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Gizmo.h" />
-    <ClInclude Include="GlobalMappings.h" />
-    <ClInclude Include="GridManager.h" />
-    <ClInclude Include="HostLobbyMode.h" />
-    <ClInclude Include="HostPlayingMode.h" />
-    <ClInclude Include="InteractionInfo.h" />
-    <ClInclude Include="Item.h" />
-    <ClInclude Include="ItemType.h" />
-    <ClInclude Include="JoinLobbyMode.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="LOG.h" />
-    <ClInclude Include="MainMenuMode.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshTextureLoader.h" />
-    <ClInclude Include="MessageParser.h" />
-    <ClInclude Include="Network\Command.h" />
-    <ClInclude Include="Network\GameState.h" />
-    <ClInclude Include="Network\GameStateManager.h" />
-    <ClInclude Include="Network\NetworkConfig.h" />
-    <ClInclude Include="Network\NetworkMessage.h" />
-    <ClInclude Include="Network\UDPClient.h" />
-    <ClInclude Include="Network\UDPServer.h" />
-    <ClInclude Include="ObjectType.h" />
-    <ClInclude Include="PlayerDirection.h" />
-    <ClInclude Include="PlayingMode.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="ShaderProgramLoader.h" />
-    <ClInclude Include="SystemManager.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="utils.h" />
+    <ClInclude Include="include\Core\Animation.h" />
+    <ClInclude Include="include\Core\ApplicationConfig.h" />
+    <ClInclude Include="include\GameModes\JoinPlayingMode.h" />
+    <ClInclude Include="include\Core\Event.h" />
+    <ClInclude Include="include\Core\FactoryType.h" />
+    <ClInclude Include="include\Core\GameEngine.h" />
+    <ClInclude Include="include\Core\GameMode.h" />
+    <ClInclude Include="include\Core\GameModeController.h" />
+    <ClInclude Include="include\Core\GameObject.h" />
+    <ClInclude Include="include\Rendering\Gizmo.h" />
+    <ClInclude Include="include\Core\GlobalMappings.h" />
+    <ClInclude Include="include\Core\GridManager.h" />
+    <ClInclude Include="include\GameModes\HostLobbyMode.h" />
+    <ClInclude Include="include\GameModes\HostPlayingMode.h" />
+    <ClInclude Include="include\Core\InteractionInfo.h" />
+    <ClInclude Include="include\Core\Item.h" />
+    <ClInclude Include="include\Core\ItemType.h" />
+    <ClInclude Include="include\GameModes\JoinLobbyMode.h" />
+    <ClInclude Include="include\Rendering\Light.h" />
+    <ClInclude Include="include\Utils\LOG.h" />
+    <ClInclude Include="include\GameModes\MainMenuMode.h" />
+    <ClInclude Include="include\Rendering\Mesh.h" />
+    <ClInclude Include="include\Core\MessageParser.h" />
+    <ClInclude Include="include\Network\Command.h" />
+    <ClInclude Include="include\Network\GameState.h" />
+    <ClInclude Include="include\Network\GameStateManager.h" />
+    <ClInclude Include="include\Network\NetworkConfig.h" />
+    <ClInclude Include="include\Network\NetworkMessage.h" />
+    <ClInclude Include="include\Network\UDPClient.h" />
+    <ClInclude Include="include\Network\UDPServer.h" />
+    <ClInclude Include="include\Core\ObjectType.h" />
+    <ClInclude Include="include\Core\PlayerDirection.h" />
+    <ClInclude Include="include\GameModes\PlayingMode.h" />
+    <ClInclude Include="include\Rendering\ShaderProgramLoader.h" />
+    <ClInclude Include="include\Core\SystemManager.h" />
+    <ClInclude Include="include\Rendering\Texture.h" />
+    <ClInclude Include="include\Core\Transform.h" />
+    <ClInclude Include="include\Utils\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

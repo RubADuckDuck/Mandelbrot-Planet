@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿  Event.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
 C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
@@ -78,11 +79,48 @@ E:\dev\glm-master\glm\detail\func_common.inl(160,72): error C2440: 'static_cast'
               U=float
           ]
 E:\dev\glm-master\glm\detail\func_common.inl(160,72): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+=======
+﻿  Animation.cpp
+  ApplicationConfig.cpp
+  Event.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  GameEngine.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  GameMode.cpp
+  GameModeController.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  GameObject.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  GlobalMappings.cpp
+  GridManager.cpp
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(204,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(206,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(210,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(211,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(212,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(219,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(220,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(221,48): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(226,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(227,48): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(234,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(235,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(241,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(242,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(243,14): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp(188,13): warning C4101: 'curTransform': unreferenced local variable
+  GroundType.h
+>>>>>>> RiskyBranch
   HostLobbyMode.cpp
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
+<<<<<<< HEAD
 E:\dev\glm-master\glm\detail\func_common.inl(160,26): error C2440: 'static_cast': cannot convert from 'const T' to 'U'
           with
           [
@@ -117,11 +155,17 @@ E:\dev\glm-master\glm\detail\func_common.inl(160,72): error C2440: 'static_cast'
               U=float
           ]
 E:\dev\glm-master\glm\detail\func_common.inl(160,72): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+=======
+  HostPlayingMode.cpp
+  ImageLoader.cpp
+  Item.cpp
+>>>>>>> RiskyBranch
   JoinLobbyMode.cpp
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
+<<<<<<< HEAD
   MainMenuMode.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
 C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
@@ -315,11 +359,46 @@ E:\dev\glm-master\glm\detail\func_common.inl(160,72): error C2440: 'static_cast'
               U=float
           ]
 E:\dev\glm-master\glm\detail\func_common.inl(160,72): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+=======
+  JoinPlayingMode.cpp
+  LOG.cpp
+  MainMenuMode.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  main_game.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  Mesh.cpp
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(153,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(185,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(206,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(253,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  Generating Code...
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GameObject.cpp(130): warning C4172: returning address of local variable or temporary: temp
+  Compiling...
+  MessageParser.cpp
+  Command.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  GameState.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  GameStateManager.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  NetworkMessage.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  UDPClient.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+>>>>>>> RiskyBranch
   UDPServer.cpp
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
+<<<<<<< HEAD
 E:\dev\glm-master\glm\detail\func_common.inl(160,26): error C2440: 'static_cast': cannot convert from 'const T' to 'U'
           with
           [
@@ -402,3 +481,21 @@ E:\dev\glm-master\glm\detail\func_common.inl(160,72): message : No user-defined-
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
 C:\Users\kmo73\source\repos\apple\websocketsharp\duckfishing\duckfishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   Generating Code...
+=======
+  PlayerDirection.cpp
+  PlayingMode.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+  RidableObject.cpp
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\RidableObject.cpp(54,13): warning C4244: '=': conversion from '__int64' to 'uint8_t', possible loss of data
+  RidableObject.h
+  ShaderProgramLoader.cpp
+  stb_image.h
+  Texture.cpp
+  Transform.cpp
+  utils.cpp
+  Generating Code...
+  glad.c
+x64\Debug\RidableObject.obj : warning LNK4042: object specified more than once; extras ignored
+  duckfishing.vcxproj -> E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\duckfishing.exe
+>>>>>>> RiskyBranch

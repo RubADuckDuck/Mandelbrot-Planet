@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 E:\proj\[gameproj]\DontStarve\DuckFishing\Animation.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Animation.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\ApplicationConfig.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\ApplicationConfig.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\Event.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Event.obj
@@ -37,3 +38,42 @@ E:\proj\[gameproj]\DontStarve\DuckFishing\SystemManager.cpp;E:\proj\[gameproj]\D
 E:\proj\[gameproj]\DontStarve\DuckFishing\Texture.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Texture.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\Transform.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\Transform.obj
 E:\proj\[gameproj]\DontStarve\DuckFishing\utils.cpp;E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\utils.obj
+=======
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\Animation.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\Animation.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\ApplicationConfig.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\ApplicationConfig.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\Event.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\Event.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GameEngine.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GameEngine.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GameMode.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GameMode.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GameModeController.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GameModeController.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GameObject.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GameObject.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GlobalMappings.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GlobalMappings.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GridManager.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GridManager.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GroundType.h;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GroundType.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\GameModes\HostLobbyMode.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\HostLobbyMode.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\GameModes\HostPlayingMode.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\HostPlayingMode.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\ImageLoader.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\ImageLoader.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\Item.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\Item.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\GameModes\JoinLobbyMode.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\JoinLobbyMode.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\GameModes\JoinPlayingMode.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\JoinPlayingMode.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Utils\LOG.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\LOG.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\GameModes\MainMenuMode.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\MainMenuMode.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\main_game.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\main_game.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\Mesh.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\MessageParser.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\MessageParser.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Network\Command.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\Command.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Network\GameState.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GameState.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Network\GameStateManager.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\GameStateManager.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Network\NetworkMessage.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\NetworkMessage.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Network\UDPClient.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\UDPClient.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Network\UDPServer.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\UDPServer.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\PlayerDirection.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\PlayerDirection.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\GameModes\PlayingMode.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\PlayingMode.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\RidableObject.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\RidableObject.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\RidableObject.h;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\RidableObject.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\ShaderProgramLoader.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\ShaderProgramLoader.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\glad.c;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\glad.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\ThirdParty\stb_image.h;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\stb_image.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Texture.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\Texture.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\Transform.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\Transform.obj
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Utils\utils.cpp;E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\utils.obj
+>>>>>>> RiskyBranch

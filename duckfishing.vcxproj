@@ -184,6 +184,8 @@
     <ClCompile Include="src\main_game.cpp" />
     <ClCompile Include="src\Rendering\Mesh.cpp" />
     <ClCompile Include="src\Core\MessageParser.cpp" />
+    <ClCompile Include="src\Core\SystemManager.cpp" />
+    <ClCompile Include="src\Rendering\Renderer.cpp" />
     <ClCompile Include="src\Network\Command.cpp" />
     <ClCompile Include="src\Network\GameState.cpp" />
     <ClCompile Include="src\Network\GameStateManager.cpp" />
@@ -238,6 +240,8 @@
     <ClInclude Include="include\Rendering\ShaderProgramLoader.h" />
     <ClInclude Include="include\Core\SystemManager.h" />
     <ClInclude Include="include\Rendering\Texture.h" />
+    <ClInclude Include="include\Rendering\MeshTextureLoader.h" />
+    <ClInclude Include="include\Rendering\Renderer.h" />
     <ClInclude Include="include\Core\Transform.h" />
     <ClInclude Include="include\Utils\utils.h" />
   </ItemGroup>

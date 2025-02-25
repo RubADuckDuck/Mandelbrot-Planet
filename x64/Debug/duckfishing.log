@@ -1,82 +1,59 @@
 ﻿  Animation.cpp
-  ApplicationConfig.cpp
   Event.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   GameEngine.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
 E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
-  GameMode.cpp
-  GameModeController.cpp
+  GameObject.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
 E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
-  GameObject.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
   GlobalMappings.cpp
-  GridManager.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
   GroundType.h
   HostLobbyMode.cpp
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
   HostPlayingMode.cpp
-  ImageLoader.cpp
   Item.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
   JoinLobbyMode.cpp
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-  JoinPlayingMode.cpp
-  LOG.cpp
-  MainMenuMode.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
-  main_game.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
-  Mesh.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(153,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(185,34): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(206,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Mesh.cpp(253,27): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  Generating Code...
-  Compiling...
-  MessageParser.cpp
-  SystemManager.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\SystemManager.cpp(1,10): fatal  error C1083: Cannot open include file: 'SystemManager.h': No such file or directory
   Renderer.cpp
-c1xx : fatal  error C1083: Cannot open source file: 'src\Rendering\Renderer.cpp': No such file or directory
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Renderer.cpp(379,73): warning C4305: '+=': truncation from 'double' to 'float'
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Renderer.cpp(420,41): warning C4101: 'currGrandParent': unreferenced local variable
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Rendering\Renderer.cpp(672,73): warning C4305: '+=': truncation from 'double' to 'float'
   Command.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   GameState.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   GameStateManager.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   NetworkMessage.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   UDPClient.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   UDPServer.cpp
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
   PlayerDirection.cpp
-  PlayingMode.cpp
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\glad\glad.h(650,1): message : see previous definition of 'APIENTRY'
   RidableObject.cpp
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\RidableObject.cpp(56,13): warning C4244: '=': conversion from '__int64' to 'uint8_t', possible loss of data
   RidableObject.h
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\include\Core\GridManager.h(8,10): fatal  error C1083: Cannot open include file: 'LOG.h': No such file or directory
-  ShaderProgramLoader.cpp
-  stb_image.h
-  Texture.cpp
-  Transform.cpp
-  utils.cpp
   Generating Code...
+E:\proj\[gameproj]\dst_dir_organized\DuckFishing\src\Core\GameObject.cpp(130): warning C4172: returning address of local variable or temporary: temp
+  glad.c
+x64\Debug\RidableObject.obj : warning LNK4042: object specified more than once; extras ignored
+  duckfishing.vcxproj -> E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\duckfishing.exe

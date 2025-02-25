@@ -59,7 +59,8 @@ public:
 		// Adjust interpolation factor based on the difference
 		float interpolationFactor = norm > threshold ? 0.5f : 0.0f;
 
-		resultMat = glm::mix(prevGridTransform_, currTransformMat, interpolationFactor);
+		resultMat = prevGridTransform_ * (1.0f - interpolationFactor) +
+			currTransformMat * interpolationFactor;
 
 		prevGridTransform_ = resultMat;
 

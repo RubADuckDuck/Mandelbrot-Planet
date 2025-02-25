@@ -1,8 +1,8 @@
 #pragma once
-#include "LOG.h" 
+#include "Utils/LOG.h" 
 #include "Network/GameState.h"
 #include <stack>
-#include "MeshTextureLoader.h"
+#include "Rendering/MeshTextureLoader.h"
 
 
 
@@ -34,6 +34,8 @@ public:
     Renderer(GameState* gameState);
 
     void SetTransformationsForEachGameObject();
+
+    void SetTransformationChainForEachGameObject();
 
     void DrawDepth(uint32_t objID, uint8_t descendDepth);
 

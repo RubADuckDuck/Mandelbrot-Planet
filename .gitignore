@@ -1,2 +1,5 @@
 # ignore vs code thing 
 .vs/
+
+# ignore build 
+x64/

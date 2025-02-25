@@ -1,4 +1,4 @@
-#include "Renderer.h"
+#include "Rendering/Renderer.h"
 #include "Network/GameState.h"
 #include <string>
 #include <sstream>
@@ -380,13 +380,11 @@ void Renderer::DrawDepth(uint32_t objID, uint8_t descendDepth) {
                                 itpValue = currChildObj->interpolationValue_;
 
                                 currGridTransformMat = (1 - itpValue) * currChildObj->prevGridTransform_
-                                    + itpValue * currGrizzzz
+                                    + itpValue; // * currGrizzzz // what was I about to finish?
                             }
 
                             
                             currGridTransformMat = currRidable->GetGridTransformAt(index); 
-
-                            t
 
                             // no interpolation ----------------------------------------------
                             
@@ -464,10 +462,10 @@ void Renderer::DrawDepth(uint32_t objID, uint8_t descendDepth) {
                             // add to frontier 
                             obj_stack.push(currChildObj);
 
-                            transform_matrix_stack.push()
+                            //transform_matrix_stack.push()
 
-                            // increase number of object in current depth
-                            n_frontier[currDepthIndex] += 1;
+                            //// increase number of object in current depth
+                            //n_frontier[currDepthIndex] += 1;
                         }
                     }
                 }
@@ -675,7 +673,7 @@ void Renderer::DrawRespectTo(uint32_t objID, uint8_t ascendLevels, uint8_t desce
                                 itpValue = currChildObj->interpolationValue_; 
 
                                 currGridTransformMat = (1 - itpValue) * currChildObj->prevGridTransform_
-                                    + itpValue * currGrizzzz
+                                    + itpValue; // *currGrizzzz // what is this currGrizzzz......
                             }
 
                             currGridTransformMat = currRidable->GetGridTransformAt(index);

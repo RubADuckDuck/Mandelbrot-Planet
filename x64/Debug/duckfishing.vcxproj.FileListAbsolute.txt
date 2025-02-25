@@ -1,2 +1,0 @@
-E:\proj\[gameproj]\DontStarve\DuckFishing\x64\Debug\duckfishing.exe
-E:\proj\[gameproj]\dst_dir_organized\DuckFishing\x64\Debug\duckfishing.exe

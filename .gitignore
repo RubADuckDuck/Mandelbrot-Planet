@@ -3,3 +3,7 @@
 
 # ignore build 
 x64/
+
+SDL2.dll 
+glad.zip
+assimp-vc143-mt.dll

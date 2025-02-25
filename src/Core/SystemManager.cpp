@@ -1,4 +1,4 @@
-#include "SystemManager.h"
+#include "Core/SystemManager.h"
 
 void GetOpenGLVersionInfo() {
     glGetString(GL_RENDERER);
